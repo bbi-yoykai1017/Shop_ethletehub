@@ -5,23 +5,24 @@ $db = new Database();
 $conn = $db->connect();
 $items = getallproduct($conn);
 ?>
-
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách sản phẩm - AthleteHub</title>
-    
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/products-page.css">
 </head>
+
 <body>
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg">
@@ -30,11 +31,11 @@ $items = getallproduct($conn);
                 <i class="fas fa-dumbbell"></i>
                 AthleteHub
             </a>
-            
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
@@ -53,18 +54,18 @@ $items = getallproduct($conn);
                         <a class="nav-link" href="#contact">Liên hệ</a>
                     </li>
                 </ul>
-                
+
                 <div class="navbar-right d-flex align-items-center">
                     <div class="nav-notification">
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">2</span>
                     </div>
-                    
+
                     <div class="cart-icon">
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count">0</span>
                     </div>
-                    
+
                     <div class="user-account">
                         <i class="fas fa-user-circle"></i>
                     </div>
@@ -262,15 +263,15 @@ $items = getallproduct($conn);
                         <nav aria-label="Page navigation">
                             <ul class="pagination">
                                 <li class="page-item"><a class="page-link" href="#">
-                                    <i class="fas fa-chevron-left"></i> Trước
-                                </a></li>
+                                        <i class="fas fa-chevron-left"></i> Trước
+                                    </a></li>
                                 <li class="page-item active"><a class="page-link" href="#">1</a></li>
                                 <li class="page-item"><a class="page-link" href="#">2</a></li>
                                 <li class="page-item"><a class="page-link" href="#">3</a></li>
                                 <li class="page-item"><a class="page-link" href="#">4</a></li>
                                 <li class="page-item"><a class="page-link" href="#">
-                                    Tiếp <i class="fas fa-chevron-right"></i>
-                                </a></li>
+                                        Tiếp <i class="fas fa-chevron-right"></i>
+                                    </a></li>
                             </ul>
                         </nav>
                     </div>
@@ -349,6 +350,11 @@ $items = getallproduct($conn);
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Kiểm tra nếu chưa có thì mới gán, dùng 'var' hoặc gán thẳng vào 'window'
+    window.allProducts = <?php echo json_encode($items); ?>;
+</script>
     <script src="js/products-page.js"></script>
 </body>
+
 </html>

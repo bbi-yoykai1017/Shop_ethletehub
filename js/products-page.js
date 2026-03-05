@@ -1,134 +1,3 @@
-// ===========================
-// PRODUCTS PAGE JAVASCRIPT
-// ===========================
-
-// Sample Products Data
-const allProducts = [
-    {
-        id: 1,
-        name: 'Áo tập Pro Performance',
-        category: 'quan-ao',
-        price: 299000,
-        originalPrice: 429000,
-        rating: 4.8,
-        reviews: 120,
-        image: 'https://via.placeholder.com/200?text=Product+1'
-    },
-    {
-        id: 2,
-        name: 'Giày chạy Elite Runner',
-        category: 'giay',
-        price: 1299000,
-        originalPrice: 1599000,
-        rating: 4.9,
-        reviews: 95,
-        image: 'https://via.placeholder.com/200?text=Product+2'
-    },
-    {
-        id: 3,
-        name: 'Tạ tay đôi 10KG',
-        category: 'thiet-bi',
-        price: 499000,
-        originalPrice: 499000,
-        rating: 4.7,
-        reviews: 78,
-        image: 'https://via.placeholder.com/200?text=Product+3'
-    },
-    {
-        id: 4,
-        name: 'Kính bảo vệ UV',
-        category: 'phu-kien',
-        price: 299000,
-        originalPrice: 349000,
-        rating: 4.6,
-        reviews: 64,
-        image: 'https://via.placeholder.com/200?text=Product+4'
-    },
-    {
-        id: 5,
-        name: 'Bình nước thể thao 1L',
-        category: 'phu-kien',
-        price: 149000,
-        originalPrice: 149000,
-        rating: 4.9,
-        reviews: 112,
-        image: 'https://via.placeholder.com/200?text=Product+5'
-    },
-    {
-        id: 6,
-        name: 'Quần tập thể thao',
-        category: 'quan-ao',
-        price: 349000,
-        originalPrice: 499000,
-        rating: 4.8,
-        reviews: 88,
-        image: 'https://via.placeholder.com/200?text=Product+6'
-    },
-    {
-        id: 7,
-        name: 'Áo tập Casual',
-        category: 'quan-ao',
-        price: 199000,
-        originalPrice: 249000,
-        rating: 4.7,
-        reviews: 85,
-        image: 'https://via.placeholder.com/200?text=Product+7'
-    },
-    {
-        id: 8,
-        name: 'Áo tập Marathon',
-        category: 'quan-ao',
-        price: 249000,
-        originalPrice: 299000,
-        rating: 4.6,
-        reviews: 56,
-        image: 'https://via.placeholder.com/200?text=Product+8'
-    },
-    {
-        id: 9,
-        name: 'Áo tập Mesh',
-        category: 'quan-ao',
-        price: 279000,
-        originalPrice: 329000,
-        rating: 4.9,
-        reviews: 102,
-        image: 'https://via.placeholder.com/200?text=Product+9'
-    },
-    {
-        id: 10,
-        name: 'Áo tập Premium',
-        category: 'quan-ao',
-        price: 349000,
-        originalPrice: 449000,
-        rating: 4.8,
-        reviews: 78,
-        image: 'https://via.placeholder.com/200?text=Product+10'
-    },
-    {
-        id: 11,
-        name: 'Giày chạy Marathon',
-        category: 'giay',
-        price: 999000,
-        originalPrice: 1199000,
-        rating: 4.8,
-        reviews: 92,
-        image: 'https://via.placeholder.com/200?text=Product+11'
-    },
-    {
-        id: 12,
-        name: 'Giày bóng rổ Pro',
-        category: 'giay',
-        price: 899000,
-        originalPrice: 999000,
-        rating: 4.7,
-        reviews: 67,
-        image: 'https://via.placeholder.com/200?text=Product+12'
-    }
-];
-
-// ===========================
-// FILTER STATE
-// ===========================
 
 let filterState = {
     category: 'all',
@@ -145,29 +14,37 @@ let filterState = {
 
 function renderProducts() {
     const grid = document.getElementById('productsGrid');
-    let filteredProducts = filterProducts();
+    // Quan trọng: Lấy dữ liệu từ window.allProducts mà PHP đã đổ vào
+    const data = window.allProducts || []; 
     
+    let filteredProducts = filterProducts(data);
+
+    if (!grid) return; // Tránh lỗi nếu không tìm thấy thẻ grid
+
     if (filteredProducts.length === 0) {
-        grid.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h3>Không tìm thấy sản phẩm</h3><p>Vui lòng thay đổi bộ lọc của bạn</p></div>';
+        grid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 50px;"><i class="fas fa-search fa-3x"></i><h3>Không tìm thấy sản phẩm</h3><p>Vui lòng thay đổi bộ lọc của bạn</p></div>';
+        document.getElementById('showingCount').textContent = 0;
         return;
     }
-    
+
     grid.innerHTML = filteredProducts.map(product => `
         <div class="product-card-page">
             <div class="product-image-page">
-                <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
                 ${getDiscountBadge(product)}
             </div>
             <div class="product-info-page">
                 <div class="product-category-page">${getCategoryLabel(product.category)}</div>
                 <h3 class="product-name-page">${product.name}</h3>
                 <div class="rating-page">
-                    ${getStarRating(product.rating)}
-                    <span>(${product.reviews})</span>
+                    ${getStarRating(Number(product.rating))} 
+                    <span>(${product.reviews || 0})</span>
                 </div>
                 <div class="product-price-page">
                     <span class="price-current-page">${formatPrice(product.price)}</span>
-                    ${product.originalPrice !== product.price ? `<span class="price-original-page">${formatPrice(product.originalPrice)}</span>` : ''}
+                    ${(product.originalPrice && Number(product.originalPrice) > Number(product.price)) 
+                        ? `<span class="price-original-page">${formatPrice(product.originalPrice)}</span>` 
+                        : ''}
                 </div>
                 <button class="btn-page-add" onclick="addToCart(${product.id})">
                     <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
@@ -175,8 +52,7 @@ function renderProducts() {
             </div>
         </div>
     `).join('');
-    
-    // Update showing count
+
     document.getElementById('showingCount').textContent = filteredProducts.length;
 }
 
@@ -184,50 +60,53 @@ function renderProducts() {
 // FILTER PRODUCTS
 // ===========================
 
-function filterProducts() {
-    let filtered = allProducts.filter(product => {
+function filterProducts(data) {
+    let filtered = data.filter(product => {
+        // Ép kiểu số để so sánh chính xác
+        const pPrice = Number(product.price);
+        const pRating = Math.round(Number(product.rating));
+
         // Category filter
         if (filterState.category !== 'all' && product.category !== filterState.category) {
             return false;
         }
-        
+
         // Search filter
         if (filterState.search && !product.name.toLowerCase().includes(filterState.search.toLowerCase())) {
             return false;
         }
-        
+
         // Price filter
-        if (product.price > filterState.maxPrice) {
+        if (pPrice > filterState.maxPrice) {
             return false;
         }
-        
+
         // Rating filter
         if (filterState.ratings.length > 0) {
-            const productRating = Math.round(product.rating);
-            if (!filterState.ratings.includes(productRating)) {
+            if (!filterState.ratings.includes(pRating)) {
                 return false;
             }
         }
-        
+
         return true;
     });
-    
+
     // Sort
     filtered.sort((a, b) => {
+        const priceA = Number(a.price);
+        const priceB = Number(b.price);
+        const ratingA = Number(a.rating);
+        const ratingB = Number(b.rating);
+
         switch (filterState.sortBy) {
-            case 'price-low':
-                return a.price - b.price;
-            case 'price-high':
-                return b.price - a.price;
-            case 'rating':
-                return b.rating - a.rating;
-            case 'newest':
-                return b.id - a.id;
-            default:
-                return 0;
+            case 'price-low': return priceA - priceB;
+            case 'price-high': return priceB - priceA;
+            case 'rating': return ratingB - ratingA;
+            case 'newest': return b.id - a.id;
+            default: return 0;
         }
     });
-    
+
     return filtered;
 }
 
@@ -237,7 +116,7 @@ function filterProducts() {
 
 // Category Filter
 document.querySelectorAll('.category-filter').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
+    checkbox.addEventListener('change', function () {
         if (this.value === 'all') {
             filterState.category = 'all';
         } else {
@@ -248,13 +127,13 @@ document.querySelectorAll('.category-filter').forEach(checkbox => {
 });
 
 // Search Filter
-document.getElementById('searchInput')?.addEventListener('input', function() {
+document.getElementById('searchInput')?.addEventListener('input', function () {
     filterState.search = this.value;
     renderProducts();
 });
 
 // Price Range
-document.getElementById('priceRange')?.addEventListener('input', function() {
+document.getElementById('priceRange')?.addEventListener('input', function () {
     filterState.maxPrice = parseInt(this.value);
     document.getElementById('maxPrice').textContent = formatPrice(this.value);
     renderProducts();
@@ -262,7 +141,7 @@ document.getElementById('priceRange')?.addEventListener('input', function() {
 
 // Rating Filter
 document.querySelectorAll('.rating-filter').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
+    checkbox.addEventListener('change', function () {
         if (this.checked) {
             filterState.ratings.push(parseInt(this.value));
         } else {
@@ -273,13 +152,13 @@ document.querySelectorAll('.rating-filter').forEach(checkbox => {
 });
 
 // Sort
-document.getElementById('sortBy')?.addEventListener('change', function() {
+document.getElementById('sortBy')?.addEventListener('change', function () {
     filterState.sortBy = this.value;
     renderProducts();
 });
 
 // Clear Filters
-document.getElementById('clearFilters')?.addEventListener('click', function() {
+document.getElementById('clearFilters')?.addEventListener('click', function () {
     filterState = {
         category: 'all',
         search: '',
@@ -288,15 +167,15 @@ document.getElementById('clearFilters')?.addEventListener('click', function() {
         ratings: [],
         sortBy: 'popular'
     };
-    
+
     document.getElementById('searchInput').value = '';
     document.getElementById('priceRange').value = 2000000;
     document.getElementById('maxPrice').textContent = formatPrice(2000000);
     document.getElementById('sortBy').value = 'popular';
-    
+
     document.querySelectorAll('.category-filter').forEach(cb => cb.checked = cb.value === 'all');
     document.querySelectorAll('.rating-filter').forEach(cb => cb.checked = false);
-    
+
     renderProducts();
     showNotification('Đã xóa tất cả bộ lọc', 'info');
 });
@@ -328,19 +207,19 @@ function getStarRating(rating) {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
     let html = '';
-    
+
     for (let i = 0; i < fullStars; i++) {
         html += '<i class="fas fa-star"></i>';
     }
-    
+
     if (hasHalfStar) {
         html += '<i class="fas fa-star-half"></i>';
     }
-    
+
     for (let i = fullStars + (hasHalfStar ? 1 : 0); i < 5; i++) {
         html += '<i class="far fa-star"></i>';
     }
-    
+
     return html;
 }
 
@@ -355,9 +234,9 @@ function getDiscountBadge(product) {
 function addToCart(productId) {
     const product = allProducts.find(p => p.id === productId);
     if (!product) return;
-    
+
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    
+
     const cartItem = {
         id: product.id,
         name: product.name,
@@ -365,10 +244,10 @@ function addToCart(productId) {
         quantity: 1,
         image: product.image
     };
-    
+
     cart.push(cartItem);
     localStorage.setItem('cart', JSON.stringify(cart));
-    
+
     updateCartCount();
     showNotification(`${product.name} đã được thêm vào giỏ hàng!`, 'success');
 }
@@ -391,9 +270,9 @@ function showNotification(message, type = 'info') {
     notification.style.minWidth = '300px';
     notification.style.animation = 'slideInRight 0.3s ease-out';
     notification.textContent = message;
-    
+
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease-out';
         setTimeout(() => {
@@ -402,11 +281,13 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
+console.log(allProducts);
+
 // ===========================
 // INITIALIZE
 // ===========================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     renderProducts();
     updateCartCount();
     console.log('✅ Trang danh sách sản phẩm đã được khởi tạo!');
