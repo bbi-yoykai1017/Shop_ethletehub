@@ -107,11 +107,15 @@ document.querySelectorAll('.btn-quick-view').forEach(button => {
     button.addEventListener('click', function(e) {
         e.preventDefault();
         const productCard = this.closest('.product-card');
-        const productName = productCard.querySelector('.product-name').textContent;
-        const productPrice = productCard.querySelector('.price-current').textContent;
-        const productCategory = productCard.querySelector('.product-category').textContent;
+        const productId = productCard.getAttribute('data-product-id');
         
-        showQuickViewModal(productName, productPrice, productCategory);
+        // Redirect to product detail page with product ID
+        if (productId) {
+            window.location.href = 'product-detail.html?id=' + productId;
+        } else {
+            // Fallback: redirect to product detail page
+            window.location.href = 'product-detail.html';
+        }
     });
 });
 

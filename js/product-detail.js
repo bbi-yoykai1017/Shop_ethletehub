@@ -3,6 +3,123 @@
 // ===========================
 
 // ===========================
+// PRODUCT DATABASE
+// ===========================
+
+const products = [
+    {
+        id: 1,
+        name: 'Áo tập Pro Performance',
+        category: 'Quần áo',
+        price: 299000,
+        originalPrice: 429000,
+        discount: 30,
+        icon: 'fa-shirt',
+        rating: 4.8,
+        reviews: 120,
+        description: 'Áo tập luyện cao cấp với công nghệ hút ẩm tiên tiến'
+    },
+    {
+        id: 2,
+        name: 'Giày chạy Elite Runner',
+        category: 'Giày',
+        price: 1299000,
+        originalPrice: 1599000,
+        discount: 19,
+        icon: 'fa-shoe-prints',
+        rating: 4.9,
+        reviews: 95,
+        description: 'Giày chạy nhẹ với công nghệ đệm chân tối ưu'
+    },
+    {
+        id: 3,
+        name: 'Tạ tay đôi 10KG',
+        category: 'Thiết bị',
+        price: 499000,
+        originalPrice: null,
+        discount: 0,
+        icon: 'fa-dumbbell',
+        rating: 4.7,
+        reviews: 78,
+        description: 'Tạ tay chắc chắn với bề mặt cao su chống trượt'
+    },
+    {
+        id: 4,
+        name: 'Kính bảo vệ UV',
+        category: 'Phụ kiện',
+        price: 299000,
+        originalPrice: 349000,
+        discount: 15,
+        icon: 'fa-glasses',
+        rating: 4.6,
+        reviews: 64,
+        description: 'Kính chống UV 100% cho hoạt động ngoài trời'
+    },
+    {
+        id: 5,
+        name: 'Bình nước thể thao 1L',
+        category: 'Phụ kiện',
+        price: 149000,
+        originalPrice: null,
+        discount: 0,
+        icon: 'fa-water',
+        rating: 4.9,
+        reviews: 112,
+        description: 'Bình nước giữ nhiệt tốt, không chứa BPA'
+    },
+    {
+        id: 6,
+        name: 'Quần tập thể thao',
+        category: 'Quần áo',
+        price: 349000,
+        originalPrice: 499000,
+        discount: 25,
+        icon: 'fa-person-biking',
+        rating: 4.8,
+        reviews: 88,
+        description: 'Quần tập vải co giãn 4 chiều thoải mái'
+    }
+];
+
+// ===========================
+// GET PRODUCT BY ID
+// ===========================
+
+function getProductById(id) {
+    return products.find(product => product.id === parseInt(id));
+}
+
+// ===========================
+// LOAD PRODUCT FROM URL PARAMETER
+// ===========================
+
+function loadProductDetails() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    
+    const product = getProductById(productId) || products[0]; // Default to first product
+    
+    // Update page title
+    document.title = `${product.name} - AthleteHub`;
+    
+    // Update product details in HTML
+    const detailTitle = document.querySelector('.detail-title');
+    const priceCurrentElement = document.querySelector('.price-current');
+    const priceOriginalElement = document.querySelector('.price-original');
+    const productCategoryElement = document.querySelector('.product-category-detail');
+    
+    if (detailTitle) detailTitle.textContent = product.name;
+    if (priceCurrentElement) priceCurrentElement.textContent = product.price.toLocaleString('vi-VN') + '₫';
+    if (priceOriginalElement && product.originalPrice) {
+        priceOriginalElement.textContent = product.originalPrice.toLocaleString('vi-VN') + '₫';
+        priceOriginalElement.style.display = 'inline';
+    } else if (priceOriginalElement) {
+        priceOriginalElement.style.display = 'none';
+    }
+    if (productCategoryElement) productCategoryElement.textContent = product.category;
+}
+
+// ===========================
 // CHANGE PRODUCT IMAGE
 // ===========================
 
@@ -378,6 +495,11 @@ document.head.appendChild(style);
 // ===========================
 // INITIALIZE
 // ===========================
+
+// Load product details based on URL parameter
+document.addEventListener('DOMContentLoaded', function() {
+    loadProductDetails();
+});
 
 // Update cart count on page load
 updateCartCount();
