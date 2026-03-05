@@ -38,7 +38,7 @@ function renderProducts() {
                 <h3 class="product-name-page">${product.mo_ta}</h3>
                 <div class="rating-page">
                     ${getStarRating(Number(product.trung_binh_sao))} 
-                    <span>(${product.reviews || 0})</span>
+                    <span>(${product.so_luong_danh_gia || 0})</span>
                 </div>
                 <div class="product-price-page">
                     <span class="price-current-page">${formatPrice(product.gia)}</span>
