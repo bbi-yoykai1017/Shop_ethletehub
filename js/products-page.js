@@ -15,8 +15,8 @@ let filterState = {
 function renderProducts() {
     const grid = document.getElementById('productsGrid');
     // Quan trọng: Lấy dữ liệu từ window.allProducts mà PHP đã đổ vào
-    const data = window.allProducts || []; 
-    
+    const data = window.allProducts || [];
+
     let filteredProducts = filterProducts(data);
 
     if (!grid) return; // Tránh lỗi nếu không tìm thấy thẻ grid
@@ -30,7 +30,9 @@ function renderProducts() {
     grid.innerHTML = filteredProducts.map(product => `
         <div class="product-card-page">
             <div class="product-image-page">
-                <img src="${product.image}" alt="${product.mo_ta}" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
+                <img src="./public/${product.hinh_anh_chinh}" 
+     alt="${product.ten_san_pham}" 
+     onerror="this.src='./public/images/aoamnu.jpg'">
                 ${getDiscountBadge(product)}
             </div>
             <div class="product-info-page">
@@ -42,9 +44,9 @@ function renderProducts() {
                 </div>
                 <div class="product-price-page">
                     <span class="price-current-page">${formatPrice(product.gia)}</span>
-                    ${(product.gia_goc && Number(product.gia_goc) > Number(product.gia)) 
-                        ? `<span class="price-original-page">${formatPrice(product.gia_goc)}</span>` 
-                        : ''}
+                    ${(product.gia_goc && Number(product.gia_goc) > Number(product.gia))
+            ? `<span class="price-original-page">${formatPrice(product.gia_goc)}</span>`
+            : ''}
                 </div>
                 <button class="btn-page-add" onclick="addToCart(${product.id})">
                     <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
