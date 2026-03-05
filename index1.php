@@ -42,10 +42,10 @@
                 <!-- Left Navigation Links -->
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#home">Trang chủ</a>
+                        <a class="nav-link active" href="index1.php">Trang chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="products.html">Sản phẩm</a>
+                        <a class="nav-link" href="#products">Sản phẩm</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#categories">Danh mục</a>
@@ -267,7 +267,7 @@
             
             <div class="products-grid">
                 <!-- Product 1 -->
-                <div class="product-card" data-product-id="1">
+                <div class="product-card">
                     <div class="product-image">
                         <i class="fas fa-shirt"></i>
                         <span class="product-badge sale">-30%</span>
@@ -308,7 +308,7 @@
                 </div>
 
                 <!-- Product 2 -->
-                <div class="product-card" data-product-id="2">
+                <div class="product-card">
                     <div class="product-image">
                         <i class="fas fa-shoe-prints"></i>
                         <span class="product-badge new">Mới</span>
@@ -349,7 +349,7 @@
                 </div>
 
                 <!-- Product 3 -->
-                <div class="product-card" data-product-id="3">
+                <div class="product-card">
                     <div class="product-image">
                         <i class="fas fa-dumbbell"></i>
                         <span class="product-badge">Hot</span>
@@ -388,7 +388,7 @@
                 </div>
 
                 <!-- Product 4 -->
-                <div class="product-card" data-product-id="4">
+                <div class="product-card">
                     <div class="product-image">
                         <i class="fas fa-glasses"></i>
                         <span class="product-badge sale">-15%</span>
@@ -429,7 +429,7 @@
                 </div>
 
                 <!-- Product 5 -->
-                <div class="product-card" data-product-id="5">
+                <div class="product-card">
                     <div class="product-image">
                         <i class="fas fa-water"></i>
                         <span class="product-badge new">Mới</span>
@@ -468,7 +468,7 @@
                 </div>
 
                 <!-- Product 6 -->
-                <div class="product-card" data-product-id="6">
+                <div class="product-card">
                     <div class="product-image">
                         <i class="fas fa-person-biking"></i>
                         <span class="product-badge sale">-25%</span>
@@ -509,10 +509,10 @@
                 </div>
             </div>
             
-            <div class="view-all-btn">
-                <button class="btn-custom btn-primary-custom">
+            <div class="view-all-btn" >
+                <button class="btn-custom btn-primary-custom" onclick="window.location.href='products.php'">             
                     <i class="fas fa-arrow-right"></i>
-                    Xem tất cả sản phẩm
+                   Xem tất cả sản phẩm 
                 </button>
             </div>
         </div>
