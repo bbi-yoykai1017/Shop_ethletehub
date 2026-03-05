@@ -41,9 +41,9 @@ function renderProducts() {
                     <span>(${product.reviews || 0})</span>
                 </div>
                 <div class="product-price-page">
-                    <span class="price-current-page">${formatPrice(product.price)}</span>
-                    ${(product.originalPrice && Number(product.originalPrice) > Number(product.price)) 
-                        ? `<span class="price-original-page">${formatPrice(product.originalPrice)}</span>` 
+                    <span class="price-current-page">${formatPrice(product.gia)}</span>
+                    ${(product.gia_goc && Number(product.gia_goc) > Number(product.gia)) 
+                        ? `<span class="price-original-page">${formatPrice(product.gia_goc)}</span>` 
                         : ''}
                 </div>
                 <button class="btn-page-add" onclick="addToCart(${product.id})">
