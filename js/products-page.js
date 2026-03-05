@@ -30,12 +30,12 @@ function renderProducts() {
     grid.innerHTML = filteredProducts.map(product => `
         <div class="product-card-page">
             <div class="product-image-page">
-                <img src="${product.image}" alt="${product.ten}" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
+                <img src="${product.image}" alt="${product.mo_ta}" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
                 ${getDiscountBadge(product)}
             </div>
             <div class="product-info-page">
-                <div class="product-category-page">${getCategoryLabel(product.category)}</div>
-                <h3 class="product-name-page">${product.ten}</h3>
+                <div class="product-category-page">${getCategoryLabel(product.ten)}</div>
+                <h3 class="product-name-page">${product.mo_ta}</h3>
                 <div class="rating-page">
                     ${getStarRating(Number(product.trung_binh_sao))} 
                     <span>(${product.reviews || 0})</span>
