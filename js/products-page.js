@@ -37,7 +37,7 @@ function renderProducts() {
                 <div class="product-category-page">${getCategoryLabel(product.category)}</div>
                 <h3 class="product-name-page">${product.ten}</h3>
                 <div class="rating-page">
-                    ${getStarRating(Number(product.rating))} 
+                    ${getStarRating(Number(product.trung_binh_sao))} 
                     <span>(${product.reviews || 0})</span>
                 </div>
                 <div class="product-price-page">
