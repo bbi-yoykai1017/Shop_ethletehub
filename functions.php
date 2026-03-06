@@ -72,7 +72,25 @@ function formatPrice($price) {
     return number_format($price, 0, ',', '.') . '₫';
 }
 
-// ham lay chi tiet san pham theo id 
+// Hàm xử lý sản phẩm - thêm các trường tính toán
+function processProducts($products) {
+    return array_map(function($p) {
+        $p['categoryLabel'] = getCategoryLabel($p['category']);
+        $p['rating'] = floatval($p['rating']);
+        $p['originalPrice'] = floatval($p['originalPrice']);
+        $p['price'] = floatval($p['price']);
+        
+        // Tính discount
+        $p['discount'] = 0;
+        if ($p['originalPrice'] > $p['price'] && $p['originalPrice'] > 0) {
+            $p['discount'] = round((($p['originalPrice'] - $p['price']) / $p['originalPrice']) * 100);
+        }
+        
+        return $p;
+    }, $products);
+}
+
+// ham lay chi tiet san pham theo id
 function getProductById($conn,$id) {
      // truy van lay chi tiet san pham
  $sql = "SELECT * FROM san_pham WHERE id = :id";

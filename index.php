@@ -6,17 +6,11 @@ $db = new Database();
 $conn = $db->connect();
 $products = getallproduct($conn);
 
+// Xử lý sản phẩm - thêm các trường tính toán
+$products = processProducts($products);
+
 // Giới hạn hiển thị 6 sản phẩm
 $displayProducts = array_slice($products, 0, 6);
-
-$categoryLabel = getCategoryLabel($product['category']);
-$rating = floatval($product['rating']);
-$originalPrice = floatval($product['originalPrice']);
-$price = floatval($product['price']);
-$discount = 0;
-if ($originalPrice > $price && $originalPrice > 0) {
-    $discount = round((($originalPrice - $price) / $originalPrice) * 100);
-}
 ?>
 
 
@@ -302,27 +296,27 @@ if ($originalPrice > $price && $originalPrice > 0) {
                             <?php else: ?>
                                 <i class="fas fa-shirt"></i>
                             <?php endif; ?>
-                            <?php if ($discount > 0): ?>
-                                <span class="product-badge sale">-<?php echo $discount; ?>%</span>
+                            <?php if ($product['discount'] > 0): ?>
+                                <span class="product-badge sale">-<?php echo $product['discount']; ?>%</span>
                             <?php endif; ?>
                             <span class="product-rating">
                                 <i class="fas fa-star"></i>
-                                <?php echo number_format($rating, 1); ?>
+                                <?php echo number_format($product['rating'], 1); ?>
                             </span>
                             <button class="btn-quick-view">Xem nhanh</button>
                         </div>
                         <div class="product-info">
-                            <div class="product-category"><?php echo $categoryLabel; ?></div>
+                            <div class="product-category"><?php echo $product['categoryLabel']; ?></div>
                             <h3 class="product-name"><?php echo htmlspecialchars($product['name']); ?></h3>
                             <div class="rating-stars">
-                                <?php echo getStarRating($rating); ?>
+                                <?php echo getStarRating($product['rating']); ?>
                                 <span class="rating-text">(<?php echo $product['so_luong_danh_gia'] ?? 0; ?>)</span>
                             </div>
                             <div class="product-price">
-                                <span class="price-current"><?php echo formatPrice($price); ?></span>
-                                <?php if ($originalPrice > $price): ?>
-                                    <span class="price-original"><?php echo formatPrice($originalPrice); ?></span>
-                                    <span class="price-discount">-<?php echo $discount; ?>%</span>
+                                <span class="price-current"><?php echo formatPrice($product['price']); ?></span>
+                                <?php if ($product['originalPrice'] > $product['price']): ?>
+                                    <span class="price-original"><?php echo formatPrice($product['originalPrice']); ?></span>
+                                    <span class="price-discount">-<?php echo $product['discount']; ?>%</span>
                                 <?php endif; ?>
                             </div>
                             <p class="product-description"><?php echo htmlspecialchars($product['description'] ?? ''); ?>
