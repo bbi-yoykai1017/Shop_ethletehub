@@ -30,7 +30,7 @@ function renderProducts() {
     grid.innerHTML = filteredProducts.map(product => `
         <div class="product-card-page">
             <div class="product-image-page">
-                <img src="./public/${product.hinh_anh_chinh}" 
+            <img src="./public/${product.hinh_anh_chinh}" ~ 
      alt="${product.ten_san_pham}" 
      onerror="this.src='./public/images/aoamnu.jpg'">
                 ${getDiscountBadge(product)}

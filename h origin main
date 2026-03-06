@@ -1,0 +1,108 @@
+[33mcommit a6ea41543a441f63406ca1eb792e4fce65a2e785[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: td130999-cell <td130999@gmail.com>
+Date:   Fri Mar 6 15:37:15 2026 +0700
+
+    Xoa file ad va cap nhat products-page
+
+[33mcommit f3adee6217956b9e044cc9e26adb7a73b513ef00[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: isonekai <leanhtuan02072006@gmail.com>
+Date:   Thu Mar 5 16:32:49 2026 +0700
+
+    toa file mới
+
+[33mcommit d6d189a9f6f52b388d2c860f5182825de7851938[m
+Author: td130999-cell <td130999@gmail.com>
+Date:   Thu Mar 5 16:22:22 2026 +0700
+
+    function renderProducts update ham
+
+[33mcommit aa19ef5308d750188da08f1d7039ce7e69cb0139[m
+Author: td130999-cell <td130999@gmail.com>
+Date:   Thu Mar 5 16:02:19 2026 +0700
+
+    reviews- so luong dnah gia
+
+[33mcommit c0f91b8913c592c3d3e0917401129ee67002e776[m
+Author: td130999-cell <td130999@gmail.com>
+Date:   Thu Mar 5 16:01:24 2026 +0700
+
+    category -  gia
+
+[33mcommit 325e6fe030e747214d6f1ed0765aedd98c0a7c7c[m
+Author: td130999-cell <td130999@gmail.com>
+Date:   Thu Mar 5 15:55:14 2026 +0700
+
+    originalPrice - thanh gia goc  price - thanh gia
+
+[33mcommit 4ce58bff9523d7f3a14df95da5443c64d80adaa2[m
+Author: td130999-cell <td130999@gmail.com>
+Date:   Thu Mar 5 15:51:42 2026 +0700
+
+    js product doi rating  trung binh sao
+
+[33mcommit 06763f6287e96d1269e8910e3064d2f69871e423[m
+Author: td130999-cell <td130999@gmail.com>
+Date:   Thu Mar 5 15:44:28 2026 +0700
+
+    doi name thanh ten trong js product - pages
+
+[33mcommit 07b66a09322b323784bcda9d3f3b2de361cea6d7[m
+Author: td130999-cell <td130999@gmail.com>
+Date:   Thu Mar 5 15:40:08 2026 +0700
+
+    sua  ham render  fiter product js-product_pages  , them lenh lay ben product.php
+
+[33mcommit 95c293900fcb49f56535c342dca274b76a074e51[m
+Author: td130999-cell <td130999@gmail.com>
+Date:   Thu Mar 5 14:55:48 2026 +0700
+
+    update
+    
+    sua data
+
+[33mcommit 15821edffb5102c94bbcfb3b61b5b56a35d3ecb8[m
+Merge: 260620f a9d89de
+Author: td130999-cell <td130999@gmail.com>
+Date:   Thu Mar 5 14:42:57 2026 +0700
+
+    Merge branch 'main' of https://github.com/bbi-yoykai1017/Shop_ethletehub
+
+[33mcommit 260620fc09bc58db41cbe85ab3462fffc2bd6d4c[m
+Author: td130999-cell <td130999@gmail.com>
+Date:   Thu Mar 5 14:42:28 2026 +0700
+
+    update
+    
+    Database, index1.php products.php , images
+
+[33mcommit a9d89defa8da7c133e61f1a982a4735d2a0ddd39[m
+Author: isonekai <leanhtuan02072006@gmail.com>
+Date:   Wed Mar 4 21:53:01 2026 +0700
+
+    fix sự kiện chuyển sang trang xem chi tiết của từng sản phẩm
+
+[33mcommit 42fa0f41dd367d157a15c3ce4201ed173b962d35[m
+Author: isonekai <leanhtuan02072006@gmail.com>
+Date:   Wed Mar 4 20:37:00 2026 +0700
+
+    update
+
+[33mcommit c9c631e1ba4696277f13c6ed9bcac1adec4e1a07[m
+Author: isonekai <leanhtuan02072006@gmail.com>
+Date:   Tue Mar 3 20:52:16 2026 +0700
+
+    update
+
+[33mcommit b3435d8330a9a3e9e1c3404bfa0770b6c0bccb95[m
+Author: isonekai <leanhtuan02072006@gmail.com>
+Date:   Tue Mar 3 20:49:15 2026 +0700
+
+    khởi tạo dự án
+    
+    tạo giao diện, database
+
+[33mcommit d661b7dbc02e0e930c828d28a62a1d7cdc04da81[m
+Author: isonekai <leanhtuan02072006@gmail.com>
+Date:   Tue Mar 3 20:48:01 2026 +0700
+
+    Initial commit
