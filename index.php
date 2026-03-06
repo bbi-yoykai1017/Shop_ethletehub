@@ -93,7 +93,7 @@ $displayProducts = array_slice($products, 0, 6);
                         <span class="notification-badge">2</span>
                     </div>
 
-                    <div class="cart-icon" onclick="window.location.href='cart.html'">
+                    <div class="cart-icon" onclick="window.location.href='cart.php'">
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count">0</span>
                     </div>
@@ -389,11 +389,10 @@ $displayProducts = array_slice($products, 0, 6);
                         <div class="footer-section">
                             <h4 class="footer-title">Liên kết nhanh</h4>
                             <ul class="footer-links">
-                                <li><a href="#"><i class="fas fa-angle-right"></i>Trang chủ</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right"></i>Sản phẩm</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right"></i>Danh mục</a></li>
+                                <li><a href="index.php"><i class="fas fa-angle-right"></i>Trang chủ</a></li>
+                                <li><a href="products.php"><i class="fas fa-angle-right"></i>Sản phẩm</a></li>
+                                <li><a href="#categories"><i class="fas fa-angle-right"></i>Danh mục</a></li>
                                 <li><a href="#"><i class="fas fa-angle-right"></i>Về chúng tôi</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right"></i>Blog</a></li>
                             </ul>
                         </div>
                     </div>

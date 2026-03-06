@@ -629,9 +629,10 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                 </div>
             </div>
             <div class="footer-bottom">
-                <div class="footer-bottom-content">
-                    <div class="footer-copyright">&copy; 2024 <strong>AthleteHub</strong>. Bảo lưu mọi quyền.</div>
-                </div>
+                 <div class="footer-copyright">
+                        &copy;
+                        <?php echo date("Y"); ?> <strong>AthleteHub</strong>. Bảo lưu mọi quyền.
+                    </div>
             </div>
         </div>
     </footer>
