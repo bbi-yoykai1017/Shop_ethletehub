@@ -819,40 +819,67 @@
     border-top: 2px solid var(--gray-light);
 }
 
+/* 1. Khung bao ngoài cùng */
 .product-card-small {
-    background: white;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-base);
+    display: flex;
+    flex-direction: column; 
+    height: 100%; 
+    border: 1px solid #eee; 
+    border-radius: 8px;
+    overflow: hidden; 
+    background: #fff;
+    transition: all 0.3s ease;
 }
 
 .product-card-small:hover {
     transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); /* Mình dùng mã màu bóng mờ tiêu chuẩn đề phòng biến --shadow-lg của bạn bị lỗi */
 }
 
+/* 2. Khung chứa ảnh */
 .product-image-small {
-    width: 100%;
-    height: 200px;
+    position: relative;
+    width: 147%;
+    height: 319px;
     background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 3rem;
     color: #999;
+    overflow: hidden;
 }
 
+.product-image-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ép ảnh vừa khít khung 200px mà không bị méo */
+    display: block;
+}
+
+/* 3. Phần chứa chữ và nút */
 .product-info-small {
-    padding: var(--spacing-lg);
+    padding: 15px;
+    display: flex;
+    flex-direction: column; 
+    flex-grow: 1; 
+    justify-content: space-between; 
 }
 
+/* 4. Tên sản phẩm */
 .product-info-small h4 {
     font-size: 1rem;
-    font-weight: var(--font-weight-bold);
-    color: var(--dark);
-    margin-bottom: var(--spacing-sm);
+    font-weight: 600; 
+    color: #333; 
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4; 
 }
+
 
 .price-small {
     margin-bottom: var(--spacing-md);
@@ -894,6 +921,19 @@
 
 .btn-add-quick:hover {
     background: var(--primary-dark);
+}
+
+
+.btn-view-detail {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    background: var(--primary); 
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: auto; 
 }
 
 /* Responsive */
