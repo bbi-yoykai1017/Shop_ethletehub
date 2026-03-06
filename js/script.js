@@ -111,10 +111,10 @@ document.querySelectorAll('.btn-quick-view').forEach(button => {
         
         // Redirect to product detail page with product ID
         if (productId) {
-            window.location.href = 'product-detail.html?id=' + productId;
+            window.location.href = 'product-detail.php?id=' + productId;
         } else {
             // Fallback: redirect to product detail page
-            window.location.href = 'product-detail.html';
+            window.location.href = 'product-detail.php';
         }
     });
 });
