@@ -1,37 +1,48 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require_once 'functions.php';
 require_once 'Database.php';
 
 $db = new Database();
 $conn = $db->connect();
-// lay id san pham tu url 
+
+// Lay id san pham tu URL
 $id = (int) isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-$product = getProductById($conn, $id);
+// Su dung ham lay chi tiet san pham
+$product = getProductDetail($conn, $id);
 
-// neu khong tim thay sam pham, chuyen huong ve trang chu 
+// Neu khong tim thay san pham, chuyen huong ve trang chu
 if (!$product) {
-    header("Location: index.html");
+    header("Location: index.php");
     exit();
 }
 
-// goi ham danh gia
+// Lay danh gia
 $reviews = getReviewsByProductId($conn, $id);
 
-// xu ly cac bien hien thi
-$gia = $product['gia'];
-$gia_goc = $product['gia_goc'];
-$tiet_kiem = $gia_goc - $gia;
-$phan_tram_giam = $gia_goc > 0 ? round((($gia_goc - $gia) / $gia_goc) * 100) : 0;
-$danh_muc = function_exists('getCategoryKey') ? getCategoryKey($product['danh_muc_id']) : 'Danh mục';
+// Lay san pham lien quan
+$relatedProducts = getRelatedProducts($conn, $product['danh_muc_id'], $id, 4);
 
-// lay san pham co lien quan 
-$all_products = function_exists('getallproduct') ? getallproduct($conn) : [];
-$related_products = array_filter($all_products, function ($p) use ($id, $danh_muc) {
-    return isset($p['category']) && $p['category'] === $danh_muc && $p['id'] != $id;
-});
-$related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản phẩm
+// Xu ly hinh anh cho gallery
+$thumbnails = $product['images'] ?? []; // Nếu không có ảnh thì trả về mảng rỗng
+$mainImage = !empty($thumbnails) ? $thumbnails[0]['duong_dan'] : ($product['hinh_anh_chinh'] ?? '');
 
+// Xu ly size va mau
+$sizes = function_exists('getProductSizes') ? getProductSizes($conn, $id) : [];
+$colors = function_exists('getProductColors') ? getProductColors($conn, $id) : [];
+
+// Xu ly gia tri mac dinh (Chống lỗi văng trang)
+$gia = $product['gia'] ?? 0;
+$gia_goc = $product['gia_goc'] ?? 0;
+$discountPercent = $product['discount_percent'] ?? 0;
+$savings = $product['savings'] ?? 0;
+$danh_muc = $product['ten_danh_muc'] ?? 'Danh mục';
+$categoryKey = $product['category_key'] ?? '';
+
+// Rating summary
+$ratingSummary = $product['rating_summary'] ?? 0;
 ?>
 
 <!DOCTYPE html>
@@ -161,10 +172,10 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
         <div class="container-custom">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Trang chủ</a></li>
-                    <li class="breadcrumb-item"><a href="products.html">Sản phẩm</a></li>
-                    <li class="breadcrumb-item"><a href="#">Quần áo</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Áo tập Pro Performance</li>
+                    <li class="breadcrumb-item"><a href="index.php">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="products.php">Sản phẩm</a></li>
+                    <li class="breadcrumb-item"><a href="products.php?category=<?php echo $categoryKey; ?>"><?php echo htmlspecialchars($danh_muc); ?></a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($product['ten']); ?></li>
                 </ol>
             </nav>
         </div>
@@ -178,23 +189,28 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                 <div class="col-lg-6">
                     <div class="product-gallery">
                         <div class="main-image">
-                            <img id="mainImage" src="https://via.placeholder.com/500x600?text=Áo+Tập+Pro"
-                                alt="Áo tập Pro Performance">
-                            <span class="product-badge-detail sale">-30%</span>
+                            <img id="mainImage" src="public/<?php echo htmlspecialchars($mainImage); ?>" 
+                                alt="<?php echo htmlspecialchars($product['ten']); ?>">
+                            <?php if ($discountPercent > 0): ?>
+                            <span class="product-badge-detail sale">-<?php echo $discountPercent; ?>%</span>
+                            <?php endif; ?>
                         </div>
                         <div class="thumbnail-images">
-                            <div class="thumbnail-item active" onclick="changeImage(this)">
-                                <img src="https://via.placeholder.com/80x100?text=View+1" alt="View 1">
-                            </div>
-                            <div class="thumbnail-item" onclick="changeImage(this)">
-                                <img src="https://via.placeholder.com/80x100?text=View+2" alt="View 2">
-                            </div>
-                            <div class="thumbnail-item" onclick="changeImage(this)">
-                                <img src="https://via.placeholder.com/80x100?text=View+3" alt="View 3">
-                            </div>
-                            <div class="thumbnail-item" onclick="changeImage(this)">
-                                <img src="https://via.placeholder.com/80x100?text=View+4" alt="View 4">
-                            </div>
+                            <?php if (!empty($thumbnails)): ?>
+                                <?php foreach ($thumbnails as $index => $img): ?>
+                                <div class="thumbnail-item <?php echo $index === 0 ? 'active' : ''; ?>" 
+                                     onclick="changeImage(this)" 
+                                     data-src="public/<?php echo htmlspecialchars($img['duong_dan']); ?>">
+                                    <img src="public/<?php echo htmlspecialchars($img['duong_dan']); ?>" 
+                                         alt="View <?php echo $index + 1; ?>">
+                                </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="thumbnail-item active" onclick="changeImage(this)">
+                                    <img src="public/<?php echo htmlspecialchars($product['hinh_anh_chinh']); ?>" 
+                                         alt="View 1">
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -204,42 +220,47 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                     <div class="product-detail-info">
                         <!-- Category & Rating -->
                         <div class="detail-header">
-                            <span class="product-category">Quần áo</span>
+                            <span class="product-category"><?php echo htmlspecialchars($danh_muc); ?></span>
                             <div class="rating-group">
                                 <div class="stars">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half"></i>
+                                    <?php echo getStarRating($ratingSummary['average_rating']); ?>
                                 </div>
-                                <span class="rating-count">(120 đánh giá)</span>
+                                <span class="rating-count">(<?php echo $ratingSummary['total_reviews']; ?> đánh giá)</span>
                             </div>
                         </div>
 
                         <!-- Title & Price -->
-                        <h1 class="detail-title">Áo tập Pro Performance</h1>
-                        <p class="detail-description">Áo tập luyện cao cấp với công nghệ hút ẩm tiên tiến, giúp bạn
-                            thoải mái trong mọi bài tập thể dục.</p>
+                        <h1 class="detail-title"><?php echo htmlspecialchars($product['ten']); ?></h1>
+                        <p class="detail-description"><?php echo htmlspecialchars($product['mo_ta']); ?></p>
 
                         <!-- Price Section -->
                         <div class="detail-price-section">
                             <div class="price-group">
-                                <span class="price-current">299.000₫</span>
-                                <span class="price-original">429.000₫</span>
-                                <span class="price-discount">-30%</span>
+                                <span class="price-current"><?php echo $product['gia_formatted']; ?></span>
+                                <span class="price-original"><?php echo $product['gia_goc_formatted']; ?></span>
+                                <?php if ($discountPercent > 0): ?>
+                                <span class="price-discount">-<?php echo $discountPercent; ?>%</span>
+                                <?php endif; ?>
                             </div>
                             <div class="price-info">
-                                <p>Tiết kiệm: <strong>130.000₫</strong></p>
+                                <p>Tiết kiệm: <strong><?php echo $product['savings_formatted']; ?></strong></p>
                             </div>
                         </div>
 
                         <!-- Stock Status -->
                         <div class="stock-section">
+                            <?php if ($product['total_stock'] > 0): ?>
                             <span class="stock-status-badge in-stock">
-                                <i class="fas fa-check-circle"></i> Còn hàng (450 sản phẩm)
+                                <i class="fas fa-check-circle"></i> Còn hàng (<?php echo $product['total_stock']; ?> sản phẩm)
                             </span>
-                            <span class="stock-warning">Chỉ còn 15 sản phẩm với giá này!</span>
+                            <?php if ($product['total_stock'] < 20): ?>
+                            <span class="stock-warning">Chỉ còn <?php echo $product['total_stock']; ?> sản phẩm với giá này!</span>
+                            <?php endif; ?>
+                            <?php else: ?>
+                            <span class="stock-status-badge out-of-stock">
+                                <i class="fas fa-times-circle"></i> Hết hàng
+                            </span>
+                            <?php endif; ?>
                         </div>
 
                         <!-- Product Options -->
@@ -247,24 +268,29 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                             <!-- Size -->
                             <div class="option-group">
                                 <label class="option-label">Size:</label>
-                                <div class="size-options">
-                                    <button class="size-btn">XS</button>
-                                    <button class="size-btn active">S</button>
-                                    <button class="size-btn">M</button>
-                                    <button class="size-btn">L</button>
-                                    <button class="size-btn">XL</button>
-                                    <button class="size-btn">XXL</button>
+                                <div class="size-options" id="sizeOptions">
+                                    <?php foreach ($sizes as $size): ?>
+                                    <button type="button" class="size-btn" 
+                                            data-size-id="<?php echo $size['id']; ?>"
+                                            data-size-name="<?php echo htmlspecialchars($size['ten']); ?>">
+                                        <?php echo htmlspecialchars($size['ten']); ?>
+                                    </button>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
 
                             <!-- Color -->
                             <div class="option-group">
                                 <label class="option-label">Màu sắc:</label>
-                                <div class="color-options">
-                                    <div class="color-btn active" style="background-color: #000;" title="Đen"></div>
-                                    <div class="color-btn" style="background-color: #1a73e8;" title="Xanh"></div>
-                                    <div class="color-btn" style="background-color: #ff0000;" title="Đỏ"></div>
-                                    <div class="color-btn" style="background-color: #ffd700;" title="Vàng"></div>
+                                <div class="color-options" id="colorOptions">
+                                    <?php foreach ($colors as $color): ?>
+                                    <button type="button" class="color-btn" 
+                                            data-color-id="<?php echo $color['id']; ?>"
+                                            data-color-name="<?php echo htmlspecialchars($color['ten']); ?>"
+                                            style="background-color: <?php echo htmlspecialchars($color['ma_hex']); ?>;" 
+                                            title="<?php echo htmlspecialchars($color['ten']); ?>">
+                                    </button>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
 
@@ -275,7 +301,8 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                                     <button class="qty-btn" onclick="decreaseQty()">
                                         <i class="fas fa-minus"></i>
                                     </button>
-                                    <input type="number" id="quantity" class="qty-input" value="1" min="1" max="100">
+                                    <input type="number" id="quantity" class="qty-input" value="1" min="1" 
+                                           max="<?php echo $product['total_stock']; ?>">
                                     <button class="qty-btn" onclick="increaseQty()">
                                         <i class="fas fa-plus"></i>
                                     </button>
@@ -285,7 +312,8 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
 
                         <!-- Action Buttons -->
                         <div class="detail-actions">
-                            <button class="btn-add-to-cart-detail">
+                            <button class="btn-add-to-cart-detail" 
+                                    data-product-id="<?php echo $product['id']; ?>">
                                 <i class="fas fa-shopping-cart"></i>
                                 Thêm vào giỏ hàng
                             </button>
@@ -293,7 +321,8 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                                 <i class="fas fa-bolt"></i>
                                 Mua ngay
                             </button>
-                            <button class="btn-wishlist-detail" id="wishlistBtn">
+                            <button class="btn-wishlist-detail" id="wishlistBtn" 
+                                    data-product-id="<?php echo $product['id']; ?>">
                                 <i class="far fa-heart"></i>
                                 <span>Yêu thích</span>
                             </button>
@@ -336,7 +365,7 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                 </div>
             </div>
 
-            <!-- Product Details Tabs -->
+                <!-- Product Details Tabs -->
             <div class="product-tabs-section">
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
@@ -354,7 +383,7 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews"
                             type="button">
-                            Đánh giá (120)
+                            Đánh giá (<?php echo $ratingSummary['total_reviews']; ?>)
                         </button>
                     </li>
                 </ul>
@@ -364,28 +393,13 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                     <div class="tab-pane fade show active" id="description" role="tabpanel">
                         <div class="tab-content-body">
                             <h3>Mô tả sản phẩm</h3>
-                            <p>Áo tập Pro Performance được thiết kế dành cho những người yêu thích hoạt động thể thao.
-                                Với công nghệ hút ẩm tiên tiến, sản phẩm giúp bạn luôn thoải mái ngay cả trong những bài
-                                tập cơ bắp.</p>
-
-                            <h4>Đặc điểm nổi bật:</h4>
-                            <ul class="feature-list">
-                                <li>Vải co giãn 4 chiều, thoáng khí</li>
-                                <li>Công nghệ hút ẩm nhanh khô</li>
-                                <li>Thiết kế ergonomic, thoải mái vận động</li>
-                                <li>Đường may chắc chắn, bền lâu</li>
-                                <li>In ấn chất lượng cao, không phai</li>
-                                <li>Phù hợp mọi mùa, mọi điều kiện thời tiết</li>
-                            </ul>
-
-                            <h4>Hướng dẫn chăm sóc:</h4>
-                            <ul class="care-list">
-                                <li>Giặt tay bằng nước mát, không sử dụng nước nóng</li>
-                                <li>Không giặt máy, không tẩy</li>
-                                <li>Không là với nhiệt độ cao</li>
-                                <li>Phơi trong bóng mát</li>
-                                <li>Không ủi khi còn ẩm</li>
-                            </ul>
+                            <?php if (!empty($product['mo_ta_chi_tiet'])): ?>
+                            <p><?php echo nl2br(htmlspecialchars($product['mo_ta_chi_tiet'])); ?></p>
+                            <?php elseif (!empty($product['mo_ta'])): ?>
+                            <p><?php echo nl2br(htmlspecialchars($product['mo_ta'])); ?></p>
+                            <?php else: ?>
+                            <p>Chưa có mô tả chi tiết cho sản phẩm này.</p>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -393,36 +407,18 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                     <div class="tab-pane fade" id="specifications" role="tabpanel">
                         <div class="tab-content-body">
                             <h3>Thông số kỹ thuật</h3>
+                            <?php if (!empty($product['specifications'])): ?>
                             <table class="specs-table">
+                                <?php foreach ($product['specifications'] as $spec): ?>
                                 <tr>
-                                    <td>Chất liệu</td>
-                                    <td>85% Polyester, 15% Spandex</td>
+                                    <td><?php echo htmlspecialchars($spec['ten_thong_so']); ?></td>
+                                    <td><?php echo htmlspecialchars($spec['gia_tri']); ?></td>
                                 </tr>
-                                <tr>
-                                    <td>Màu sắc</td>
-                                    <td>Đen, Xanh, Đỏ, Vàng</td>
-                                </tr>
-                                <tr>
-                                    <td>Cân nặng</td>
-                                    <td>180g ± 10g</td>
-                                </tr>
-                                <tr>
-                                    <td>Kích thước có sẵn</td>
-                                    <td>XS, S, M, L, XL, XXL</td>
-                                </tr>
-                                <tr>
-                                    <td>Độ dành cho</td>
-                                    <td>Nam & Nữ</td>
-                                </tr>
-                                <tr>
-                                    <td>Xuất xứ</td>
-                                    <td>Việt Nam</td>
-                                </tr>
-                                <tr>
-                                    <td>Bảo hành</td>
-                                    <td>12 tháng</td>
-                                </tr>
+                                <?php endforeach; ?>
                             </table>
+                            <?php else: ?>
+                            <p>Chưa có thông số kỹ thuật cho sản phẩm này.</p>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -432,53 +428,25 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                             <div class="reviews-container">
                                 <div class="reviews-summary">
                                     <div class="rating-box">
-                                        <div class="rating-number">4.8</div>
+                                        <div class="rating-number"><?php echo number_format($ratingSummary['average_rating'], 1); ?></div>
                                         <div class="rating-stars">
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star-half"></i>
+                                            <?php echo getStarRating($ratingSummary['average_rating']); ?>
                                         </div>
-                                        <p>Dựa trên 120 đánh giá</p>
+                                        <p>Dựa trên <?php echo $ratingSummary['total_reviews']; ?> đánh giá</p>
                                     </div>
 
                                     <div class="rating-breakdown">
+                                        <?php for ($i = 5; $i >= 1; $i--): 
+                                            $dist = $ratingSummary['rating_distribution'][$i] ?? ['count' => 0, 'percentage' => 0];
+                                        ?>
                                         <div class="rating-bar">
-                                            <span class="rating-label">5 <i class="fas fa-star"></i></span>
+                                            <span class="rating-label"><?php echo $i; ?> <i class="fas fa-star"></i></span>
                                             <div class="bar">
-                                                <div class="fill" style="width: 70%;"></div>
+                                                <div class="fill" style="width: <?php echo $dist['percentage']; ?>%;"></div>
                                             </div>
-                                            <span class="rating-count">84</span>
+                                            <span class="rating-count"><?php echo $dist['count']; ?></span>
                                         </div>
-                                        <div class="rating-bar">
-                                            <span class="rating-label">4 <i class="fas fa-star"></i></span>
-                                            <div class="bar">
-                                                <div class="fill" style="width: 20%;"></div>
-                                            </div>
-                                            <span class="rating-count">24</span>
-                                        </div>
-                                        <div class="rating-bar">
-                                            <span class="rating-label">3 <i class="fas fa-star"></i></span>
-                                            <div class="bar">
-                                                <div class="fill" style="width: 7%;"></div>
-                                            </div>
-                                            <span class="rating-count">8</span>
-                                        </div>
-                                        <div class="rating-bar">
-                                            <span class="rating-label">2 <i class="fas fa-star"></i></span>
-                                            <div class="bar">
-                                                <div class="fill" style="width: 2%;"></div>
-                                            </div>
-                                            <span class="rating-count">2</span>
-                                        </div>
-                                        <div class="rating-bar">
-                                            <span class="rating-label">1 <i class="fas fa-star"></i></span>
-                                            <div class="bar">
-                                                <div class="fill" style="width: 1%;"></div>
-                                            </div>
-                                            <span class="rating-count">2</span>
-                                        </div>
+                                        <?php endfor; ?>
                                     </div>
                                 </div>
 
@@ -511,62 +479,34 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
 
                                 <div class="reviews-list">
                                     <h4>Đánh giá từ khách hàng</h4>
-
-                                    <!-- Review Item 1 -->
-                                    <div class="review-item">
-                                        <div class="review-header">
-                                            <div class="reviewer-info">
-                                                <img src="https://via.placeholder.com/40?text=Avatar" alt="Avatar"
-                                                    class="reviewer-avatar">
-                                                <div>
-                                                    <h5>Nguyễn Văn A</h5>
-                                                    <p class="review-date">5 sao - 3 tuần trước</p>
+                                    <?php if (!empty($reviews)): ?>
+                                        <?php foreach ($reviews as $review): ?>
+                                        <div class="review-item">
+                                            <div class="review-header">
+                                                <div class="reviewer-info">
+                                                    <img src="<?php echo !empty($review['anh_dai_dien']) ? 'public/' . htmlspecialchars($review['anh_dai_dien']) : 'https://via.placeholder.com/40?text=Avatar'; ?>" 
+                                                         alt="Avatar"
+                                                        class="reviewer-avatar">
+                                                    <div>
+                                                        <h5><?php echo htmlspecialchars($review['ten_nguoi_dung']); ?></h5>
+                                                        <p class="review-date"><?php echo $review['so_sao']; ?> sao - <?php echo date('d/m/Y', strtotime($review['ngay_danh_gia'])); ?></p>
+                                                    </div>
                                                 </div>
+                                                <span class="verified-badge">
+                                                    <i class="fas fa-check-circle"></i> Đã xác minh
+                                                </span>
                                             </div>
-                                            <span class="verified-badge">
-                                                <i class="fas fa-check-circle"></i> Đã xác minh
-                                            </span>
-                                        </div>
-                                        <h5 class="review-title">Sản phẩm rất tốt, thoái mái khi mặc</h5>
-                                        <p class="review-content">Áo rất chất lượng, vải co giãn tốt, thoáng khí. Tôi đã
-                                            mặc để chạy bộ và cảm thấy rất thoải mái. Chắc chắn sẽ mua lại!</p>
-                                        <div class="review-actions">
-                                            <button class="helpful-btn">
-                                                <i class="fas fa-thumbs-up"></i> Hữu ích (12)
-                                            </button>
-                                            <button class="unhelpful-btn">
-                                                <i class="fas fa-thumbs-down"></i> Không hữu ích (1)
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Review Item 2 -->
-                                    <div class="review-item">
-                                        <div class="review-header">
-                                            <div class="reviewer-info">
-                                                <img src="https://via.placeholder.com/40?text=Avatar" alt="Avatar"
-                                                    class="reviewer-avatar">
-                                                <div>
-                                                    <h5>Trần Thị B</h5>
-                                                    <p class="review-date">4 sao - 1 tháng trước</p>
-                                                </div>
+                                            <p class="review-content"><?php echo nl2br(htmlspecialchars($review['binh_luan'])); ?></p>
+                                            <div class="review-actions">
+                                                <button class="helpful-btn">
+                                                    <i class="fas fa-thumbs-up"></i> Hữu ích
+                                                </button>
                                             </div>
-                                            <span class="verified-badge">
-                                                <i class="fas fa-check-circle"></i> Đã xác minh
-                                            </span>
                                         </div>
-                                        <h5 class="review-title">Tốt nhưng hơi rộng</h5>
-                                        <p class="review-content">Áo chất lượng tốt, nhưng hơi rộng so với mong đợi. Bạn
-                                            nên mua size nhỏ hơn 1 size. Nhưng nhìn chung sản phẩm rất xứng đáng.</p>
-                                        <div class="review-actions">
-                                            <button class="helpful-btn">
-                                                <i class="fas fa-thumbs-up"></i> Hữu ích (8)
-                                            </button>
-                                            <button class="unhelpful-btn">
-                                                <i class="fas fa-thumbs-down"></i> Không hữu ích (0)
-                                            </button>
-                                        </div>
-                                    </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -581,97 +521,45 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                 </h2>
 
                 <div class="row">
-                    <div class="col-lg-3 col-md-6 col-sm-6">
-                        <div class="product-card-small">
-                            <div class="product-image-small">
-                                <i class="fas fa-shirt"></i>
-                            </div>
-                            <div class="product-info-small">
-                                <h4>Áo tập Casual</h4>
-                                <div class="price-small">
-                                    <span class="price">199.000₫</span>
+                    <?php if (!empty($relatedProducts)): ?>
+                        <?php foreach ($relatedProducts as $related): ?>
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="product-card-small">
+                                <div class="product-image-small">
+                                    <?php if (!empty($related['hinh_anh_chinh'])): ?>
+                                    <img src="public/<?php echo htmlspecialchars($related['hinh_anh_chinh']); ?>" 
+                                         alt="<?php echo htmlspecialchars($related['ten']); ?>">
+                                    <?php else: ?>
+                                    <i class="fas fa-shirt"></i>
+                                    <?php endif; ?>
+                                    <?php if ($related['discount_percent'] > 0): ?>
+                                    <span class="product-badge">-<?php echo $related['discount_percent']; ?>%</span>
+                                    <?php endif; ?>
                                 </div>
-                                <div class="rating-small">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half"></i>
-                                    <span>(85)</span>
+                                <div class="product-info-small">
+                                    <h4><?php echo htmlspecialchars($related['ten']); ?></h4>
+                                    <div class="price-small">
+                                        <span class="price"><?php echo $related['gia_formatted']; ?></span>
+                                        <?php if ($related['discount_percent'] > 0): ?>
+                                        <span class="price-old"><?php echo $related['gia_goc_formatted']; ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="rating-small">
+                                        <?php echo $related['star_rating']; ?>
+                                        <span>(<?php echo $related['so_luong_danh_gia']; ?>)</span>
+                                    </div>
+                                    <a href="product-detail.php?id=<?php echo $related['id']; ?>" class="btn-add-quick">
+                                        Xem chi tiết
+                                    </a>
                                 </div>
-                                <button class="btn-add-quick">Thêm vào giỏ</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 col-sm-6">
-                        <div class="product-card-small">
-                            <div class="product-image-small">
-                                <i class="fas fa-shirt"></i>
-                            </div>
-                            <div class="product-info-small">
-                                <h4>Áo tập Marathon</h4>
-                                <div class="price-small">
-                                    <span class="price">249.000₫</span>
-                                </div>
-                                <div class="rating-small">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <span>(56)</span>
-                                </div>
-                                <button class="btn-add-quick">Thêm vào giỏ</button>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 col-sm-6">
-                        <div class="product-card-small">
-                            <div class="product-image-small">
-                                <i class="fas fa-shirt"></i>
-                            </div>
-                            <div class="product-info-small">
-                                <h4>Áo tập Mesh</h4>
-                                <div class="price-small">
-                                    <span class="price">279.000₫</span>
-                                </div>
-                                <div class="rating-small">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <span>(102)</span>
-                                </div>
-                                <button class="btn-add-quick">Thêm vào giỏ</button>
-                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-12">
+                            <p class="text-center">Không có sản phẩm liên quan.</p>
                         </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 col-sm-6">
-                        <div class="product-card-small">
-                            <div class="product-image-small">
-                                <i class="fas fa-shirt"></i>
-                            </div>
-                            <div class="product-info-small">
-                                <h4>Áo tập Premium</h4>
-                                <div class="price-small">
-                                    <span class="price">349.000₫</span>
-                                </div>
-                                <div class="rating-small">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half"></i>
-                                    <span>(78)</span>
-                                </div>
-                                <button class="btn-add-quick">Thêm vào giỏ</button>
-                            </div>
-                        </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
