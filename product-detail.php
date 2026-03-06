@@ -174,8 +174,11 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.php">Trang chủ</a></li>
                     <li class="breadcrumb-item"><a href="products.php">Sản phẩm</a></li>
-                    <li class="breadcrumb-item"><a href="products.php?category=<?php echo $categoryKey; ?>"><?php echo htmlspecialchars($danh_muc); ?></a></li>
-                    <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($product['ten']); ?></li>
+                    <li class="breadcrumb-item"><a
+                            href="products.php?category=<?php echo $categoryKey; ?>"><?php echo htmlspecialchars($danh_muc); ?></a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <?php echo htmlspecialchars($product['ten']); ?></li>
                 </ol>
             </nav>
         </div>
@@ -189,26 +192,26 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                 <div class="col-lg-6">
                     <div class="product-gallery">
                         <div class="main-image">
-                            <img id="mainImage" src="public/<?php echo htmlspecialchars($mainImage); ?>" 
+                            <img id="mainImage" src="public/<?php echo htmlspecialchars($mainImage); ?>"
                                 alt="<?php echo htmlspecialchars($product['ten']); ?>">
                             <?php if ($discountPercent > 0): ?>
-                            <span class="product-badge-detail sale">-<?php echo $discountPercent; ?>%</span>
+                                <span class="product-badge-detail sale">-<?php echo $discountPercent; ?>%</span>
                             <?php endif; ?>
                         </div>
                         <div class="thumbnail-images">
                             <?php if (!empty($thumbnails)): ?>
                                 <?php foreach ($thumbnails as $index => $img): ?>
-                                <div class="thumbnail-item <?php echo $index === 0 ? 'active' : ''; ?>" 
-                                     onclick="changeImage(this)" 
-                                     data-src="public/<?php echo htmlspecialchars($img['duong_dan']); ?>">
-                                    <img src="public/<?php echo htmlspecialchars($img['duong_dan']); ?>" 
-                                         alt="View <?php echo $index + 1; ?>">
-                                </div>
+                                    <div class="thumbnail-item <?php echo $index === 0 ? 'active' : ''; ?>"
+                                        onclick="changeImage(this)"
+                                        data-src="public/<?php echo htmlspecialchars($img['duong_dan']); ?>">
+                                        <img src="public/<?php echo htmlspecialchars($img['duong_dan']); ?>"
+                                            alt="View <?php echo $index + 1; ?>">
+                                    </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <div class="thumbnail-item active" onclick="changeImage(this)">
-                                    <img src="public/<?php echo htmlspecialchars($product['hinh_anh_chinh']); ?>" 
-                                         alt="View 1">
+                                    <img src="public/<?php echo htmlspecialchars($product['hinh_anh_chinh']); ?>"
+                                        alt="View 1">
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -225,7 +228,8 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                 <div class="stars">
                                     <?php echo getStarRating($ratingSummary['average_rating']); ?>
                                 </div>
-                                <span class="rating-count">(<?php echo $ratingSummary['total_reviews']; ?> đánh giá)</span>
+                                <span class="rating-count">(<?php echo $ratingSummary['total_reviews']; ?> đánh
+                                    giá)</span>
                             </div>
                         </div>
 
@@ -239,7 +243,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                 <span class="price-current"><?php echo $product['gia_formatted']; ?></span>
                                 <span class="price-original"><?php echo $product['gia_goc_formatted']; ?></span>
                                 <?php if ($discountPercent > 0): ?>
-                                <span class="price-discount">-<?php echo $discountPercent; ?>%</span>
+                                    <span class="price-discount">-<?php echo $discountPercent; ?>%</span>
                                 <?php endif; ?>
                             </div>
                             <div class="price-info">
@@ -250,16 +254,18 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                         <!-- Stock Status -->
                         <div class="stock-section">
                             <?php if ($product['total_stock'] > 0): ?>
-                            <span class="stock-status-badge in-stock">
-                                <i class="fas fa-check-circle"></i> Còn hàng (<?php echo $product['total_stock']; ?> sản phẩm)
-                            </span>
-                            <?php if ($product['total_stock'] < 20): ?>
-                            <span class="stock-warning">Chỉ còn <?php echo $product['total_stock']; ?> sản phẩm với giá này!</span>
-                            <?php endif; ?>
+                                <span class="stock-status-badge in-stock">
+                                    <i class="fas fa-check-circle"></i> Còn hàng (<?php echo $product['total_stock']; ?> sản
+                                    phẩm)
+                                </span>
+                                <?php if ($product['total_stock'] < 20): ?>
+                                    <span class="stock-warning">Chỉ còn <?php echo $product['total_stock']; ?> sản phẩm với giá
+                                        này!</span>
+                                <?php endif; ?>
                             <?php else: ?>
-                            <span class="stock-status-badge out-of-stock">
-                                <i class="fas fa-times-circle"></i> Hết hàng
-                            </span>
+                                <span class="stock-status-badge out-of-stock">
+                                    <i class="fas fa-times-circle"></i> Hết hàng
+                                </span>
                             <?php endif; ?>
                         </div>
 
@@ -270,11 +276,10 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                 <label class="option-label">Size:</label>
                                 <div class="size-options" id="sizeOptions">
                                     <?php foreach ($sizes as $size): ?>
-                                    <button type="button" class="size-btn" 
-                                            data-size-id="<?php echo $size['id']; ?>"
+                                        <button type="button" class="size-btn" data-size-id="<?php echo $size['id']; ?>"
                                             data-size-name="<?php echo htmlspecialchars($size['ten']); ?>">
-                                        <?php echo htmlspecialchars($size['ten']); ?>
-                                    </button>
+                                            <?php echo htmlspecialchars($size['ten']); ?>
+                                        </button>
                                     <?php endforeach; ?>
                                 </div>
                             </div>
@@ -284,12 +289,11 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                 <label class="option-label">Màu sắc:</label>
                                 <div class="color-options" id="colorOptions">
                                     <?php foreach ($colors as $color): ?>
-                                    <button type="button" class="color-btn" 
-                                            data-color-id="<?php echo $color['id']; ?>"
+                                        <button type="button" class="color-btn" data-color-id="<?php echo $color['id']; ?>"
                                             data-color-name="<?php echo htmlspecialchars($color['ten']); ?>"
-                                            style="background-color: <?php echo htmlspecialchars($color['ma_hex']); ?>;" 
+                                            style="background-color: <?php echo htmlspecialchars($color['ma_hex']); ?>;"
                                             title="<?php echo htmlspecialchars($color['ten']); ?>">
-                                    </button>
+                                        </button>
                                     <?php endforeach; ?>
                                 </div>
                             </div>
@@ -301,8 +305,8 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                     <button class="qty-btn" onclick="decreaseQty()">
                                         <i class="fas fa-minus"></i>
                                     </button>
-                                    <input type="number" id="quantity" class="qty-input" value="1" min="1" 
-                                           max="<?php echo $product['total_stock']; ?>">
+                                    <input type="number" id="quantity" class="qty-input" value="1" min="1"
+                                        max="<?php echo $product['total_stock']; ?>">
                                     <button class="qty-btn" onclick="increaseQty()">
                                         <i class="fas fa-plus"></i>
                                     </button>
@@ -312,8 +316,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
 
                         <!-- Action Buttons -->
                         <div class="detail-actions">
-                            <button class="btn-add-to-cart-detail" 
-                                    data-product-id="<?php echo $product['id']; ?>">
+                            <button class="btn-add-to-cart-detail" data-product-id="<?php echo $product['id']; ?>">
                                 <i class="fas fa-shopping-cart"></i>
                                 Thêm vào giỏ hàng
                             </button>
@@ -321,8 +324,8 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                 <i class="fas fa-bolt"></i>
                                 Mua ngay
                             </button>
-                            <button class="btn-wishlist-detail" id="wishlistBtn" 
-                                    data-product-id="<?php echo $product['id']; ?>">
+                            <button class="btn-wishlist-detail" id="wishlistBtn"
+                                data-product-id="<?php echo $product['id']; ?>">
                                 <i class="far fa-heart"></i>
                                 <span>Yêu thích</span>
                             </button>
@@ -365,7 +368,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                 </div>
             </div>
 
-                <!-- Product Details Tabs -->
+            <!-- Product Details Tabs -->
             <div class="product-tabs-section">
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
@@ -394,11 +397,11 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                         <div class="tab-content-body">
                             <h3>Mô tả sản phẩm</h3>
                             <?php if (!empty($product['mo_ta_chi_tiet'])): ?>
-                            <p><?php echo nl2br(htmlspecialchars($product['mo_ta_chi_tiet'])); ?></p>
+                                <p><?php echo nl2br(htmlspecialchars($product['mo_ta_chi_tiet'])); ?></p>
                             <?php elseif (!empty($product['mo_ta'])): ?>
-                            <p><?php echo nl2br(htmlspecialchars($product['mo_ta'])); ?></p>
+                                <p><?php echo nl2br(htmlspecialchars($product['mo_ta'])); ?></p>
                             <?php else: ?>
-                            <p>Chưa có mô tả chi tiết cho sản phẩm này.</p>
+                                <p>Chưa có mô tả chi tiết cho sản phẩm này.</p>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -408,16 +411,16 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                         <div class="tab-content-body">
                             <h3>Thông số kỹ thuật</h3>
                             <?php if (!empty($product['specifications'])): ?>
-                            <table class="specs-table">
-                                <?php foreach ($product['specifications'] as $spec): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($spec['ten_thong_so']); ?></td>
-                                    <td><?php echo htmlspecialchars($spec['gia_tri']); ?></td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </table>
+                                <table class="specs-table">
+                                    <?php foreach ($product['specifications'] as $spec): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($spec['ten_thong_so']); ?></td>
+                                            <td><?php echo htmlspecialchars($spec['gia_tri']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </table>
                             <?php else: ?>
-                            <p>Chưa có thông số kỹ thuật cho sản phẩm này.</p>
+                                <p>Chưa có thông số kỹ thuật cho sản phẩm này.</p>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -428,7 +431,8 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                             <div class="reviews-container">
                                 <div class="reviews-summary">
                                     <div class="rating-box">
-                                        <div class="rating-number"><?php echo number_format($ratingSummary['average_rating'], 1); ?></div>
+                                        <div class="rating-number">
+                                            <?php echo number_format($ratingSummary['average_rating'], 1); ?></div>
                                         <div class="rating-stars">
                                             <?php echo getStarRating($ratingSummary['average_rating']); ?>
                                         </div>
@@ -436,16 +440,18 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                     </div>
 
                                     <div class="rating-breakdown">
-                                        <?php for ($i = 5; $i >= 1; $i--): 
+                                        <?php for ($i = 5; $i >= 1; $i--):
                                             $dist = $ratingSummary['rating_distribution'][$i] ?? ['count' => 0, 'percentage' => 0];
-                                        ?>
-                                        <div class="rating-bar">
-                                            <span class="rating-label"><?php echo $i; ?> <i class="fas fa-star"></i></span>
-                                            <div class="bar">
-                                                <div class="fill" style="width: <?php echo $dist['percentage']; ?>%;"></div>
+                                            ?>
+                                            <div class="rating-bar">
+                                                <span class="rating-label"><?php echo $i; ?> <i
+                                                        class="fas fa-star"></i></span>
+                                                <div class="bar">
+                                                    <div class="fill" style="width: <?php echo $dist['percentage']; ?>%;">
+                                                    </div>
+                                                </div>
+                                                <span class="rating-count"><?php echo $dist['count']; ?></span>
                                             </div>
-                                            <span class="rating-count"><?php echo $dist['count']; ?></span>
-                                        </div>
                                         <?php endfor; ?>
                                     </div>
                                 </div>
@@ -481,28 +487,30 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                     <h4>Đánh giá từ khách hàng</h4>
                                     <?php if (!empty($reviews)): ?>
                                         <?php foreach ($reviews as $review): ?>
-                                        <div class="review-item">
-                                            <div class="review-header">
-                                                <div class="reviewer-info">
-                                                    <img src="<?php echo !empty($review['anh_dai_dien']) ? 'public/' . htmlspecialchars($review['anh_dai_dien']) : 'https://via.placeholder.com/40?text=Avatar'; ?>" 
-                                                         alt="Avatar"
-                                                        class="reviewer-avatar">
-                                                    <div>
-                                                        <h5><?php echo htmlspecialchars($review['ten_nguoi_dung']); ?></h5>
-                                                        <p class="review-date"><?php echo $review['so_sao']; ?> sao - <?php echo date('d/m/Y', strtotime($review['ngay_danh_gia'])); ?></p>
+                                            <div class="review-item">
+                                                <div class="review-header">
+                                                    <div class="reviewer-info">
+                                                        <img src="<?php echo !empty($review['anh_dai_dien']) ? 'public/' . htmlspecialchars($review['anh_dai_dien']) : 'https://via.placeholder.com/40?text=Avatar'; ?>"
+                                                            alt="Avatar" class="reviewer-avatar">
+                                                        <div>
+                                                            <h5><?php echo htmlspecialchars($review['ten_nguoi_dung']); ?></h5>
+                                                            <p class="review-date"><?php echo $review['so_sao']; ?> sao -
+                                                                <?php echo date('d/m/Y', strtotime($review['ngay_danh_gia'])); ?>
+                                                            </p>
+                                                        </div>
                                                     </div>
+                                                    <span class="verified-badge">
+                                                        <i class="fas fa-check-circle"></i> Đã xác minh
+                                                    </span>
                                                 </div>
-                                                <span class="verified-badge">
-                                                    <i class="fas fa-check-circle"></i> Đã xác minh
-                                                </span>
+                                                <p class="review-content">
+                                                    <?php echo nl2br(htmlspecialchars($review['binh_luan'])); ?></p>
+                                                <div class="review-actions">
+                                                    <button class="helpful-btn">
+                                                        <i class="fas fa-thumbs-up"></i> Hữu ích
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <p class="review-content"><?php echo nl2br(htmlspecialchars($review['binh_luan'])); ?></p>
-                                            <div class="review-actions">
-                                                <button class="helpful-btn">
-                                                    <i class="fas fa-thumbs-up"></i> Hữu ích
-                                                </button>
-                                            </div>
-                                        </div>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <p>Chưa có đánh giá nào cho sản phẩm này.</p>
@@ -523,37 +531,38 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                 <div class="row">
                     <?php if (!empty($relatedProducts)): ?>
                         <?php foreach ($relatedProducts as $related): ?>
-                        <div class="col-lg-3 col-md-6 col-sm-6">
-                            <div class="product-card-small">
-                                <div class="product-image-small">
-                                    <?php if (!empty($related['hinh_anh_chinh'])): ?>
-                                    <img src="public/<?php echo htmlspecialchars($related['hinh_anh_chinh']); ?>" 
-                                         alt="<?php echo htmlspecialchars($related['ten']); ?>">
-                                    <?php else: ?>
-                                    <i class="fas fa-shirt"></i>
-                                    <?php endif; ?>
-                                    <?php if ($related['discount_percent'] > 0): ?>
-                                    <span class="product-badge">-<?php echo $related['discount_percent']; ?>%</span>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="product-info-small">
-                                    <h4><?php echo htmlspecialchars($related['ten']); ?></h4>
-                                    <div class="price-small">
-                                        <span class="price"><?php echo $related['gia_formatted']; ?></span>
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="product-card-small">
+                                    <div class="product-image-small">
+                                        <?php if (!empty($related['hinh_anh_chinh'])): ?>
+                                            <img src="public/<?php echo htmlspecialchars($related['hinh_anh_chinh']); ?>"
+                                                alt="<?php echo htmlspecialchars($related['ten']); ?>">
+                                        <?php else: ?>
+                                            <i class="fas fa-shirt"></i>
+                                        <?php endif; ?>
                                         <?php if ($related['discount_percent'] > 0): ?>
-                                        <span class="price-old"><?php echo $related['gia_goc_formatted']; ?></span>
+                                            <span class="product-badge">-<?php echo $related['discount_percent']; ?>%</span>
                                         <?php endif; ?>
                                     </div>
-                                    <div class="rating-small">
-                                        <?php echo $related['star_rating']; ?>
-                                        <span>(<?php echo $related['so_luong_danh_gia']; ?>)</span>
+                                    <div class="product-info-small">
+                                        <h4><?php echo htmlspecialchars($related['ten']); ?></h4>
+                                        <div class="price-small">
+                                            <span class="price"><?php echo $related['gia_formatted']; ?></span>
+                                            <?php if ($related['discount_percent'] > 0): ?>
+                                                <span class="price-old"><?php echo $related['gia_goc_formatted']; ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="rating-small">
+                                            <?php echo $related['star_rating']; ?>
+                                            <span>(<?php echo $related['so_luong_danh_gia']; ?>)</span>
+                                        </div>
+                                        <a href="product-detail.php?id=<?php echo $related['id']; ?>" class="btn-view-detail"
+                                            style="display: inline-block; padding: 8px 15px; background: var(--primary); color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
+                                            Xem chi tiết
+                                        </a>
                                     </div>
-                                    <a href="product-detail.php?id=<?php echo $related['id']; ?>" class="btn-add-quick">
-                                        Xem chi tiết
-                                    </a>
                                 </div>
                             </div>
-                        </div>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <div class="col-12">

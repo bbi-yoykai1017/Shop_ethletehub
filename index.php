@@ -287,52 +287,61 @@ $displayProducts = array_slice($products, 0, 6);
             <div class="products-grid">
                 <?php foreach ($displayProducts as $product): ?>
                     <div class="product-card" data-product-id="<?php echo $product['id']; ?>">
-                        <div class="product-image">
-                            <?php if (!empty($product['image'])): ?>
-                                <img src="./public/<?php echo htmlspecialchars($product['image']); ?>"
-                                    alt="<?php echo htmlspecialchars($product['name']); ?>"
-                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <i class="fas fa-shirt" style="display:none;"></i>
-                            <?php else: ?>
-                                <i class="fas fa-shirt"></i>
-                            <?php endif; ?>
-                            <?php if ($product['discount'] > 0): ?>
-                                <span class="product-badge sale">-<?php echo $product['discount']; ?>%</span>
-                            <?php endif; ?>
-                            <span class="product-rating">
-                                <i class="fas fa-star"></i>
-                                <?php echo number_format($product['rating'], 1); ?>
-                            </span>
-                            <button class="btn-quick-view">Xem nhanh</button>
-                        </div>
-                        <div class="product-info">
-                            <div class="product-category"><?php echo $product['categoryLabel']; ?></div>
-                            <h3 class="product-name"><?php echo htmlspecialchars($product['name']); ?></h3>
-                            <div class="rating-stars">
-                                <?php echo getStarRating($product['rating']); ?>
-                                <span class="rating-text">(<?php echo $product['so_luong_danh_gia'] ?? 0; ?>)</span>
-                            </div>
-                            <div class="product-price">
-                                <span class="price-current"><?php echo formatPrice($product['price']); ?></span>
-                                <?php if ($product['originalPrice'] > $product['price']): ?>
-                                    <span class="price-original"><?php echo formatPrice($product['originalPrice']); ?></span>
-                                    <span class="price-discount">-<?php echo $product['discount']; ?>%</span>
-                                <?php endif; ?>
-                            </div>
-                            <p class="product-description"><?php echo htmlspecialchars($product['description'] ?? ''); ?>
-                            </p>
-                            <span class="stock-status in-stock">Còn hàng</span>
-                            <div class="product-actions">
-                                <button class="product-btn btn-add-cart">
-                                    <i class="fas fa-shopping-cart"></i>
-                                    Thêm
-                                </button>
-                                <button class="product-btn btn-wishlist">
-                                    <i class="fas fa-heart"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+    <div class="product-image">
+        <a href="product-detail.php?id=<?php echo $product['id']; ?>" style="display: block;">
+            <?php if (!empty($product['image'])): ?>
+                <img src="./public/<?php echo htmlspecialchars($product['image']); ?>"
+                    alt="<?php echo htmlspecialchars($product['name']); ?>"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <i class="fas fa-shirt" style="display:none;"></i>
+            <?php else: ?>
+                <i class="fas fa-shirt"></i>
+            <?php endif; ?>
+        </a>
+
+        <?php if ($product['discount'] > 0): ?>
+            <span class="product-badge sale">-<?php echo $product['discount']; ?>%</span>
+        <?php endif; ?>
+        <span class="product-rating">
+            <i class="fas fa-star"></i>
+            <?php echo number_format($product['rating'], 1); ?>
+        </span>
+        <button class="btn-quick-view">Xem nhanh</button>
+    </div>
+    
+    <div class="product-info">
+        <div class="product-category"><?php echo $product['categoryLabel']; ?></div>
+        
+        <h3 class="product-name">
+            <a href="product-detail.php?id=<?php echo $product['id']; ?>" style="text-decoration: none; color: inherit;">
+                <?php echo htmlspecialchars($product['name']); ?>
+            </a>
+        </h3>
+        
+        <div class="rating-stars">
+            <?php echo getStarRating($product['rating']); ?>
+            <span class="rating-text">(<?php echo $product['so_luong_danh_gia'] ?? 0; ?>)</span>
+        </div>
+        <div class="product-price">
+            <span class="price-current"><?php echo formatPrice($product['price']); ?></span>
+            <?php if ($product['originalPrice'] > $product['price']): ?>
+                <span class="price-original"><?php echo formatPrice($product['originalPrice']); ?></span>
+                <span class="price-discount">-<?php echo $product['discount']; ?>%</span>
+            <?php endif; ?>
+        </div>
+        <p class="product-description"><?php echo htmlspecialchars($product['description'] ?? ''); ?></p>
+        <span class="stock-status in-stock">Còn hàng</span>
+        
+        <div class="product-actions">
+            <button class="product-btn btn-add-cart">
+                <i class="fas fa-shopping-cart"></i> Thêm
+            </button>
+            <button class="product-btn btn-wishlist">
+                <i class="fas fa-heart"></i>
+            </button>
+        </div>
+    </div>
+</div>
                 <?php endforeach; ?>
             </div>
 
