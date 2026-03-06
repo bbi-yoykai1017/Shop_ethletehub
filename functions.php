@@ -51,6 +51,22 @@ function getProductById($conn,$id) {
  return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-
+// ham lay danh sach danh gia cua mot san pham theo id cua san pham do
+function getReviewsByProductId($conn, $id, $limit = 5) {
+    try {
+        $sql = "SELECT dg.*, nd.ten AS ten_nguoi_dung 
+                FROM danh_gia dg 
+                JOIN nguoi_dung nd ON dg.nguoi_dung_id = nd.id 
+                WHERE dg.san_pham_id = :id 
+                ORDER BY dg.ngay_tao DESC LIMIT :limit";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // tra ve danh sach danh gia
+    } catch (Exception $e) {
+        return []; // neu bang chua ton tai thi tra ve mang rong
+    }
+}
 
 ?>
