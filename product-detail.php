@@ -2,9 +2,21 @@
  require_once 'functions.php';
  require_once 'Database.php';
 
+ $db = new Database();
+    $conn = $db->connect();
  // lay id san pham tu url 
-
  $id = (int)isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+ $product = getProductById($conn, $id);
+ 
+ // neu khong tim thay sam pham, chuyen huong ve trang chu 
+if (!$product)
+    {
+        header("Location: index.html");
+        exit();
+    }
+
+
 ?>
 
 <!DOCTYPE html>
