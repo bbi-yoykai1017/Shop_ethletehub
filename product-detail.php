@@ -26,6 +26,13 @@ $tiet_kiem = $gia_goc - $gia;
 $phan_tram_giam = $gia_goc > 0 ? round((($gia_goc - $gia) / $gia_goc) * 100) : 0;
 $danh_muc = function_exists('getCategoryKey') ? getCategoryKey($product['danh_muc_id']) : 'Danh mục';
 
+// lay san pham co lien quan 
+$all_products = function_exists('getallproduct') ? getallproduct($conn) : [];
+$related_products = array_filter($all_products, function($p) use ($id, $danh_muc) {
+    return isset($p['category']) && $p['category'] === $danh_muc && $p['id'] != $id;
+});
+$related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản phẩm
+
 ?>
 
 <!DOCTYPE html>
