@@ -1,3 +1,12 @@
+<?php
+ require_once 'functions.php';
+ require_once 'Database.php';
+
+ // lay id san pham tu url 
+
+ $id = (int)isset($_GET['id']) ? (int)$_GET['id'] : 0;
+?>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
