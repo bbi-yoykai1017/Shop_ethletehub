@@ -42,10 +42,10 @@
                 <!-- Left Navigation Links -->
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="index1.php">Trang chủ</a>
+                        <a class="nav-link active" href="index.php">Trang chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#products">Sản phẩm</a>
+                        <a class="nav-link" href="products.php">Sản phẩm</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#categories">Danh mục</a>
