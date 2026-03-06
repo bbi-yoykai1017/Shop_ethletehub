@@ -41,6 +41,37 @@ function getCategoryKey($danhMucId) {
     return isset($categoryMap[$danhMucId]) ? $categoryMap[$danhMucId] : 'quan-ao';
 }
 
+// Hàm hiển thị danh mục (label tiếng Việt)
+function getCategoryLabel($category) {
+    $labels = [
+        'quan-ao' => 'Quần áo',
+        'giay' => 'Giày',
+        'thiet-bi' => 'Thiết bị',
+        'phu-kien' => 'Phụ kiện'
+    ];
+    return $labels[$category] ?? 'Quần áo';
+}
+
+// Hàm hiển thị sao đánh giá
+function getStarRating($rating) {
+    $html = '';
+    for ($i = 1; $i <= 5; $i++) {
+        if ($i <= floor($rating)) {
+            $html .= '<i class="fas fa-star"></i>';
+        } elseif ($i - 0.5 <= $rating) {
+            $html .= '<i class="fas fa-star-half"></i>';
+        } else {
+            $html .= '<i class="far fa-star"></i>';
+        }
+    }
+    return $html;
+}
+
+// Hàm định dạng giá tiền
+function formatPrice($price) {
+    return number_format($price, 0, ',', '.') . '₫';
+}
+
 // ham lay chi tiet san pham theo id 
 function getProductById($conn,$id) {
      // truy van lay chi tiet san pham

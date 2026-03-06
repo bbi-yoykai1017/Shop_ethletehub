@@ -109,7 +109,7 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-custom">
-            <a class="navbar-brand" href="index.html">
+            <a class="navbar-brand" href="index.php">
                 <i class="fas fa-dumbbell"></i>
                 AthleteHub
             </a>
@@ -121,13 +121,13 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">Trang chủ</a>
+                        <a class="nav-link" href="index.php">Trang chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="products.html">Sản phẩm</a>
+                        <a class="nav-link active" href="products.php">Sản phẩm</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#categories">Danh mục</a>
+                        <a class="nav-link" href="index.php#categories">Danh mục</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#about">Về chúng tôi</a>

@@ -16,7 +16,7 @@ function loadCart() {
                 <i class="fas fa-shopping-cart"></i>
                 <h3>Giỏ hàng của bạn trống</h3>
                 <p>Hãy thêm một số sản phẩm vào giỏ hàng của bạn để tiếp tục mua sắm.</p>
-                <a href="products.html" class="btn btn-primary">
+                <a href="products.php" class="btn btn-primary">
                     <i class="fas fa-arrow-right"></i>
                     Tiếp tục mua sắm
                 </a>
