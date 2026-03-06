@@ -16,6 +16,15 @@ if (!$product)
         exit();
     }
 
+// goi ham danh gia
+$reviews = getReviewsByProductId($conn, $id);
+
+// xu ly cac bien hien thi
+$gia = $product['gia'];
+$gia_goc = $product['gia_goc'];
+$tiet_kiem = $gia_goc - $gia;
+$phan_tram_giam = $gia_goc > 0 ? round((($gia_goc - $gia) / $gia_goc) * 100) : 0;
+$danh_muc = function_exists('getCategoryKey') ? getCategoryKey($product['danh_muc_id']) : 'Danh mục';
 
 ?>
 
