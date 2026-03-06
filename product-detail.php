@@ -1,20 +1,19 @@
 <?php
- require_once 'functions.php';
- require_once 'Database.php';
+require_once 'functions.php';
+require_once 'Database.php';
 
- $db = new Database();
-    $conn = $db->connect();
- // lay id san pham tu url 
- $id = (int)isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$db = new Database();
+$conn = $db->connect();
+// lay id san pham tu url 
+$id = (int) isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
- $product = getProductById($conn, $id);
- 
- // neu khong tim thay sam pham, chuyen huong ve trang chu 
-if (!$product)
-    {
-        header("Location: index.html");
-        exit();
-    }
+$product = getProductById($conn, $id);
+
+// neu khong tim thay sam pham, chuyen huong ve trang chu 
+if (!$product) {
+    header("Location: index.html");
+    exit();
+}
 
 // goi ham danh gia
 $reviews = getReviewsByProductId($conn, $id);
@@ -28,7 +27,7 @@ $danh_muc = function_exists('getCategoryKey') ? getCategoryKey($product['danh_mu
 
 // lay san pham co lien quan 
 $all_products = function_exists('getallproduct') ? getallproduct($conn) : [];
-$related_products = array_filter($all_products, function($p) use ($id, $danh_muc) {
+$related_products = array_filter($all_products, function ($p) use ($id, $danh_muc) {
     return isset($p['category']) && $p['category'] === $danh_muc && $p['id'] != $id;
 });
 $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản phẩm
@@ -37,20 +36,75 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chi tiết sản phẩm - AthleteHub</title>
-    
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/product-detail.css">
+    <style>
+        .product-tabs-section .nav-tabs {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .product-tabs-section .nav-link {
+            color: #555;
+            font-weight: 600;
+            border: none;
+            padding: 12px 20px;
+        }
+
+        .product-tabs-section .nav-link.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            background: none;
+        }
+
+        .tab-content-body {
+            padding: 20px 0;
+            line-height: 1.8;
+            color: #444;
+        }
+
+        .review-item {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .review-author {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .review-date {
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        .review-stars {
+            color: #ffc107;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
+
 <body>
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg">
@@ -59,11 +113,11 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                 <i class="fas fa-dumbbell"></i>
                 AthleteHub
             </a>
-            
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
@@ -82,18 +136,18 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                         <a class="nav-link" href="#contact">Liên hệ</a>
                     </li>
                 </ul>
-                
+
                 <div class="navbar-right d-flex align-items-center">
                     <div class="nav-notification">
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">2</span>
                     </div>
-                    
+
                     <div class="cart-icon">
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count">0</span>
                     </div>
-                    
+
                     <div class="user-account">
                         <i class="fas fa-user-circle"></i>
                     </div>
@@ -124,7 +178,8 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                 <div class="col-lg-6">
                     <div class="product-gallery">
                         <div class="main-image">
-                            <img id="mainImage" src="https://via.placeholder.com/500x600?text=Áo+Tập+Pro" alt="Áo tập Pro Performance">
+                            <img id="mainImage" src="https://via.placeholder.com/500x600?text=Áo+Tập+Pro"
+                                alt="Áo tập Pro Performance">
                             <span class="product-badge-detail sale">-30%</span>
                         </div>
                         <div class="thumbnail-images">
@@ -164,7 +219,8 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
 
                         <!-- Title & Price -->
                         <h1 class="detail-title">Áo tập Pro Performance</h1>
-                        <p class="detail-description">Áo tập luyện cao cấp với công nghệ hút ẩm tiên tiến, giúp bạn thoải mái trong mọi bài tập thể dục.</p>
+                        <p class="detail-description">Áo tập luyện cao cấp với công nghệ hút ẩm tiên tiến, giúp bạn
+                            thoải mái trong mọi bài tập thể dục.</p>
 
                         <!-- Price Section -->
                         <div class="detail-price-section">
@@ -284,17 +340,20 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
             <div class="product-tabs-section">
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button">
+                        <button class="nav-link active" id="description-tab" data-bs-toggle="tab"
+                            data-bs-target="#description" type="button">
                             Mô tả sản phẩm
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="specifications-tab" data-bs-toggle="tab" data-bs-target="#specifications" type="button">
+                        <button class="nav-link" id="specifications-tab" data-bs-toggle="tab"
+                            data-bs-target="#specifications" type="button">
                             Thông số kỹ thuật
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button">
+                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews"
+                            type="button">
                             Đánh giá (120)
                         </button>
                     </li>
@@ -305,8 +364,10 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                     <div class="tab-pane fade show active" id="description" role="tabpanel">
                         <div class="tab-content-body">
                             <h3>Mô tả sản phẩm</h3>
-                            <p>Áo tập Pro Performance được thiết kế dành cho những người yêu thích hoạt động thể thao. Với công nghệ hút ẩm tiên tiến, sản phẩm giúp bạn luôn thoải mái ngay cả trong những bài tập cơ bắp.</p>
-                            
+                            <p>Áo tập Pro Performance được thiết kế dành cho những người yêu thích hoạt động thể thao.
+                                Với công nghệ hút ẩm tiên tiến, sản phẩm giúp bạn luôn thoải mái ngay cả trong những bài
+                                tập cơ bắp.</p>
+
                             <h4>Đặc điểm nổi bật:</h4>
                             <ul class="feature-list">
                                 <li>Vải co giãn 4 chiều, thoáng khí</li>
@@ -436,11 +497,13 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                                         </div>
                                         <div class="form-group">
                                             <label>Tiêu đề:</label>
-                                            <input type="text" class="form-control" placeholder="Viết tiêu đề đánh giá...">
+                                            <input type="text" class="form-control"
+                                                placeholder="Viết tiêu đề đánh giá...">
                                         </div>
                                         <div class="form-group">
                                             <label>Nội dung:</label>
-                                            <textarea class="form-control" rows="4" placeholder="Chia sẻ kinh nghiệm của bạn..."></textarea>
+                                            <textarea class="form-control" rows="4"
+                                                placeholder="Chia sẻ kinh nghiệm của bạn..."></textarea>
                                         </div>
                                         <button type="submit" class="btn-submit-review">Gửi đánh giá</button>
                                     </form>
@@ -448,12 +511,13 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
 
                                 <div class="reviews-list">
                                     <h4>Đánh giá từ khách hàng</h4>
-                                    
+
                                     <!-- Review Item 1 -->
                                     <div class="review-item">
                                         <div class="review-header">
                                             <div class="reviewer-info">
-                                                <img src="https://via.placeholder.com/40?text=Avatar" alt="Avatar" class="reviewer-avatar">
+                                                <img src="https://via.placeholder.com/40?text=Avatar" alt="Avatar"
+                                                    class="reviewer-avatar">
                                                 <div>
                                                     <h5>Nguyễn Văn A</h5>
                                                     <p class="review-date">5 sao - 3 tuần trước</p>
@@ -464,7 +528,8 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                                             </span>
                                         </div>
                                         <h5 class="review-title">Sản phẩm rất tốt, thoái mái khi mặc</h5>
-                                        <p class="review-content">Áo rất chất lượng, vải co giãn tốt, thoáng khí. Tôi đã mặc để chạy bộ và cảm thấy rất thoải mái. Chắc chắn sẽ mua lại!</p>
+                                        <p class="review-content">Áo rất chất lượng, vải co giãn tốt, thoáng khí. Tôi đã
+                                            mặc để chạy bộ và cảm thấy rất thoải mái. Chắc chắn sẽ mua lại!</p>
                                         <div class="review-actions">
                                             <button class="helpful-btn">
                                                 <i class="fas fa-thumbs-up"></i> Hữu ích (12)
@@ -479,7 +544,8 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                                     <div class="review-item">
                                         <div class="review-header">
                                             <div class="reviewer-info">
-                                                <img src="https://via.placeholder.com/40?text=Avatar" alt="Avatar" class="reviewer-avatar">
+                                                <img src="https://via.placeholder.com/40?text=Avatar" alt="Avatar"
+                                                    class="reviewer-avatar">
                                                 <div>
                                                     <h5>Trần Thị B</h5>
                                                     <p class="review-date">4 sao - 1 tháng trước</p>
@@ -490,7 +556,8 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                                             </span>
                                         </div>
                                         <h5 class="review-title">Tốt nhưng hơi rộng</h5>
-                                        <p class="review-content">Áo chất lượng tốt, nhưng hơi rộng so với mong đợi. Bạn nên mua size nhỏ hơn 1 size. Nhưng nhìn chung sản phẩm rất xứng đáng.</p>
+                                        <p class="review-content">Áo chất lượng tốt, nhưng hơi rộng so với mong đợi. Bạn
+                                            nên mua size nhỏ hơn 1 size. Nhưng nhìn chung sản phẩm rất xứng đáng.</p>
                                         <div class="review-actions">
                                             <button class="helpful-btn">
                                                 <i class="fas fa-thumbs-up"></i> Hữu ích (8)
@@ -618,7 +685,8 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-section">
                             <h4 class="footer-title">AthleteHub</h4>
-                            <p style="color: #c0c0c0;">Chúng tôi cung cấp sản phẩm thể thao chất lượng cao với giá cạnh tranh tốt nhất.</p>
+                            <p style="color: #c0c0c0;">Chúng tôi cung cấp sản phẩm thể thao chất lượng cao với giá cạnh
+                                tranh tốt nhất.</p>
                             <div class="footer-socials">
                                 <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
                                 <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
@@ -674,4 +742,5 @@ $related_products = array_slice($related_products, 0, 4); // Chỉ lấy 4 sản
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="js/product-detail.js"></script>
 </body>
+
 </html>
