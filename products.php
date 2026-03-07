@@ -314,9 +314,10 @@ $items = getallproduct($conn);
                         <div class="footer-section">
                             <h4 class="footer-title">Liên kết nhanh</h4>
                             <ul class="footer-links">
-                                <li><a href="#">Trang chủ</a></li>
-                                <li><a href="#">Sản phẩm</a></li>
-                                <li><a href="#">Danh mục</a></li>
+                                <li><a href="index.php"><i class="fas fa-angle-right"></i>Trang chủ</a></li>
+                                <li><a href="products.php"><i class="fas fa-angle-right"></i>Sản phẩm</a></li>
+                                <li><a href="#categories"><i class="fas fa-angle-right"></i>Danh mục</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Về chúng tôi</a></li>
                             </ul>
                         </div>
                     </div>
