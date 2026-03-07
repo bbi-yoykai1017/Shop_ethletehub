@@ -190,17 +190,17 @@ $displayProducts = array_slice($products, 0, 6);
                             </a>
                         </div>
 
-                        <a href="#giay" class="dropdown-cat-item">
+                        <a href="Category_products.php?danh_muc_id=2" class="dropdown-cat-item" onclick="window.location.href=this.href" >
                             <i class="fas fa-shoe-prints"></i>
                             <span>Giày</span>
                             <span class="badge">150+</span>
                         </a>
-                        <a href="#thietbi" class="dropdown-cat-item">
+                        <a href="Category_products.php?danh_muc_id=3" class="dropdown-cat-item" onclick="window.location.href=this.href" >
                             <i class="fas fa-dumbbell"></i>
                             <span>Thiết bị</span>
                             <span class="badge">300+</span>
                         </a>
-                        <a href="#phukien" class="dropdown-cat-item">
+                        <a href="Category_products.php?danh_muc_id=4" class="dropdown-cat-item" onclick="window.location.href=this.href" >
                             <i class="fas fa-briefcase"></i>
                             <span>Phụ kiện</span>
                             <span class="badge">250+</span>
