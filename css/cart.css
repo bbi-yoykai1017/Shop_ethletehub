@@ -36,7 +36,7 @@
 .cart-items {
     display: flex;
     flex-direction: column;
-    divide-y;
+   
 }
 
 /* Cart Item */
