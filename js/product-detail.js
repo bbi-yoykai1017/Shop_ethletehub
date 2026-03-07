@@ -119,18 +119,22 @@ if (addToCartBtn) {
         const sizeBtn = document.querySelector('.size-btn.active');
         const colorBtn = document.querySelector('.color-btn.active');
         
-        if (!sizeBtn) {
+        // Check if product has variants (size or color buttons exist)
+        const hasSizeOptions = document.querySelectorAll('.size-btn').length > 0;
+        const hasColorOptions = document.querySelectorAll('.color-btn').length > 0;
+        
+        if (hasSizeOptions && !sizeBtn) {
             showNotification('Vui lòng chọn size!', 'danger');
             return;
         }
         
-        if (!colorBtn) {
+        if (hasColorOptions && !colorBtn) {
             showNotification('Vui lòng chọn màu sắc!', 'danger');
             return;
         }
         
-        const size = sizeBtn.dataset.sizeName || sizeBtn.textContent;
-        const color = colorBtn.dataset.colorName || colorBtn.title;
+        const size = sizeBtn ? (sizeBtn.dataset.sizeName || sizeBtn.textContent) : '';
+        const color = colorBtn ? (colorBtn.dataset.colorName || colorBtn.title) : '';
         const productName = document.querySelector('.detail-title').textContent;
         
         // Add to cart logic
@@ -162,7 +166,17 @@ if (addToCartBtn) {
         // Update cart count
         updateCartCount();
         
-        showNotification(productName + ' (' + size + '/' + color + ') đã được thêm vào giỏ hàng! (' + quantity + ' sản phẩm)', 'success');
+        // Create variant text
+        let variantText = '';
+        if (size && color) {
+            variantText = ' (' + size + '/' + color + ')';
+        } else if (size) {
+            variantText = ' (Size: ' + size + ')';
+        } else if (color) {
+            variantText = ' (Màu: ' + color + ')';
+        }
+        
+        showNotification(productName + variantText + ' đã được thêm vào giỏ hàng! (' + quantity + ' sản phẩm)', 'success');
         
         // Reset quantity
         document.getElementById('quantity').value = 1;
@@ -179,12 +193,16 @@ if (buyNowBtn) {
         const sizeBtn = document.querySelector('.size-btn.active');
         const colorBtn = document.querySelector('.color-btn.active');
         
-        if (!sizeBtn) {
+        // Check if product has variants
+        const hasSizeOptions = document.querySelectorAll('.size-btn').length > 0;
+        const hasColorOptions = document.querySelectorAll('.color-btn').length > 0;
+        
+        if (hasSizeOptions && !sizeBtn) {
             showNotification('Vui lòng chọn size!', 'danger');
             return;
         }
         
-        if (!colorBtn) {
+        if (hasColorOptions && !colorBtn) {
             showNotification('Vui lòng chọn màu sắc!', 'danger');
             return;
         }

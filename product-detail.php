@@ -271,7 +271,9 @@ $ratingSummary = $product['rating_summary'] ?? 0;
 
                         <!-- Product Options -->
                         <div class="product-options">
+                            <?php if (!empty($sizes) || !empty($colors)): ?>
                             <!-- Size -->
+                            <?php if (!empty($sizes)): ?>
                             <div class="option-group">
                                 <label class="option-label">Size:</label>
                                 <div class="size-options" id="sizeOptions">
@@ -283,8 +285,10 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                     <?php endforeach; ?>
                                 </div>
                             </div>
+                            <?php endif; ?>
 
                             <!-- Color -->
+                            <?php if (!empty($colors)): ?>
                             <div class="option-group">
                                 <label class="option-label">Màu sắc:</label>
                                 <div class="color-options" id="colorOptions">
@@ -297,6 +301,8 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                     <?php endforeach; ?>
                                 </div>
                             </div>
+                            <?php endif; ?>
+                            <?php endif; ?>
 
                             <!-- Quantity -->
                             <div class="option-group">
