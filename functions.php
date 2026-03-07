@@ -428,4 +428,28 @@ function getReviewsByProductId($conn, $id, $limit = 5) {
     }
 }
 
+ //Lấy danh sách sản phẩm theo ID danh mục
+ 
+function getProductsByCategory($conn, $categoryId) {
+    $sql = "SELECT * FROM san_pham WHERE danh_muc_id = :cat_id AND trang_thai = 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cat_id', $categoryId, PDO::PARAM_INT);
+    $stmt->execute();
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Sử dụng lại logic map dữ liệu bạn đã viết ở hàm getallproduct
+    return array_map(function($p) {
+        return [
+            'id' => $p['id'],
+            'name' => $p['ten'],
+            'description' => $p['mo_ta'],
+            'price' => $p['gia'],
+            'originalPrice' => $p['gia_goc'],
+            'rating' => $p['trung_binh_sao'],
+            'image' => $p['hinh_anh_chinh'],
+            'category' => getCategoryKey($p['danh_muc_id']),
+            // ... thêm các trường khác nếu cần
+        ];
+    }, $products);
+}
 ?>
