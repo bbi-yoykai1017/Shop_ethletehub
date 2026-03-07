@@ -356,7 +356,6 @@ $items = getallproduct($conn);
     // Kiểm tra nếu chưa có thì mới gán, dùng 'var' hoặc gán thẳng vào 'window'
     window.allProducts = <?php echo json_encode($items); ?>;
 </script>
-
     <script src="js/products-page.js"></script>
 </body>
 
