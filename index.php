@@ -182,11 +182,14 @@ $displayProducts = array_slice($products, 0, 6);
                         <i class="fas fa-chevron-down dropdown-icon"></i>
                     </button>
                     <div class="categories-dropdown-menu" id="categoriesDropdownMenu">
-                        <a href="Category_products.php?danh_muc_id=1" class="dropdown-cat-item">
-                            <i class="fas fa-person-running"></i>
-                            <span>Quần áo</span>
-                            <span class="badge">200+</span>
-                        </a>
+                        <div>
+                            <a href="Category_products.php?danh_muc_id=1" class="dropdown-cat-item" onclick="window.location.href=this.href" >
+                                <i class="fas fa-person-running"></i>
+                                <span>Quần áo</span>
+                                <span class="badge">200+</span>
+                            </a>
+                        </div>
+
                         <a href="#giay" class="dropdown-cat-item">
                             <i class="fas fa-shoe-prints"></i>
                             <span>Giày</span>
