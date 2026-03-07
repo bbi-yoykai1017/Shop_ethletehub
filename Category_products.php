@@ -128,7 +128,7 @@ if ($id_danhmuc > 0) {
                 <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="product-card h-100 shadow-sm border-0">
                         <div class="product-img-container position-relative">
-                            <img src="public/<?php echo $product['image']; ?>" class="card-img-top p-3" alt="<?php echo $product['name']; ?>">
+                            <img src="public/<?php echo $product['image']; ?>" class="product-image" alt="<?php echo $product['name']; ?>">
                         </div>
                         <div class="card-body">
                             <h5 class="product-title text-truncate"><?php echo $product['name']; ?></h5>
