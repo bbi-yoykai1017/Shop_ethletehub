@@ -106,7 +106,126 @@ if ($id_danhmuc > 0) {
             </div>
         </div>
     </nav>
+  <!-- ========================
+         FOOTER
+         ======================== -->
+    <footer class="footer">
+        <div class="container-custom">
+            <div class="footer-top">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-section">
+                            <h4 class="footer-title">AthleteHub</h4>
+                            <p style="color: #c0c0c0; margin-bottom: 20px;">Chúng tôi cung cấp sản phẩm thể thao chất
+                                lượng cao với giá cạnh tranh tốt nhất trên thị trường.</p>
+                            <div class="footer-socials">
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-youtube"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-section">
+                            <h4 class="footer-title">Liên kết nhanh</h4>
+                            <ul class="footer-links">
+                                <li><a href="index.php"><i class="fas fa-angle-right"></i>Trang chủ</a></li>
+                                <li><a href="products.php"><i class="fas fa-angle-right"></i>Sản phẩm</a></li>
+                                <li><a href="#categories"><i class="fas fa-angle-right"></i>Danh mục</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Về chúng tôi</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-section">
+                            <h4 class="footer-title">Hỗ trợ khách hàng</h4>
+                            <ul class="footer-links">
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Liên hệ chúng tôi</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Chính sách giao hàng</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Chính sách hoàn trả</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Câu hỏi thường gặp</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Theo dõi đơn hàng</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-section">
+                            <h4 class="footer-title">Liên lạc</h4>
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <p>123 Đường Thể Thao, TP. Hồ Chí Minh, Việt Nam</p>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <p>+84 (0) 123 456 789</p>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <p>support@athletehub.vn</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="row mt-5">
+                <div class="col-lg-6 mx-auto">
+                    <div class="footer-newsletter">
+                        <h3>Đăng ký nhận tin</h3>
+                        <p>Nhận ưu đãi độc quyền, cập nhật sản phẩm mới và nhiều hơn nữa trực tiếp vào hộp thư của bạn.
+                        </p>
+                        <form class="newsletter-form">
+                            <input type="email" class="newsletter-input" placeholder="Nhập email của bạn" required>
+                            <button type="submit" class="newsletter-btn">
+                                <i class="fas fa-paper-plane"></i>
+                                Đăng ký
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <div class="footer-copyright">
+                        &copy;
+                        <?php echo date("Y"); ?> <strong>AthleteHub</strong>. Bảo lưu mọi quyền.
+                    </div>
+                    <ul class="footer-bottom-links">
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">Điều khoản dịch vụ</a></li>
+                        <li><a href="#">Sitemap</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/script.js"></script>
+    <script src="js/categories.js"></script>
 </body>
-<header>
-    
-</header>
+
+</html>
