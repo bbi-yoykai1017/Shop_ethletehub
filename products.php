@@ -358,6 +358,7 @@ $items = getallproduct($conn);
 </script>
 
     <script src="js/products-page.js"></script>
+    
 </body>
 
 </html>

@@ -29,25 +29,34 @@ function renderProducts() {
 
     grid.innerHTML = filteredProducts.map(product => `
         <div class="product-card-page">
-            <div class="product-image-page">
-            <img src="./public/${product.hinh_anh_chinh}" ~ 
-     alt="${product.ten_san_pham}" 
-     onerror="this.src='./public/images/aoamnu.jpg'">
-                ${getDiscountBadge(product)}
-            </div>
+            <a href="product-detail.php?id=${product.id}" class="product-item-link" style="text-decoration: none; color: inherit;">
+                <div class="product-image-page">
+                    <img src="./public/${product.hinh_anh_chinh}" 
+                         alt="${product.ten}" 
+                         onerror="this.src='./public/images/aoamnu.jpg'">
+                    ${getDiscountBadge(product)}
+                </div>
+            </a>
+            
             <div class="product-info-page">
                 <div class="product-category-page">${getCategoryLabel(product.ten)}</div>
-                <h3 class="product-name-page">${product.mo_ta}</h3>
+                
+                <a href="product-detail.php?id=${product.id}" style="text-decoration: none; color: inherit;">
+                    <h3 class="product-name-page">${product.ten}</h3>
+                </a>
+
                 <div class="rating-page">
                     ${getStarRating(Number(product.trung_binh_sao))} 
                     <span>(${product.so_luong_danh_gia || 0})</span>
                 </div>
+                
                 <div class="product-price-page">
                     <span class="price-current-page">${formatPrice(product.gia)}</span>
                     ${(product.gia_goc && Number(product.gia_goc) > Number(product.gia))
-            ? `<span class="price-original-page">${formatPrice(product.gia_goc)}</span>`
-            : ''}
+                        ? `<span class="price-original-page">${formatPrice(product.gia_goc)}</span>`
+                        : ''}
                 </div>
+                
                 <button class="btn-page-add" onclick="addToCart(${product.id})">
                     <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
                 </button>
