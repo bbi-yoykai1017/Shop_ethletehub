@@ -106,6 +106,8 @@ if ($id_danhmuc > 0) {
             </div>
         </div>
     </nav>
+
+</body>
   <!-- ========================
          FOOTER
          ======================== -->
@@ -226,6 +228,6 @@ if ($id_danhmuc > 0) {
     <!-- Custom JS -->
     <script src="js/script.js"></script>
     <script src="js/categories.js"></script>
-</body>
+
 
 </html>
