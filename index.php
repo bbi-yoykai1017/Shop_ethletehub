@@ -182,24 +182,22 @@ $displayProducts = array_slice($products, 0, 6);
                         <i class="fas fa-chevron-down dropdown-icon"></i>
                     </button>
                     <div class="categories-dropdown-menu" id="categoriesDropdownMenu">
-                        <div class="category-card" onclick="window.location.href='Category_products.php?danh_muc_id=1'">
-                            <h3>Quần áo</h3>
-                        </div>
-                        <i class="fas fa-person-running"></i>
-                        <span>Quần áo</span>
-                        <span class="badge">200+</span>
-                   
-                        <a href="Category_products.php?category=giay" class="dropdown-cat-item">
+                        <a href="Category_products.php?danh_muc_id=1" class="dropdown-cat-item">
+                            <i class="fas fa-person-running"></i>
+                            <span>Quần áo</span>
+                            <span class="badge">200+</span>
+                        </a>
+                        <a href="#giay" class="dropdown-cat-item">
                             <i class="fas fa-shoe-prints"></i>
                             <span>Giày</span>
                             <span class="badge">150+</span>
                         </a>
-                        <a href="Category_products.php?category=thietbi" class="dropdown-cat-item">
+                        <a href="#thietbi" class="dropdown-cat-item">
                             <i class="fas fa-dumbbell"></i>
                             <span>Thiết bị</span>
                             <span class="badge">300+</span>
                         </a>
-                        <a href="Category_products.php?category=phukien" class="dropdown-cat-item">
+                        <a href="#phukien" class="dropdown-cat-item">
                             <i class="fas fa-briefcase"></i>
                             <span>Phụ kiện</span>
                             <span class="badge">250+</span>
