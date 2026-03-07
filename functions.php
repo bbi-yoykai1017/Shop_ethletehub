@@ -446,9 +446,15 @@ function getProductsByCategory($conn, $categoryId) {
             'price' => $p['gia'],
             'originalPrice' => $p['gia_goc'],
             'rating' => $p['trung_binh_sao'],
-            'image' => $p['hinh_anh_chinh'],
+            'image' => $p['hinh_anh_chinh'], // Sử dụng trực tiếp tên file từ database
             'category' => getCategoryKey($p['danh_muc_id']),
-            // ... thêm các trường khác nếu cần
+            'trung_binh_sao' => $p['trung_binh_sao'],
+            'so_luong_danh_gia' => $p['so_luong_danh_gia'],
+            'hinh_anh_chinh' => $p['hinh_anh_chinh'],
+            'ten' => $p['ten'],
+            'mo_ta' => $p['mo_ta'],
+            'gia' => $p['gia'],
+            'gia_goc' => $p['gia_goc']
         ];
     }, $products);
 }
