@@ -106,7 +106,63 @@ if ($id_danhmuc > 0) {
             </div>
         </div>
     </nav>
+<main class="container my-5">
+    <div class="section-header mb-4">
+        <h2 class="text-uppercase fw-bold">
+            <?php 
+                // Hiển thị tên danh mục dựa trên ID
+                $categoryName = "Sản phẩm";
+                if($id_danhmuc == 1) $categoryName = "Quần áo";
+                if($id_danhmuc == 2) $categoryName = "Giày";
+                if($id_danhmuc == 3) $categoryName = "Thiết bị";
+                if($id_danhmuc == 4) $categoryName = "Phụ kiện";
+                echo $categoryName;
+            ?>
+        </h2>
+        <p class="text-muted">Tìm thấy <?php echo count($products); ?> sản phẩm</p>
+    </div>
 
+    <div class="row g-4">
+        <?php if (!empty($products)): ?>
+            <?php foreach ($products as $product): ?>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product-card h-100 shadow-sm border-0">
+                        <div class="product-img-container position-relative">
+                            <img src="<?php echo $product['image']; ?>" class="card-img-top p-3" alt="<?php echo $product['name']; ?>">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="product-title text-truncate"><?php echo $product['name']; ?></h5>
+                            <div class="product-rating mb-2 text-warning small">
+                                <?php 
+                                    for($i = 1; $i <= 5; $i++) {
+                                        echo $i <= $product['rating'] ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+                                    }
+                                ?>
+                            </div>
+                            <div class="product-price d-flex align-items-center gap-2">
+                                <span class="current-price fw-bold text-danger"><?php echo number_format($product['price'], 0, ',', '.'); ?>đ</span>
+                                <?php if($product['originalPrice'] > $product['price']): ?>
+                                    <span class="old-price text-muted text-decoration-line-through small"><?php echo number_format($product['originalPrice'], 0, ',', '.'); ?>đ</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pb-3">
+                            <button class="btn btn-outline-primary w-100 add-to-cart-btn">
+                                <i class="fas fa-shopping-cart me-2"></i>Thêm vào giỏ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="col-12 text-center my-5">
+                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                <p>Hiện chưa có sản phẩm nào trong danh mục này.</p>
+                <a href="index.php" class="btn btn-primary">Quay lại trang chủ</a>
+            </div>
+        <?php endif; ?>
+    </div>
+</main>
 </body>
   <!-- ========================
          FOOTER
