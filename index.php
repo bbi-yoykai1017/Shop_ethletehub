@@ -338,8 +338,9 @@ $displayProducts = array_slice($products, 0, 6);
                                 <button class="product-btn btn-add-cart">
                                     <i class="fas fa-shopping-cart"></i> Thêm
                                 </button>
-                                <button class="product-btn btn-wishlist">
-                                    <i class="fas fa-heart"></i>
+                                <button class="btn-buy-now-detail" onclick="window.location.href='ThanhToan.php?id=<?php echo $product['id']; ?>'">
+                                    <i class="fas fa-bolt"></i>
+                                    Mua Ngay
                                 </button>
                             </div>
                         </div>
@@ -348,7 +349,7 @@ $displayProducts = array_slice($products, 0, 6);
             </div>
 
             <div class="view-all-btn">
-                <button class="btn-custom btn-primary-custom" onclick="window.location.href='products.php'">
+                <button class="btn-custom btn-primary-custom" >
                     <i class="fas fa-arrow-right"></i>
                     Xem tất cả sản phẩm
                 </button>
@@ -473,8 +474,6 @@ $displayProducts = array_slice($products, 0, 6);
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom JS -->
-    <script src="js/script.js"></script>
     <script src="js/categories.js"></script>
 </body>
 
