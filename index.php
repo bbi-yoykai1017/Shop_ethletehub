@@ -328,10 +328,7 @@ $displayProducts = array_slice($products, 0, 6);
                             </div>
                             <div class="product-price">
                                 <span class="price-current"><?php echo formatPrice($product['price']); ?></span>
-                                <?php if ($product['originalPrice'] > $product['price']): ?>
-                                    <span class="price-original"><?php echo formatPrice($product['originalPrice']); ?></span>
-                                    <span class="price-discount">-<?php echo $product['discount']; ?>%</span>
-                                <?php endif; ?>
+                               
                             </div>
                             <p class="product-description"><?php echo htmlspecialchars($product['description'] ?? ''); ?>
                             </p>
