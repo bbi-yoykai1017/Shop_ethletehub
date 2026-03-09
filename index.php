@@ -115,7 +115,7 @@ $displayProducts = array_slice($products, 0, 6);
                 <!-- Hero Image (Left) -->
                 <div class="col-lg-6 col-md-6">
                     <div class="hero-image hero-image-left">
-                        <img src="https://via.placeholder.com/450x550?text=Đồ+Thể+Thao" alt="Đồ thể thao chuyên nghiệp"
+                        <img src="https://conndesign.vn/wp-content/uploads/2024/04/thiet-ke-shop-the-thao-8.jpg" alt="Đồ thể thao chuyên nghiệp"
                             class="hero-img">
                     </div>
                 </div>

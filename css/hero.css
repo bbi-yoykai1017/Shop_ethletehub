@@ -253,13 +253,15 @@
     }
 }
 
+
 .hero-img {
-    max-width: 100%;
-    height: auto;
+    width: 100%;             /* Đảm bảo ảnh phủ hết chiều rộng khung */
+    height: 550px;           /* Tăng chiều cao lên mức bạn muốn (ví dụ 550px) */
+    object-fit: cover;       /* Giúp ảnh không bị móp méo khi tăng chiều cao */
+    object-position: center; /* Giữ trọng tâm ảnh ở giữa */
     filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
     animation: floating 3s ease-in-out infinite;
     border-radius: var(--border-radius-lg);
-    object-fit: cover;
 }
 
 /* Responsive */
