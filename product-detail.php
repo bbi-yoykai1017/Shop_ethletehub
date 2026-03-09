@@ -178,8 +178,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                             href="products.php?category=<?php echo $categoryKey; ?>"><?php echo htmlspecialchars($danh_muc); ?></a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        <?php echo htmlspecialchars($product['ten']); ?>
-                    </li>
+                        <?php echo htmlspecialchars($product['ten']); ?></li>
                 </ol>
             </nav>
         </div>
@@ -273,36 +272,36 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                         <!-- Product Options -->
                         <div class="product-options">
                             <?php if (!empty($sizes) || !empty($colors)): ?>
-                                <!-- Size -->
-                                <?php if (!empty($sizes)): ?>
-                                    <div class="option-group">
-                                        <label class="option-label">Size:</label>
-                                        <div class="size-options" id="sizeOptions">
-                                            <?php foreach ($sizes as $size): ?>
-                                                <button type="button" class="size-btn" data-size-id="<?php echo $size['id']; ?>"
-                                                    data-size-name="<?php echo htmlspecialchars($size['ten']); ?>">
-                                                    <?php echo htmlspecialchars($size['ten']); ?>
-                                                </button>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
+                            <!-- Size -->
+                            <?php if (!empty($sizes)): ?>
+                            <div class="option-group">
+                                <label class="option-label">Size:</label>
+                                <div class="size-options" id="sizeOptions">
+                                    <?php foreach ($sizes as $size): ?>
+                                        <button type="button" class="size-btn" data-size-id="<?php echo $size['id']; ?>"
+                                            data-size-name="<?php echo htmlspecialchars($size['ten']); ?>">
+                                            <?php echo htmlspecialchars($size['ten']); ?>
+                                        </button>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
 
-                                <!-- Color -->
-                                <?php if (!empty($colors)): ?>
-                                    <div class="option-group">
-                                        <label class="option-label">Màu sắc:</label>
-                                        <div class="color-options" id="colorOptions">
-                                            <?php foreach ($colors as $color): ?>
-                                                <button type="button" class="color-btn" data-color-id="<?php echo $color['id']; ?>"
-                                                    data-color-name="<?php echo htmlspecialchars($color['ten']); ?>"
-                                                    style="background-color: <?php echo htmlspecialchars($color['ma_hex']); ?>;"
-                                                    title="<?php echo htmlspecialchars($color['ten']); ?>">
-                                                </button>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
+                            <!-- Color -->
+                            <?php if (!empty($colors)): ?>
+                            <div class="option-group">
+                                <label class="option-label">Màu sắc:</label>
+                                <div class="color-options" id="colorOptions">
+                                    <?php foreach ($colors as $color): ?>
+                                        <button type="button" class="color-btn" data-color-id="<?php echo $color['id']; ?>"
+                                            data-color-name="<?php echo htmlspecialchars($color['ten']); ?>"
+                                            style="background-color: <?php echo htmlspecialchars($color['ma_hex']); ?>;"
+                                            title="<?php echo htmlspecialchars($color['ten']); ?>">
+                                        </button>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
                             <?php endif; ?>
 
                             <!-- Quantity -->
@@ -439,8 +438,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                 <div class="reviews-summary">
                                     <div class="rating-box">
                                         <div class="rating-number">
-                                            <?php echo number_format($ratingSummary['average_rating'], 1); ?>
-                                        </div>
+                                            <?php echo number_format($ratingSummary['average_rating'], 1); ?></div>
                                         <div class="rating-stars">
                                             <?php echo getStarRating($ratingSummary['average_rating']); ?>
                                         </div>
@@ -512,8 +510,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                                     </span>
                                                 </div>
                                                 <p class="review-content">
-                                                    <?php echo nl2br(htmlspecialchars($review['binh_luan'])); ?>
-                                                </p>
+                                                    <?php echo nl2br(htmlspecialchars($review['binh_luan'])); ?></p>
                                                 <div class="review-actions">
                                                     <button class="helpful-btn">
                                                         <i class="fas fa-thumbs-up"></i> Hữu ích
@@ -537,77 +534,38 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                     <span>Sản phẩm liên quan</span>
                 </h2>
 
-                <div class="products-grid">
+                <div class="row">
                     <?php if (!empty($relatedProducts)): ?>
                         <?php foreach ($relatedProducts as $related): ?>
-                            <div class="product-card" data-product-id="<?php echo $related['id']; ?>">
-                                <div class="product-image">
-                                    <a href="product-detail.php?id=<?php echo $related['id']; ?>" style="display: block;">
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="product-card-small">
+                                    <div class="product-image-small">
                                         <?php if (!empty($related['hinh_anh_chinh'])): ?>
                                             <img src="public/<?php echo htmlspecialchars($related['hinh_anh_chinh']); ?>"
-                                                alt="<?php echo htmlspecialchars($related['ten']); ?>"
-                                                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                            <i class="fas fa-shirt" style="display:none;"></i>
+                                                alt="<?php echo htmlspecialchars($related['ten']); ?>">
                                         <?php else: ?>
                                             <i class="fas fa-shirt"></i>
                                         <?php endif; ?>
-                                    </a>
-
-                                    <?php if ($related['discount_percent'] > 0): ?>
-                                        <span class="product-badge sale">-<?php echo $related['discount_percent']; ?>%</span>
-                                    <?php endif; ?>
-                                    
-                                    <?php 
-                                    // Get stock status for this product
-                                    $relatedStock = getTotalStock($conn, $related['id']);
-                                    ?>
-                                    <span class="product-rating">
-                                        <i class="fas fa-star"></i>
-                                        <?php echo number_format($related['trung_binh_sao'] ?? 0, 1); ?>
-                                    </span>
-                                    <button class="btn-quick-view" onclick="window.location.href='product-detail.php?id=<?php echo $related['id']; ?>'">Xem nhanh</button>
-                                </div>
-
-                                <div class="product-info">
-                                    <?php 
-                                    // Get category label
-                                    $relatedCategoryLabel = getCategoryLabel($related['category_key'] ?? 'quan-ao');
-                                    ?>
-                                    <div class="product-category"><?php echo htmlspecialchars($relatedCategoryLabel); ?></div>
-
-                                    <h3 class="product-name">
-                                        <a href="product-detail.php?id=<?php echo $related['id']; ?>"
-                                            style="text-decoration: none; color: inherit;">
-                                            <?php echo htmlspecialchars($related['ten']); ?>
-                                        </a>
-                                    </h3>
-
-                                    <div class="rating-stars">
-                                        <?php echo $related['star_rating']; ?>
-                                        <span class="rating-text">(<?php echo $related['so_luong_danh_gia'] ?? 0; ?>)</span>
-                                    </div>
-                                    <div class="product-price">
-                                        <span class="price-current"><?php echo $related['gia_formatted']; ?></span>
                                         <?php if ($related['discount_percent'] > 0): ?>
-                                            <span class="price-original"><?php echo $related['gia_goc_formatted']; ?></span>
-                                            <span class="price-discount">-<?php echo $related['discount_percent']; ?>%</span>
+                                            <span class="product-badge">-<?php echo $related['discount_percent']; ?>%</span>
                                         <?php endif; ?>
                                     </div>
-                                    <p class="product-description"><?php echo htmlspecialchars($related['mo_ta'] ?? ''); ?></p>
-                                    
-                                    <?php if ($relatedStock > 0): ?>
-                                        <span class="stock-status in-stock">Còn hàng</span>
-                                    <?php else: ?>
-                                        <span class="stock-status out-of-stock">Hết hàng</span>
-                                    <?php endif; ?>
-
-                                    <div class="product-actions">
-                                        <button class="product-btn btn-add-cart" data-product-id="<?php echo $related['id']; ?>">
-                                            <i class="fas fa-shopping-cart"></i> Thêm
-                                        </button>
-                                        <button class="product-btn btn-wishlist" data-product-id="<?php echo $related['id']; ?>">
-                                            <i class="fas fa-heart"></i>
-                                        </button>
+                                    <div class="product-info-small">
+                                        <h4><?php echo htmlspecialchars($related['ten']); ?></h4>
+                                        <div class="price-small">
+                                            <span class="price"><?php echo $related['gia_formatted']; ?></span>
+                                            <?php if ($related['discount_percent'] > 0): ?>
+                                                <span class="price-old"><?php echo $related['gia_goc_formatted']; ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="rating-small">
+                                            <?php echo $related['star_rating']; ?>
+                                            <span>(<?php echo $related['so_luong_danh_gia']; ?>)</span>
+                                        </div>
+                                        <a href="product-detail.php?id=<?php echo $related['id']; ?>" class="btn-view-detail"
+                                            style="display: inline-block; padding: 8px 15px; background: var(--primary); color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
+                                            Xem chi tiết
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -677,17 +635,16 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                 </div>
             </div>
             <div class="footer-bottom">
-                <div class="footer-copyright">
-                    &copy;
-                    <?php echo date("Y"); ?> <strong>AthleteHub</strong>. Bảo lưu mọi quyền.
-                </div>
+                 <div class="footer-copyright">
+                        &copy;
+                        <?php echo date("Y"); ?> <strong>AthleteHub</strong>. Bảo lưu mọi quyền.
+                    </div>
             </div>
         </div>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="js/product-detail.js"></script>
-    <script src="js/script.js"></script>
 </body>
 
 </html>
