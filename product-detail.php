@@ -178,7 +178,8 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                             href="products.php?category=<?php echo $categoryKey; ?>"><?php echo htmlspecialchars($danh_muc); ?></a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        <?php echo htmlspecialchars($product['ten']); ?></li>
+                        <?php echo htmlspecialchars($product['ten']); ?>
+                    </li>
                 </ol>
             </nav>
         </div>
@@ -272,36 +273,36 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                         <!-- Product Options -->
                         <div class="product-options">
                             <?php if (!empty($sizes) || !empty($colors)): ?>
-                            <!-- Size -->
-                            <?php if (!empty($sizes)): ?>
-                            <div class="option-group">
-                                <label class="option-label">Size:</label>
-                                <div class="size-options" id="sizeOptions">
-                                    <?php foreach ($sizes as $size): ?>
-                                        <button type="button" class="size-btn" data-size-id="<?php echo $size['id']; ?>"
-                                            data-size-name="<?php echo htmlspecialchars($size['ten']); ?>">
-                                            <?php echo htmlspecialchars($size['ten']); ?>
-                                        </button>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                            <?php endif; ?>
+                                <!-- Size -->
+                                <?php if (!empty($sizes)): ?>
+                                    <div class="option-group">
+                                        <label class="option-label">Size:</label>
+                                        <div class="size-options" id="sizeOptions">
+                                            <?php foreach ($sizes as $size): ?>
+                                                <button type="button" class="size-btn" data-size-id="<?php echo $size['id']; ?>"
+                                                    data-size-name="<?php echo htmlspecialchars($size['ten']); ?>">
+                                                    <?php echo htmlspecialchars($size['ten']); ?>
+                                                </button>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
 
-                            <!-- Color -->
-                            <?php if (!empty($colors)): ?>
-                            <div class="option-group">
-                                <label class="option-label">Màu sắc:</label>
-                                <div class="color-options" id="colorOptions">
-                                    <?php foreach ($colors as $color): ?>
-                                        <button type="button" class="color-btn" data-color-id="<?php echo $color['id']; ?>"
-                                            data-color-name="<?php echo htmlspecialchars($color['ten']); ?>"
-                                            style="background-color: <?php echo htmlspecialchars($color['ma_hex']); ?>;"
-                                            title="<?php echo htmlspecialchars($color['ten']); ?>">
-                                        </button>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                            <?php endif; ?>
+                                <!-- Color -->
+                                <?php if (!empty($colors)): ?>
+                                    <div class="option-group">
+                                        <label class="option-label">Màu sắc:</label>
+                                        <div class="color-options" id="colorOptions">
+                                            <?php foreach ($colors as $color): ?>
+                                                <button type="button" class="color-btn" data-color-id="<?php echo $color['id']; ?>"
+                                                    data-color-name="<?php echo htmlspecialchars($color['ten']); ?>"
+                                                    style="background-color: <?php echo htmlspecialchars($color['ma_hex']); ?>;"
+                                                    title="<?php echo htmlspecialchars($color['ten']); ?>">
+                                                </button>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
                             <?php endif; ?>
 
                             <!-- Quantity -->
@@ -438,7 +439,8 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                 <div class="reviews-summary">
                                     <div class="rating-box">
                                         <div class="rating-number">
-                                            <?php echo number_format($ratingSummary['average_rating'], 1); ?></div>
+                                            <?php echo number_format($ratingSummary['average_rating'], 1); ?>
+                                        </div>
                                         <div class="rating-stars">
                                             <?php echo getStarRating($ratingSummary['average_rating']); ?>
                                         </div>
@@ -510,7 +512,8 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                                     </span>
                                                 </div>
                                                 <p class="review-content">
-                                                    <?php echo nl2br(htmlspecialchars($review['binh_luan'])); ?></p>
+                                                    <?php echo nl2br(htmlspecialchars($review['binh_luan'])); ?>
+                                                </p>
                                                 <div class="review-actions">
                                                     <button class="helpful-btn">
                                                         <i class="fas fa-thumbs-up"></i> Hữu ích
@@ -562,10 +565,14 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                             <?php echo $related['star_rating']; ?>
                                             <span>(<?php echo $related['so_luong_danh_gia']; ?>)</span>
                                         </div>
-                                        <a href="product-detail.php?id=<?php echo $related['id']; ?>" class="btn-view-detail"
-                                            style="display: inline-block; padding: 8px 15px; background: var(--primary); color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
-                                            Xem chi tiết
-                                        </a>
+                                        <button class="btn-add-to-cart-detail" data-product-id="<?php echo $product['id']; ?>">
+                                            <i class="fas fa-shopping-cart"></i>
+                                            Thêm vào giỏ hàng
+                                        </button>
+                                        <button class="btn-buy-now-detail">
+                                            <i class="fas fa-bolt"></i>
+                                            Mua ngay
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -635,10 +642,10 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                 </div>
             </div>
             <div class="footer-bottom">
-                 <div class="footer-copyright">
-                        &copy;
-                        <?php echo date("Y"); ?> <strong>AthleteHub</strong>. Bảo lưu mọi quyền.
-                    </div>
+                <div class="footer-copyright">
+                    &copy;
+                    <?php echo date("Y"); ?> <strong>AthleteHub</strong>. Bảo lưu mọi quyền.
+                </div>
             </div>
         </div>
     </footer>

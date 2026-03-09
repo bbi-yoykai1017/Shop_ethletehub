@@ -212,7 +212,7 @@ $displayProducts = array_slice($products, 0, 6);
             <!-- Categories Grid -->
             <div class="row" id="categoriesGrid">
                 <div class="col-lg-3 col-md-6">
-                    <div class="category-card" id="quanao" data-category="quanao">
+                    <div class="category-card" onclick="window.location.href='Category_products.php?danh_muc_id=1'" id="quanao" data-category="quanao">
                         <div class="category-img">
                             <i class="fas fa-person-running"></i>
                             <div class="category-overlay"></div>
@@ -226,7 +226,8 @@ $displayProducts = array_slice($products, 0, 6);
                 </div>
 
                 <div class="col-lg-3 col-md-6">
-                    <div class="category-card" id="giay" data-category="giay">
+                    <div class="category-card" onclick="window.location.href='Category_products.php?danh_muc_id=2'" id="giay" data-category="giay">
+                    
                         <div class="category-img">
                             <i class="fas fa-shoe-prints"></i>
                             <div class="category-overlay"></div>
@@ -240,7 +241,7 @@ $displayProducts = array_slice($products, 0, 6);
                 </div>
 
                 <div class="col-lg-3 col-md-6">
-                    <div class="category-card" id="thietbi" data-category="thietbi">
+                    <div class="category-card" onclick="window.location.href='Category_products.php?danh_muc_id=3'" id="thietbi" data-category="thietbi">
                         <div class="category-img">
                             <i class="fas fa-dumbbell"></i>
                             <div class="category-overlay"></div>
@@ -254,7 +255,7 @@ $displayProducts = array_slice($products, 0, 6);
                 </div>
 
                 <div class="col-lg-3 col-md-6">
-                    <div class="category-card" id="phukien" data-category="phukien">
+                    <div class="category-card" onclick="window.location.href='Category_products.php?danh_muc_id=4'" id="phukien" data-category="phukien">
                         <div class="category-img">
                             <i class="fas fa-briefcase"></i>
                             <div class="category-overlay"></div>
