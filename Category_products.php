@@ -177,19 +177,19 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
                                 </label>
                                 <label class="filter-label">
                                     <input type="checkbox" class="category-filter" value="quan-ao" <?php echo $categoryKey === 'quan-ao' ? 'checked' : ''; ?>>
-                                    <span>Quần áo <span class="badge">45</span></span>
+                                    <span>Quần áo </span>
                                 </label>
                                 <label class="filter-label">
                                     <input type="checkbox" class="category-filter" value="giay" <?php echo $categoryKey === 'giay' ? 'checked' : ''; ?>>
-                                    <span>Giày <span class="badge">32</span></span>
+                                    <span>Giày </span>
                                 </label>
                                 <label class="filter-label">
                                     <input type="checkbox" class="category-filter" value="thiet-bi" <?php echo $categoryKey === 'thiet-bi' ? 'checked' : ''; ?>>
-                                    <span>Thiết bị <span class="badge">28</span></span>
+                                    <span>Thiết bị </span>
                                 </label>
                                 <label class="filter-label">
                                     <input type="checkbox" class="category-filter" value="phu-kien" <?php echo $categoryKey === 'phu-kien' ? 'checked' : ''; ?>>
-                                    <span>Phụ kiện <span class="badge">56</span></span>
+                                    <span>Phụ kiện</span>
                                 </label>
                             </div>
                         </div>
