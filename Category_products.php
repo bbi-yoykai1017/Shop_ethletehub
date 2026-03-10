@@ -189,7 +189,7 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
                                 </label>
                                 <label class="filter-label">
                                     <input type="checkbox" class="category-filter" value="phu-kien" <?php echo $categoryKey === 'phu-kien' ? 'checked' : ''; ?>>
-                                    <span>Phụ kiện</span>
+                                    <span>Phụ kiện </span>
                                 </label>
                             </div>
                         </div>
