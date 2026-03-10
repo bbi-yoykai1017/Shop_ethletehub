@@ -272,3 +272,17 @@ Chọn sản phẩm → Thêm vào giỏ → Vào giỏ hàng → Tiến hành t
 Có thể hủy khi đơn hàng còn trong trạng thái "Chờ xử lý". Liên hệ hotline để được hỗ trợ.
 
 ### 3. Mã giảm giá không hoạt động?
+Kiểm tra điều kiện áp dụng (đơn hàng tối thiểu, thời hạn sử dụng)
+
+### 4. Làm sao để biết tôi đã đặt hàng thành công?
+Bạn sẽ nhận được email xác nhận và mã đơn hàng
+
+### 5. Tôi có thể thay đổi địa chỉ giao hàng không?
+Liên hệ ngay với chúng tôi trước khi đơn hàng được giao để cập nhật.
+
+---
+
+**Phiên bản**: 1.0
+**Cập nhật**: Tháng 3/2026
+**AthleteHub - Cửa Hàng Đồ Thể Thao Uy Tín**
+
