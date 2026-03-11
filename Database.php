@@ -1,9 +1,9 @@
 <?php
 class Database {
-    private $host = "localhost";
-    private $dbname = "athletehub";
-    private $user = "root";
-    private $pass = "";
+private $host = "sqlXXX.epizy.com";
+    private $dbname = "jwbsprmbk_athletehub";
+    private $user = "jwbsprmbk_athlete";
+    private $pass = "XzIUV#to3UTP";
     public $conn;
 
     public function connect() {
