@@ -57,9 +57,14 @@ function renderProducts() {
                         : ''}
                 </div>
                 
-                <button class="btn-page-add" onclick="addToCart(${product.id})">
-                    <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
-                </button>
+                <div class="product-actions-page">
+                    <button class="btn-page-add-cart" onclick="addToCart(${product.id})">
+                        <i class="fas fa-shopping-cart"></i> Thêm
+                    </button>
+                    <button class="btn-page-buy-now" onclick="buyNow(${product.id})">
+                        <i class="fas fa-bolt"></i> Mua Ngay
+                    </button>
+                </div>
             </div>
         </div>
     `).join('');
@@ -261,6 +266,27 @@ function addToCart(productId) {
 
     updateCartCount();
     showNotification(`${product.name} đã được thêm vào giỏ hàng!`, 'success');
+}
+
+function buyNow(productId) {
+    const product = allProducts.find(p => p.id === productId);
+    if (!product) return;
+    
+    // Add to cart first
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartItem = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        image: product.image
+    };
+    cart.push(cartItem);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    
+    // Redirect to payment page
+    window.location.href = 'ThanhToan.php?id=' + productId;
 }
 
 function updateCartCount() {
