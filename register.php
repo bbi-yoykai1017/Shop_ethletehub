@@ -11,7 +11,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
    $email = $_POST['email'];
    $so_dien_thoai = $_POST['so_dien_thoai'];
    $dia_chi = $_POST['dia_chi'];
-   $mat_khau
+   $mat_khau = $_POST['mat_khau'];
 
 ?>
 

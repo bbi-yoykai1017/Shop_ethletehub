@@ -39,8 +39,7 @@ $listusers = getAllUsers($conn);
     <link rel="stylesheet" href="css/products.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
-
-    <link href="crud.css" rel="stylesheet" />
+    <link href="css/crud.css" rel="stylesheet" />
 </head>
 
 <body style="background:#f4f6f9;">
