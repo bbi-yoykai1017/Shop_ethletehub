@@ -458,11 +458,19 @@ function getProductsByCategory($conn, $categoryId) {
         ];
     }, $products);
 }
-// Hàm lấy danh sach người dùng CRUD
-function getAllUsers($conn) {
-    $sql = "SELECT id, ten, email, so_dien_thoai, vai_tro FROM nguoi_dung";
+/**
+ * Hàm lấy thông tin người dùng theo ID
+ * @param PDO $conn Kết nối database
+ * @param int $id ID người dùng
+ * @return array|bool Dữ liệu người dùng hoặc false nếu không tìm thấy
+ */
+function getUserById($conn, $id) {
+    $sql = "SELECT id, ten, email, so_dien_thoai, dia_chi, anh_dai_dien, vai_tro, trang_thai, ngay_tao 
+            FROM nguoi_dung 
+            WHERE id = :id";
     $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
-?>
