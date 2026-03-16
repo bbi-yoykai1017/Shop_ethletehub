@@ -375,13 +375,13 @@
 .btn-buy-now-detail,
 .btn-wishlist-detail {
     flex: 1;
-    padding: 16px var(--spacing-lg);
+    padding: 12px var(--spacing-lg);
     border: none;
     border-radius: var(--border-radius);
     font-weight: var(--font-weight-bold);
     cursor: pointer;
     transition: all var(--transition-base);
-    font-size: 1rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: flex;
@@ -393,7 +393,7 @@
 .btn-add-to-cart-detail {
     background: var(--primary);
     color: white;
-    min-width: 200px;
+    min-width: 150px;
 }
 
 .btn-add-to-cart-detail:hover {
@@ -405,7 +405,7 @@
 .btn-buy-now-detail {
     background: var(--secondary);
     color: white;
-    min-width: 150px;
+    min-width: 120px;
 }
 
 .btn-buy-now-detail:hover {
@@ -934,6 +934,15 @@
     text-decoration: none;
     border-radius: 4px;
     margin-top: auto; 
+}
+
+/* Related Products Buttons */
+.product-info-small .btn-add-to-cart-detail,
+.product-info-small .btn-buy-now-detail {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    min-width: unset;
+    margin-top: 5px;
 }
 
 /* Responsive */

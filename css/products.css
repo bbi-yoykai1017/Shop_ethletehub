@@ -227,19 +227,19 @@
 
 .product-btn {
     flex: 1;
-    padding: 12px;
+    padding: 8px 10px;
     border: none;
     border-radius: var(--border-radius-sm);
     font-weight: var(--font-weight-bold);
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     transition: all var(--transition-base);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-sm);
+    gap: 5px;
 }
 
 .btn-add-cart {
