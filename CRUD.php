@@ -115,13 +115,13 @@ $listusers = getAllUsers($conn);
 
                                         <a href="Update.php?id=<?= $user['id'] ?>"
                                             class="btn btn-warning btn-sm">
-                                            <i class="bi bi-pencil-square"></i>
+                                            <i class="bi bi-pencil-square">Sửa</i>
                                         </a>
 
                                         <a onclick="return confirm('Xóa user <?= $user['id'] ?> ?')"
                                             href="Delete.php?id=<?= $user['id'] ?>"
                                             class="btn btn-danger btn-sm">
-                                            <i class="bi bi-trash"></i>
+                                            <i class="bi bi-trash">Xóa</i>
                                         </a>
 
                                     </td>
