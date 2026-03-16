@@ -1,6 +1,14 @@
 <?php
+session_start();
 require_once 'Database.php';
 require_once 'functions.php';
+
+// e kiem tra phan quyen vai tro o day nha a
+if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
+    header("Location: index.php");
+    exit;
+}
+//code cua a cu viet binh thuong nha 
 $db = new Database();
 $conn = $db->connect();
 $listusers = getAllUsers($conn);
