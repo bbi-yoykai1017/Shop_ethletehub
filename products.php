@@ -114,19 +114,19 @@ $items = getallproduct($conn);
                                 </label>
                                 <label class="filter-label">
                                     <input type="checkbox" class="category-filter" value="quan-ao">
-                                    <span>Quần áo <span class="badge">45</span></span>
+                                    <span>Quần áo</span>
                                 </label>
                                 <label class="filter-label">
                                     <input type="checkbox" class="category-filter" value="giay">
-                                    <span>Giày <span class="badge">32</span></span>
+                                    <span>Giày </span>
                                 </label>
                                 <label class="filter-label">
                                     <input type="checkbox" class="category-filter" value="thiet-bi">
-                                    <span>Thiết bị <span class="badge">28</span></span>
+                                    <span>Thiết bị</span>
                                 </label>
                                 <label class="filter-label">
                                     <input type="checkbox" class="category-filter" value="phu-kien">
-                                    <span>Phụ kiện <span class="badge">56</span></span>
+                                    <span>Phụ kiện </span>
                                 </label>
                             </div>
                         </div>
@@ -145,84 +145,6 @@ $items = getallproduct($conn);
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Size Filter -->
-                        <div class="filter-group">
-                            <h4 class="filter-title">
-                                <i class="fas fa-expand"></i>
-                                Kích thước
-                            </h4>
-                            <div class="size-filters">
-                                <label class="size-label">
-                                    <input type="checkbox" class="size-filter" value="xs">
-                                    <span>XS</span>
-                                </label>
-                                <label class="size-label">
-                                    <input type="checkbox" class="size-filter" value="s">
-                                    <span>S</span>
-                                </label>
-                                <label class="size-label">
-                                    <input type="checkbox" class="size-filter" value="m">
-                                    <span>M</span>
-                                </label>
-                                <label class="size-label">
-                                    <input type="checkbox" class="size-filter" value="l">
-                                    <span>L</span>
-                                </label>
-                                <label class="size-label">
-                                    <input type="checkbox" class="size-filter" value="xl">
-                                    <span>XL</span>
-                                </label>
-                                <label class="size-label">
-                                    <input type="checkbox" class="size-filter" value="xxl">
-                                    <span>XXL</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Rating Filter -->
-                        <div class="filter-group">
-                            <h4 class="filter-title">
-                                <i class="fas fa-star"></i>
-                                Đánh giá
-                            </h4>
-                            <div class="rating-filters">
-                                <label class="rating-label">
-                                    <input type="checkbox" class="rating-filter" value="5">
-                                    <span>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        (15 sản phẩm)
-                                    </span>
-                                </label>
-                                <label class="rating-label">
-                                    <input type="checkbox" class="rating-filter" value="4">
-                                    <span>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="far fa-star"></i>
-                                        (32 sản phẩm)
-                                    </span>
-                                </label>
-                                <label class="rating-label">
-                                    <input type="checkbox" class="rating-filter" value="3">
-                                    <span>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="far fa-star"></i>
-                                        <i class="far fa-star"></i>
-                                        (45 sản phẩm)
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-
                         <!-- Clear Filters -->
                         <button class="btn-clear-filters" id="clearFilters">
                             <i class="fas fa-times"></i>

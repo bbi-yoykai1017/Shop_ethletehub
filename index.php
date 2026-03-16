@@ -350,7 +350,7 @@ $displayProducts = array_slice($products, 0, 6);
             </div>
 
             <div class="view-all-btn">
-                <button class="btn-custom btn-primary-custom" >
+                <button class="btn-custom btn-primary-custom" onclick="window.location.href='products.php'" >
                     <i class="fas fa-arrow-right"></i>
                     Xem tất cả sản phẩm
                 </button>
@@ -474,7 +474,7 @@ $displayProducts = array_slice($products, 0, 6);
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
- <script src="js/script.js"></script>
+     <script src="js/script.js"></script>
     <script src="js/categories.js"></script>
 </body>
 
