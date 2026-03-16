@@ -465,7 +465,7 @@ function getAllUsers($conn) {
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-?>
+
 /**
  * Hàm lấy thông tin người dùng theo ID
  * @param PDO $conn Kết nối database
@@ -573,3 +573,4 @@ function loginUser($conn, $email, $mat_khau) {
         return ['success' => false, 'message' => 'Lỗi CSDL: ' . $e->getMessage()];
     }
 }
+?>

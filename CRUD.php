@@ -3,11 +3,12 @@ session_start();
 require_once 'Database.php';
 require_once 'functions.php';
 
+/*
 // e kiem tra phan quyen vai tro o day nha a
 if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
     header("Location: index.php");
     exit;
-}
+}*/
 //code cua a cu viet binh thuong nha 
 $db = new Database();
 $conn = $db->connect();
@@ -15,119 +16,127 @@ $listusers = getAllUsers($conn);
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <title>Shop Item - Start Bootstrap Template</title>
-    <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-    <!-- Bootstrap icons-->
-    <link href="bootstrap-5.3.8/js/bootstrap.bundle.min.js" rel="stylesheet" />
-    <!-- Core theme CSS (includes Bootstrap)-->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quản lý người dùng - EthleteHub</title>
+
+    <!-- Bootstrap -->
     <link href="bootstrap-5.3.8/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <link href="crud.css" rel="stylesheet" />
 </head>
 
-<body>
-    <!-- Navigation S4-->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container px-4 px-lg-5">
-            <a class="navbar-brand" href="#!">Start Bootstrap</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.php">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#!">All Products</a></li>
-                            <li>
-                                <hr class="dropdown-divider" />
-                            </li>
-                            <li><a class="dropdown-item" href="#!">Popular Items</a></li>
-                            <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="d-flex">
-                    <button class="btn btn-outline-dark" type="submit">
-                        <i class="bi-cart-fill me-1"></i>
-                        Cart
-                        <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
-                    </button>
-                </form>
-            </div>
+<body style="background:#f4f6f9;">
+
+    <!-- NAVBAR ADMIN -->
+    <nav class="navbar navbar-dark bg-dark shadow">
+        <div class="container-fluid px-4">
+            <span class="navbar-brand fw-bold">
+                <i class="bi bi-speedometer2"></i> EthleteHub Admin
+            </span>
+
+            <a href="index.php" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-house"></i> Trang chủ
+            </a>
         </div>
     </nav>
-    <!-- Product section-->
-    <section class="py-4">
-        <div class="container px-4 px-lg-5 my-4">
-            <div class="row gx-4 gx-lg-5 align-items-center">
-                <div class="table-wrapper">
-                    <div class="table-title">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <h2>Manage <b>Categories</b></h2>
-                            </div>
-                            <div class="col-sm-6">
-                                <a class="btn btn-success" href="frmthem.php"><span>Add New Category</span></a>
-                            </div>
-                        </div>
-                    </div>
-                    <table class="table table-striped table-hover">
-                        <thead>
+
+    <!-- CONTENT -->
+    <div class="container py-5">
+
+        <!-- CARD -->
+        <div class="card shadow-lg border-0">
+
+            <!-- CARD HEADER -->
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+
+                <h4 class="mb-0">
+                    <i class="bi bi-people-fill"></i> Quản lý người dùng
+                </h4>
+
+                <a href="frmthem.php" class="btn btn-light fw-semibold">
+                    <i class="bi bi-plus-circle"></i> Thêm người dùng
+                </a>
+
+            </div>
+
+            <!-- TABLE -->
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle text-center">
+
+                        <thead class="table-dark">
                             <tr>
-                                <th> ID </th>
-                                <th>Name</th>
+                                <th>ID</th>
+                                <th>Tên</th>
                                 <th>Email</th>
-                                <th>Phone</th>
-                                <th>Role</th>
-                                <th>Actions</th>
+                                <th>SĐT</th>
+                                <th>Vai trò</th>
+                                <th width="180">Hành động</th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            <?php
-                            foreach ($listusers as $user) {
-                            ?>
+
+                            <?php foreach ($listusers as $user) { ?>
+
                                 <tr>
                                     <td><?= $user['id'] ?></td>
                                     <td><?= $user['ten'] ?></td>
                                     <td><?= $user['email'] ?></td>
                                     <td><?= $user['so_dien_thoai'] ?></td>
-                                    <td><?= $user['vai_tro'] ?></td>
+
                                     <td>
-                                        <a class="btn btn-warning" href="Update.php?id=<?= $user['id'] ?>">Edit</a>
-                                        <a onclick="return confirm('Bạn có muốn xóa user <?= $user['id'] ?>')" class="btn btn-danger" href="Delete.php?id=<?= $user['id'] ?>">Delete</a>
+                                        <span class="badge bg-info text-dark">
+                                            <?= $user['vai_tro'] ?>
+                                        </span>
+                                    </td>
+
+                                    <td>
+
+                                        <a href="Update.php?id=<?= $user['id'] ?>"
+                                            class="btn btn-warning btn-sm">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+
+                                        <a onclick="return confirm('Xóa user <?= $user['id'] ?> ?')"
+                                            href="Delete.php?id=<?= $user['id'] ?>"
+                                            class="btn btn-danger btn-sm">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+
                                     </td>
                                 </tr>
-                            <?php
-                            }
-                            ?>
+
+                            <?php } ?>
+
                         </tbody>
+
                     </table>
 
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Footer S4-->
-    <footer class="py-5 bg-dark">
-        <div class="container">
-            <p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p>
+            </div>
+
         </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-white text-center py-3">
+        EthleteHub Admin © 2026
     </footer>
-    <!-- Bootstrap core JS-->
+
     <script src="bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
-    <!-- Core theme JS-->
-    <script src="js/scripts.js"></script>
 
 </body>
 
