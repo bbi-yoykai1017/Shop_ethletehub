@@ -458,4 +458,11 @@ function getProductsByCategory($conn, $categoryId) {
         ];
     }, $products);
 }
+// Hàm lấy danh sach người dùng CRUD
+function getAllUsers($conn) {
+    $sql = "SELECT id, ten, email, so_dien_thoai, vai_tro FROM nguoi_dung";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
