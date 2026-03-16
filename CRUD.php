@@ -102,8 +102,9 @@ $listusers = getAllUsers($conn);
                                     <td><?= $user['email'] ?></td>
                                     <td><?= $user['so_dien_thoai'] ?></td>
                                     <td><?= $user['vai_tro'] ?></td>
-                                    <a class="btn btn-warning" href="frmsua.php?cateid=<?= $loai['id'] ?>&catename=<?= $loai['name'] ?>&cateimage=<?= $loai['image'] ?>">Edit</a>
-                                    <a onclick="return confirm('Bạn có muốn xóa category <?= $loai['id'] ?>')" class="btn btn-danger" href="xulidelete.php?cateid=<?= $loai['id'] ?>">Delete</a>
+                                    <td>
+                                        <a class="btn btn-warning" href="Update.php?id=<?= $user['id'] ?>">Edit</a>
+                                        <a onclick="return confirm('Bạn có muốn xóa user <?= $user['id'] ?>')" class="btn btn-danger" href="Delete.php?id=<?= $user['id'] ?>">Delete</a>
                                     </td>
                                 </tr>
                             <?php
