@@ -26,7 +26,6 @@ class Database
         } catch (PDOException $e) {
             echo "Lỗi kết nối: " . $e->getMessage();
         }
-
         return $this->conn;
     }
 }
