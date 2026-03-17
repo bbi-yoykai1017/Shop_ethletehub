@@ -1,5 +1,31 @@
 <?php
+session_start();
+require_once 'Database.php'; // Đường dẫn tới file kết nối PDO của bạn
+require_once 'functions.php'; // File chứa hàm loginUser của bạn
 
+$error = "";
+
+if (isset($_POST['login_btn'])) {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Gọi hàm bạn đã viết
+    $result = loginUser($conn, $email, $password);
+
+    if ($result['success']) {
+        // LƯU THÔNG TIN VÀO SESSION
+        $_SESSION['user_id'] = $result['user']['id'];
+        $_SESSION['user_name'] = $result['user']['ten'];
+        $_SESSION['user_role'] = $result['user']['vai_tro']; // Giả sử cột là vai_tro
+
+        // Chuyển hướng sang trang CRUD
+        header("Location: index.php");
+        exit();
+    } else {
+        // Lấy thông báo lỗi từ hàm trả về (Sai pass, bị khóa, lỗi DB...)
+        $error = $result['message'];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -39,27 +65,30 @@
                 </div>
 
                 <div style="padding: 30px" class="panel-body">
-                    <?php if (isset($error)) echo "<p style='color:red; text-align:center;'>$error</p>"; ?>
-
+                    
                     <form method="post" class="form-horizontal">
+                        <?php if ($error): ?>
+                            <div class="alert alert-danger text-center"><?= $error ?></div>
+                        <?php endif; ?>
+
                         <div class="input-group" style="margin-bottom: 20px">
                             <span class="input-group-addon">Email</span>
-                            <input id="login-username" type="email" class="form-control" name="email" required>
+                            <input type="email" name="email" class="form-control" required>
                         </div>
 
                         <div class="input-group" style="margin-bottom: 20px">
                             <span class="input-group-addon">Mật khẩu</span>
-                            <input id="login-password" type="password" class="form-control" name="password" required>
+                            <input type="password" name="password" class="form-control" required>
                         </div>
                         <div class="margin-bottom-25">
                             <input type="checkbox" tabindex="3" class="" name="remember" id="remember">
                             <label for="remember"> Ghi nhớ đăng nhập</label>
                         </div>
+
                         <div class="form-group text-center">
                             <button type="submit" name="login_btn" class="btn btn-primary">Đăng nhập</button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
