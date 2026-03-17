@@ -33,14 +33,14 @@
     <div id="loginbox" class="col-md-6 col-sm-8" style="border: 2px solid black ;">
         <div class="panel panel-info"  >
             <div class="panel-heading">
-                <div class="panel-title text-center mt-3"><h3>Màn hình đăng nhập</h3></div>
+                <div class="panel-title text-center mt-3"><h3>LOGIN</h3></div>
             </div>
 
             <div style="padding: 30px" class="panel-body">
                 <form method="post" class="form-horizontal">
                     <div class="input-group" style="margin-bottom: 20px">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-user" style="margin-right: 20px;">Username</i></span>
-                        <input id="login-username" type="text" class="form-control" name="username" >
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user" style="margin-right: 20px;">Email</i></span>
+                        <input id="login-username" type="email" class="form-control" name="email" >
                     </div>
 
                     <div class="input-group" style="margin-bottom: 20px">
@@ -53,7 +53,7 @@
                         </div>
                     <div class="form-group text-center">
                         <button class="btn btn-default" style="color:blue; background-color: aliceblue;">Quên mật khẩu</button>
-                        <a id="btn-fblogin" href="#" class="btn btn-primary">Đăng nhập</a>
+                        <a id="btn-fblogin" href="index.php" class="btn btn-primary">Đăng nhập</a>
                     </div>
                 </form>
             </div>
