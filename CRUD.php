@@ -2,6 +2,7 @@
 session_start();
 require_once 'Database.php';
 require_once 'functions.php';
+require_once 'auth.php'; // File này sẽ kiểm tra xem người dùng đã đăng nhập chưa, nếu chưa sẽ chuyển hướng về login.php
 
 /*
 // e kiem tra phan quyen vai tro o day nha a
