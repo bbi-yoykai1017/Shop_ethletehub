@@ -68,6 +68,11 @@ $displayProducts = array_slice($products, 0, 6);
                     <li class="nav-item">
                         <a class="nav-link" href="#categories">Danh mục</a>
                     </li>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="CRUD.php">Quản trị</a>
+                        </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link" href="#about">Về chúng tôi</a>
                     </li>
@@ -183,24 +188,24 @@ $displayProducts = array_slice($products, 0, 6);
                     </button>
                     <div class="categories-dropdown-menu" id="categoriesDropdownMenu">
                         <div>
-                            <a href="Category_products.php?danh_muc_id=1" class="dropdown-cat-item" onclick="window.location.href=this.href" >
+                            <a href="Category_products.php?danh_muc_id=1" class="dropdown-cat-item" onclick="window.location.href=this.href">
                                 <i class="fas fa-person-running"></i>
                                 <span>Quần áo</span>
                                 <span class="badge">200+</span>
                             </a>
                         </div>
 
-                        <a href="Category_products.php?danh_muc_id=2" class="dropdown-cat-item" onclick="window.location.href=this.href" >
+                        <a href="Category_products.php?danh_muc_id=2" class="dropdown-cat-item" onclick="window.location.href=this.href">
                             <i class="fas fa-shoe-prints"></i>
                             <span>Giày</span>
                             <span class="badge">150+</span>
                         </a>
-                        <a href="Category_products.php?danh_muc_id=3" class="dropdown-cat-item" onclick="window.location.href=this.href" >
+                        <a href="Category_products.php?danh_muc_id=3" class="dropdown-cat-item" onclick="window.location.href=this.href">
                             <i class="fas fa-dumbbell"></i>
                             <span>Thiết bị</span>
                             <span class="badge">300+</span>
                         </a>
-                        <a href="Category_products.php?danh_muc_id=4" class="dropdown-cat-item" onclick="window.location.href=this.href" >
+                        <a href="Category_products.php?danh_muc_id=4" class="dropdown-cat-item" onclick="window.location.href=this.href">
                             <i class="fas fa-briefcase"></i>
                             <span>Phụ kiện</span>
                             <span class="badge">250+</span>
@@ -227,7 +232,7 @@ $displayProducts = array_slice($products, 0, 6);
 
                 <div class="col-lg-3 col-md-6">
                     <div class="category-card" onclick="window.location.href='Category_products.php?danh_muc_id=2'" id="giay" data-category="giay">
-                    
+
                         <div class="category-img">
                             <i class="fas fa-shoe-prints"></i>
                             <div class="category-overlay"></div>
@@ -329,7 +334,7 @@ $displayProducts = array_slice($products, 0, 6);
                             </div>
                             <div class="product-price">
                                 <span class="price-current"><?php echo formatPrice($product['price']); ?></span>
-                               
+
                             </div>
                             <p class="product-description"><?php echo htmlspecialchars($product['description'] ?? ''); ?>
                             </p>
@@ -350,7 +355,7 @@ $displayProducts = array_slice($products, 0, 6);
             </div>
 
             <div class="view-all-btn">
-                <button class="btn-custom btn-primary-custom" onclick="window.location.href='products.php'" >
+                <button class="btn-custom btn-primary-custom" onclick="window.location.href='products.php'">
                     <i class="fas fa-arrow-right"></i>
                     Xem tất cả sản phẩm
                 </button>
@@ -474,7 +479,7 @@ $displayProducts = array_slice($products, 0, 6);
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-     <script src="js/script.js"></script>
+    <script src="js/script.js"></script>
     <script src="js/categories.js"></script>
 </body>
 
