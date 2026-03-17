@@ -104,9 +104,28 @@ $displayProducts = array_slice($products, 0, 6);
                         <span class="cart-count">0</span>
                     </div>
 
-                    <div class="user-account">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
+                   <div class="user-account-wrapper d-flex align-items-center">
+    <?php if (isset($_SESSION['user_name'])): ?>
+        <div class="user-info me-3">
+            <span class="welcome-text">Xin chào, <strong><?php echo htmlspecialchars($_SESSION['user_name']); ?></strong></span>
+        </div>
+        
+        <div class="user-actions d-flex align-items-center">
+            <a href="profile.php" class="user-icon-link me-2 text-decoration-none">
+                <i class="fas fa-user-circle fa-lg"></i>
+            </a>
+            <a href="logout.php" class="btn btn-sm btn-outline-danger">
+                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+            </a>
+        </div>
+    <?php else: ?>
+        <div class="user-login">
+            <a href="login.php" class="btn btn-sm btn-primary-custom">
+                <i class="fas fa-sign-in-alt"></i> Đăng nhập
+            </a>
+        </div>
+    <?php endif; ?>
+</div>
                 </div>
             </div>
         </div>
