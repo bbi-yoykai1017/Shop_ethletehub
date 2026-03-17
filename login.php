@@ -1,28 +1,29 @@
 <?php
 session_start();
-require_once 'Database.php'; // Đường dẫn tới file kết nối PDO của bạn
-require_once 'functions.php'; // File chứa hàm loginUser của bạn
+require_once 'Database.php'; // Đảm bảo file này tồn tại
+require_once 'functions.php';
 
 $error = "";
 
+// BƯỚC 1: Khởi tạo kết nối CSDL
+$db = new Database();
+$conn = $db->connect(); // Đây là nơi biến $conn được tạo ra
+
 if (isset($_POST['login_btn'])) {
     $email = $_POST['email'];
-    $password = $_POST['password'];
+    $password = $_POST['mat_khau'];
 
-    // Gọi hàm bạn đã viết
+    // BƯỚC 2: Truyền biến $conn đã khởi tạo vào hàm
     $result = loginUser($conn, $email, $password);
 
     if ($result['success']) {
-        // LƯU THÔNG TIN VÀO SESSION
         $_SESSION['user_id'] = $result['user']['id'];
         $_SESSION['user_name'] = $result['user']['ten'];
-        $_SESSION['user_role'] = $result['user']['vai_tro']; // Giả sử cột là vai_tro
+        $_SESSION['user_role'] = $result['user']['vai_tro'];
 
-        // Chuyển hướng sang trang CRUD
         header("Location: index.php");
         exit();
     } else {
-        // Lấy thông báo lỗi từ hàm trả về (Sai pass, bị khóa, lỗi DB...)
         $error = $result['message'];
     }
 }
@@ -78,7 +79,7 @@ if (isset($_POST['login_btn'])) {
 
                         <div class="input-group" style="margin-bottom: 20px">
                             <span class="input-group-addon">Mật khẩu</span>
-                            <input type="password" name="password" class="form-control" required>
+                            <input type="password" name="mat_khau" class="form-control" required>
                         </div>
                         <div class="margin-bottom-25">
                             <input type="checkbox" tabindex="3" class="" name="remember" id="remember">
