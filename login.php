@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 ?>
 <!DOCTYPE html>
@@ -23,43 +23,47 @@
             <li class="nav-item">
                 <a class="nav-link" style="color: white;">Đăng nhập</a>
             </li>
-            <li class="nav-item" >
+            <li class="nav-item">
                 <a class="nav-link" style="color: aqua;">Đăng ký</a>
             </li>
 
         </ul>
     </div>
-   <div class="container" style="display: flex; justify-content: center; padding-top: 50px;" >
-    <div id="loginbox" class="col-md-6 col-sm-8" style="border: 2px solid black ;">
-        <div class="panel panel-info"  >
-            <div class="panel-heading">
-                <div class="panel-title text-center mt-3"><h3>LOGIN</h3></div>
-            </div>
-
-            <div style="padding: 30px" class="panel-body">
-                <form method="post" class="form-horizontal">
-                    <div class="input-group" style="margin-bottom: 20px">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-user" style="margin-right: 20px;">Email</i></span>
-                        <input id="login-username" type="email" class="form-control" name="email" >
+    <div class="container" style="display: flex; justify-content: center; padding-top: 50px;">
+        <div id="loginbox" class="col-md-6 col-sm-8" style="border: 2px solid black ;">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title text-center mt-3">
+                        <h3>LOGIN</h3>
                     </div>
+                </div>
 
-                    <div class="input-group" style="margin-bottom: 20px">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-lock" style="margin-right: 20px;">Mật khẩu</i></span>
-                        <input id="login-password" type="password" class="form-control" >
-                    </div>
-                    <div class="margin-bottom-25">
+                <div style="padding: 30px" class="panel-body">
+                    <?php if (isset($error)) echo "<p style='color:red; text-align:center;'>$error</p>"; ?>
+
+                    <form method="post" class="form-horizontal">
+                        <div class="input-group" style="margin-bottom: 20px">
+                            <span class="input-group-addon">Email</span>
+                            <input id="login-username" type="email" class="form-control" name="email" required>
+                        </div>
+
+                        <div class="input-group" style="margin-bottom: 20px">
+                            <span class="input-group-addon">Mật khẩu</span>
+                            <input id="login-password" type="password" class="form-control" name="password" required>
+                        </div>
+                        <div class="margin-bottom-25">
                             <input type="checkbox" tabindex="3" class="" name="remember" id="remember">
                             <label for="remember"> Ghi nhớ đăng nhập</label>
                         </div>
-                    <div class="form-group text-center">
-                        <button class="btn btn-default" style="color:blue; background-color: aliceblue;">Quên mật khẩu</button>
-                        <a id="btn-fblogin" href="index.php" class="btn btn-primary">Đăng nhập</a>
-                    </div>
-                </form>
+                        <div class="form-group text-center">
+                            <button type="submit" name="login_btn" class="btn btn-primary">Đăng nhập</button>
+                        </div>
+                    </form>
+
+                </div>
             </div>
         </div>
     </div>
-</div>
     <footer>
         <div class="container mt-3 p-3 my-5 bg-dark text-white" style="text-align: center;">
             <span>Lập trình backend wed 2</span>
