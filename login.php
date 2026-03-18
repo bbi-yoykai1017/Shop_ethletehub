@@ -110,6 +110,18 @@ if (isset($_POST['login_btn'])) {
                  </div>
 
                  <!-- password -->
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Mật khẩu
+                    </label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" name="password"
+                            placeholder="Nhập mật khẩu của bạn" required>
+                        <button class="input-group-text" type="button" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
              </form>
         </div>
     </div>
