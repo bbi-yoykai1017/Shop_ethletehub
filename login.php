@@ -97,6 +97,18 @@ if (isset($_POST['login_btn'])) {
                     <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success_message); ?>
                 </div>
             <?php endif; ?>
+
+            <!-- login form -->
+             <form action="" method="post">
+                <!-- email -->
+                 <div class="form-group">
+                    <label for="email" class="form-lable">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Nhập email của bạn"
+                        required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                 </div>
+             </form>
         </div>
     </div>
 </body>
