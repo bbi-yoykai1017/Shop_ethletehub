@@ -2,10 +2,13 @@
 session_start();
 require_once 'Database.php';
 require_once 'functions.php';
-require_once 'auth.php'; // kiem tra da dang nhap hay chua, neu chua thi chuyen huoong ve trang login
 // thong bao loi
 $error = "";
-
+// Nếu đã đăng nhập rồi thì chuyển hướng về trang chủ
+if (isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
 if (isset($_POST['login_btn'])) {
     $email = $_POST['email'];
     $password = $_POST['mat_khau'];
