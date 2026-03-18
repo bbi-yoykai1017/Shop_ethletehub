@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once 'Database.php'; // Đảm bảo file này tồn tại
+require_once 'Database.php'; 
 require_once 'functions.php';
 
 $error = "";
@@ -87,8 +87,6 @@ if (isset($_POST['login_btn'])) {
                             <input type="checkbox" tabindex="3" class="" name="remember" id="remember">
                             <label for="remember"> Ghi nhớ đăng nhập</label>
                         </div>
-
-
                         <div class="form-group text-center">
                             <button type="submit" name="login_btn" class="btn btn-primary">Đăng nhập</button>
                         </div>

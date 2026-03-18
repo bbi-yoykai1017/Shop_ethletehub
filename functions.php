@@ -90,16 +90,7 @@ function processProducts($products) {
     }, $products);
 }
 
-// ham lay chi tiet san pham theo id
-function getProductById($conn,$id) {
-     // truy van lay chi tiet san pham
- $sql = "SELECT * FROM san_pham WHERE id = :id";
- $stmt = $conn->prepare($sql);
- $stmt->bindParam(':id', $id, PDO::PARAM_INT);
- $stmt->execute();
- return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
+// REMOVED: getProductById (redundant, replaced by comprehensive getProductDetail)
 // ============================================
 // HÀM MỚI CHO TRANG CHI TIẾT SẢN PHẨM
 // ============================================

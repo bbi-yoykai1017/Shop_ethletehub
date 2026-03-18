@@ -104,7 +104,7 @@ $displayProducts = array_slice($products, 0, 6);
 
                     <div class="cart-icon" onclick="window.location.href='cart.php'">
                         <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">0</span>
+                        <span class="cart-count"></span>
                     </div>
 
                     <div class="user-account-wrapper d-flex align-items-center">
