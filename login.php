@@ -122,9 +122,72 @@ if (isset($_POST['login_btn'])) {
                         </button>
                     </div>
                 </div>
+
+                <!-- remember me & forgot password -->
+                <div class="remember-me">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="remember_me" id="rememberMe">
+                        Ghi nhớ tôi
+                    </label>
+                    <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                </div>
+                <!-- Login Button -->
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                </button>
              </form>
+              <div class="divider">
+                <span>hoặc</span>
+            </div>
+ 
+            <!-- Register Link -->
+            <div class="login-footer">
+                Chưa có tài khoản? <a href="register.php">Đăng ký ngay</a>
+            </div>
         </div>
     </div>
+     <!-- Footer -->
+    <footer class="footer mt-auto">
+        <div class="container-custom">
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <div class="footer-copyright">
+                        &copy; <?php echo date("Y"); ?> <strong>AthleteHub</strong>. Bảo lưu mọi quyền.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+     <script>
+        // Toggle Password Visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+ 
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+ 
+        // Form Validation
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+ 
+            if (!email || !password) {
+                e.preventDefault();
+                alert('Vui lòng nhập đầy đủ email và mật khẩu!');
+            }
+        });
+    </script>
 </body>
 
 </html>
