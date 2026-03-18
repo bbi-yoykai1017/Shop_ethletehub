@@ -408,42 +408,42 @@ function registerUser($conn, $ten, $email, $mat_khau) {
  * @param string $mat_khau Mật khẩu người dùng nhập
  * @return array Mảng chứa trạng thái (success), thông báo (message) và dữ liệu user (nếu thành công)
  */
-function loginUser($conn, $email, $mat_khau) {
-    try {
-        $sql = "SELECT * FROM nguoi_dung WHERE email = :email";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-        $stmt->execute();
-        
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        // Kiểm tra user và mật khẩu sử dụng password_verify
-        if ($user && password_verify($mat_khau, $user['mat_khau'])) {
+    function loginUser($conn, $email, $mat_khau) {
+        try {
+            $sql = "SELECT * FROM nguoi_dung WHERE email = :email";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+            $stmt->execute();
             
-            if ($user['trang_thai'] === 'bi_khoa') {
-                return ['success' => false, 'message' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin.'];
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Kiểm tra user và mật khẩu sử dụng password_verify
+            if ($user && password_verify($mat_khau, $user['mat_khau'])) {
+                
+                if ($user['trang_thai'] === 'bi_khoa') {
+                    return ['success' => false, 'message' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin.'];
+                }
+
+                // Cập nhật lần đăng nhập cuối
+                $sql_update = "UPDATE nguoi_dung SET lan_dang_nhap_cuoi = NOW() WHERE id = :id";
+                $stmt_update = $conn->prepare($sql_update);
+                $stmt_update->bindParam(':id', $user['id'], PDO::PARAM_INT);
+                $stmt_update->execute();
+
+                // Xóa mật khẩu trước khi trả về
+                unset($user['mat_khau']);
+
+                return [
+                    'success' => true, 
+                    'message' => 'Đăng nhập thành công',
+                    'user' => $user
+                ];
             }
 
-            // Cập nhật lần đăng nhập cuối
-            $sql_update = "UPDATE nguoi_dung SET lan_dang_nhap_cuoi = NOW() WHERE id = :id";
-            $stmt_update = $conn->prepare($sql_update);
-            $stmt_update->bindParam(':id', $user['id'], PDO::PARAM_INT);
-            $stmt_update->execute();
-
-            // Xóa mật khẩu trước khi trả về
-            unset($user['mat_khau']);
-
-            return [
-                'success' => true, 
-                'message' => 'Đăng nhập thành công',
-                'user' => $user
-            ];
+            return ['success' => false, 'message' => 'Email hoặc mật khẩu không chính xác!'];
+            
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Lỗi CSDL: ' . $e->getMessage()];
         }
-
-        return ['success' => false, 'message' => 'Email hoặc mật khẩu không chính xác!'];
-        
-    } catch (PDOException $e) {
-        return ['success' => false, 'message' => 'Lỗi CSDL: ' . $e->getMessage()];
     }
-}
 ?>
