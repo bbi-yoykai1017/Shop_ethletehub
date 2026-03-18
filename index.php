@@ -44,14 +44,17 @@ $displayProducts = array_slice($products, 0, 6);
          NAVBAR MỚI
          ======================== -->
     <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container-custom">
-            <!-- Logo & Brand -->
-            <a class="navbar-brand" href="#home">
-                <i class="fas fa-dumbbell"></i>
-                AthleteHub
-            </a>
-
-            <!-- Mobile Menu Toggle -->
+        <div class="container-fluid px-4">
+            <div class="row">
+                <div class="col-12">
+                    <!-- Logo & Brand -->
+                    <a class="navbar-brand" href="#home">
+                        <i class="fas fa-dumbbell"></i>
+                        AthleteHub
+                    </a>
+                </div>
+                <div class="col-12">
+                    <!-- Mobile Menu Toggle -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -69,7 +72,7 @@ $displayProducts = array_slice($products, 0, 6);
                     <li class="nav-item">
                         <a class="nav-link" href="#categories">Danh mục</a>
                     </li>
-                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="CRUD.php">Quản trị</a>
                         </li>
@@ -126,6 +129,8 @@ $displayProducts = array_slice($products, 0, 6);
                             </div>
                         <?php endif; ?>
                     </div>
+                </div>
+            </div>
                 </div>
             </div>
         </div>

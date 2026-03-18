@@ -543,21 +543,18 @@ function loginUser($conn, $email, $mat_khau) {
         
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Kiểm tra tồn tại user và khớp mật khẩu
-        if ($user && password_verify($mat_khau, $user['mat_khau'])) {
+        // So sánh mật khẩu thường (không hash)
+        if ($user && $user['mat_khau'] === $mat_khau) {
             
-            // Kiểm tra trạng thái tài khoản
             if ($user['trang_thai'] === 'bi_khoa') {
                 return ['success' => false, 'message' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin.'];
             }
 
-            // Cập nhật thời gian đăng nhập cuối
             $sql_update = "UPDATE nguoi_dung SET lan_dang_nhap_cuoi = NOW() WHERE id = :id";
             $stmt_update = $conn->prepare($sql_update);
             $stmt_update->bindParam(':id', $user['id'], PDO::PARAM_INT);
             $stmt_update->execute();
 
-            // Xóa mật khẩu khỏi mảng trước khi trả về để bảo mật
             unset($user['mat_khau']);
 
             return [
