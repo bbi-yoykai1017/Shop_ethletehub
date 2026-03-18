@@ -77,7 +77,15 @@ if (isset($_POST['login_btn'])) {
             </div>
         </div>
     </nav>
-    
+    <!-- LOGIN CONTAINER  -->
+     <div class="login-container">
+        <div class="login-card">
+        <!--header-->
+        <div class="login-header">
+            <h1><i class="fas fa-sing-in-alt"></i>Đăng Nhập</h1>
+        </div>
+        </div>
+     </div>
 </body>
 
 </html>
