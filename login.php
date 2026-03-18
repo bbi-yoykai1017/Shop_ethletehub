@@ -1,31 +1,36 @@
 <?php
 session_start();
-
-require_once 'Database.php'; 
+require_once 'Database.php';
 require_once 'functions.php';
-
+require_once 'auth.php'; // kiem tra da dang nhap hay chua, neu chua thi chuyen huoong ve trang login
+// thong bao loi
 $error = "";
-
-// BƯỚC 1: Khởi tạo kết nối CSDL
-$db = new Database();
-$conn = $db->connect(); // Đây là nơi biến $conn được tạo ra
 
 if (isset($_POST['login_btn'])) {
     $email = $_POST['email'];
     $password = $_POST['mat_khau'];
 
-    // BƯỚC 2: Truyền biến $conn đã khởi tạo vào hàm
-    $result = loginUser($conn, $email, $password);
-
-    if ($result['success']) {
-        $_SESSION['user_id'] = $result['user']['id'];
-        $_SESSION['user_name'] = $result['user']['ten'];
-        $_SESSION['user_role'] = $result['user']['vai_tro'];
-
-        header("Location: index.php");
-        exit();
+    // kiem tra input
+    if (empty($email) || empty($password)) {
+        $error = "Vui lòng nhập đầy đủ thông tin";
     } else {
-        $error = $result['message'];
+        // khoi tao ket noi
+        $db = new Database();
+        $conn = $db->connect();
+
+        // goi ham dang nhap tu fuction 
+        $result = loginUser($conn,$email,$password);
+
+        if ($result['success']) {
+            // luu thong tin cua 
+            $_SESSION['user_id'] = $result['user']['id'];
+            $_SESSION['user_id'] = $result['user']['ten'];
+            $_SESSION['user_id'] = $result['user']['email'];
+            $_SESSION['user_id'] = $result['user']['vai_tro'];
+            $_SESSION['user_id'] = $result['user']['so_dien_thoai'];
+            $_SESSION['user_id'] = $result['user']['dia_chi'];
+            $_SESSION['user_id'] = $result['user']['vai_tro'];
+        }
     }
 }
 ?>
@@ -67,10 +72,10 @@ if (isset($_POST['login_btn'])) {
                 </div>
 
                 <div style="padding: 30px" class="panel-body">
-                    
+
                     <form method="post" class="form-horizontal">
                         <?php if ($error): ?>
-                            
+
                             <div class="alert alert-danger text-center"><?= $error ?></div>
                         <?php endif; ?>
 
