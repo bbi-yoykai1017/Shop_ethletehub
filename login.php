@@ -108,6 +108,8 @@ if (isset($_POST['login_btn'])) {
                     <input type="email" class="form-control" id="email" name="email" placeholder="Nhập email của bạn"
                         required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
                  </div>
+
+                 <!-- password -->
              </form>
         </div>
     </div>
