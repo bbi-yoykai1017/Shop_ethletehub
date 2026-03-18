@@ -23,7 +23,6 @@ class Database
                 $this->pass
             );
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-               return $this->conn;
         } catch (PDOException $e) {
             echo "Lỗi kết nối: " . $e->getMessage();
         }

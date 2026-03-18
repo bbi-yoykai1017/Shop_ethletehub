@@ -15,7 +15,7 @@ function getallproduct($conn)
             'price' => $p['gia'],
             'originalPrice' => $p['gia_goc'],
             'rating' => $p['trung_binh_sao'],
-            'image' => $p['hinh_anh_chinh'], // Sử dụng trực tiếp tên file từ database
+            'image' => $p['hinh_anh_chinh'],
             'category' => getCategoryKey($p['danh_muc_id']),
             'trung_binh_sao' => $p['trung_binh_sao'],
             'so_luong_danh_gia' => $p['so_luong_danh_gia'],
@@ -90,17 +90,6 @@ function processProducts($products) {
     }, $products);
 }
 
-// REMOVED: getProductById (redundant, replaced by comprehensive getProductDetail)
-// ============================================
-// HÀM MỚI CHO TRANG CHI TIẾT SẢN PHẨM
-// ============================================
-
-/**
- * Lấy chi tiết sản phẩm đầy đủ bao gồm thông tin danh mục
- * @param PDO $conn Kết nối database
- * @param int $id ID sản phẩm
- * @return array|mixed Thông tin sản phẩm hoặc false
- */
 function getProductDetail($conn, $id) {
     $sql = "SELECT sp.*, dm.ten_danh_muc, dm.mo_ta AS mo_ta_danh_muc
             FROM san_pham sp 
@@ -146,12 +135,6 @@ function getProductDetail($conn, $id) {
     return $product;
 }
 
-/**
- * Lấy tổng số lượng tồn kho của sản phẩm
- * @param PDO $conn Kết nối database
- * @param int $productId ID sản phẩm
- * @return int Tổng số lượng tồn kho
- */
 function getTotalStock($conn, $productId) {
     $sql = "SELECT COALESCE(SUM(so_luong_ton), 0) as total 
             FROM bien_the_san_pham 
@@ -165,12 +148,6 @@ function getTotalStock($conn, $productId) {
     return (int) $result['total'];
 }
 
-/**
- * Lấy danh sách hình ảnh sản phẩm
- * @param PDO $conn Kết nối database
- * @param int $productId ID sản phẩm
- * @return array Danh sách hình ảnh
- */
 function getProductImages($conn, $productId) {
     $sql = "SELECT id, duong_dan, thu_tu, la_chinh 
             FROM hinh_anh_san_pham 
@@ -184,12 +161,6 @@ function getProductImages($conn, $productId) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/**
- * Lấy danh sách biến thể sản phẩm (size, màu, tồn kho)
- * @param PDO $conn Kết nối database
- * @param int $productId ID sản phẩm
- * @return array Danh sách biến thể
- */
 function getProductVariants($conn, $productId) {
     $sql = "SELECT bt.id, bt.san_pham_id, bt.so_luong_ton, bt.hinh_anh, bt.gia_them,
                    kt.id AS kich_thuoc_id, kt.ten AS kich_thuoc_ten,
@@ -207,12 +178,6 @@ function getProductVariants($conn, $productId) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/**
- * Lấy danh sách size có sẵn của sản phẩm
- * @param PDO $conn Kết nối database
- * @param int $productId ID sản phẩm
- * @return array Danh sách size
- */
 function getProductSizes($conn, $productId) {
     $sql = "SELECT DISTINCT kt.id, kt.ten, kt.mo_ta
             FROM bien_the_san_pham bt
@@ -229,12 +194,6 @@ function getProductSizes($conn, $productId) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/**
- * Lấy danh sách màu có sẵn của sản phẩm
- * @param PDO $conn Kết nối database
- * @param int $productId ID sản phẩm
- * @return array Danh sách màu
- */
 function getProductColors($conn, $productId) {
     $sql = "SELECT DISTINCT ms.id, ms.ten, ms.ma_hex
             FROM bien_the_san_pham bt
@@ -251,12 +210,6 @@ function getProductColors($conn, $productId) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/**
- * Lấy thông số kỹ thuật của sản phẩm
- * @param PDO $conn Kết nối database
- * @param int $productId ID sản phẩm
- * @return array Danh sách thông số
- */
 function getProductSpecifications($conn, $productId) {
     $sql = "SELECT ts.ten_thong_so, gts.gia_tri
             FROM gia_tri_thong_so gts
@@ -271,78 +224,25 @@ function getProductSpecifications($conn, $productId) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/**
- * Lấy tổng hợp đánh giá sản phẩm
- * @param PDO $conn Kết nối database
- * @param int $productId ID sản phẩm
- * @return array Thông tin đánh giá tổng hợp
- */
 function getProductRatingSummary($conn, $productId) {
-    // Lấy tổng số đánh giá và điểm trung bình từ bảng sản phẩm
-    $sql = "SELECT trung_binh_sao, so_luong_danh_gia 
-            FROM san_pham 
-            WHERE id = :id";
+    $sql = "SELECT 
+                COUNT(*) as total_reviews,
+                AVG(so_sao) as average_rating,
+                SUM(CASE WHEN so_sao = 5 THEN 1 ELSE 0 END) as five_star,
+                SUM(CASE WHEN so_sao = 4 THEN 1 ELSE 0 END) as four_star,
+                SUM(CASE WHEN so_sao = 3 THEN 1 ELSE 0 END) as three_star,
+                SUM(CASE WHEN so_sao = 2 THEN 1 ELSE 0 END) as two_star,
+                SUM(CASE WHEN so_sao = 1 THEN 1 ELSE 0 END) as one_star
+            FROM danh_gia
+            WHERE san_pham_id = :id AND trang_thai = 1";
     
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
     $stmt->execute();
     
-    $product = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    $summary = [
-        'average_rating' => $product ? floatval($product['trung_binh_sao']) : 0,
-        'total_reviews' => $product ? (int) $product['so_luong_danh_gia'] : 0,
-        'rating_distribution' => [
-            5 => 0,
-            4 => 0,
-            3 => 0,
-            2 => 0,
-            1 => 0
-        ]
-    ];
-    
-    // Lấy phân bố đánh giá
-    $sql = "SELECT so_sao, COUNT(*) as count 
-            FROM danh_gia 
-            WHERE san_pham_id = :id AND trang_thai = 1
-            GROUP BY so_sao";
-    
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
-    $stmt->execute();
-    
-    $distribution = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    foreach ($distribution as $row) {
-        $rating = (int) $row['so_sao'];
-        $count = (int) $row['count'];
-        if (isset($summary['rating_distribution'][$rating])) {
-            $summary['rating_distribution'][$rating] = $count;
-        }
-    }
-    
-    // Tính phần trăm cho mỗi mức đánh giá
-    $total = $summary['total_reviews'];
-    if ($total > 0) {
-        foreach ($summary['rating_distribution'] as $rating => $count) {
-            $summary['rating_distribution'][$rating] = [
-                'count' => $count,
-                'percentage' => round(($count / $total) * 100)
-            ];
-        }
-    }
-    
-    return $summary;
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-/**
- * Lấy sản phẩm liên quan (cùng danh mục)
- * @param PDO $conn Kết nối database
- * @param int $categoryId ID danh mục
- * @param int $productId ID sản phẩm hiện tại (để loại trừ)
- * @param int $limit Số lượng sản phẩm lấy
- * @return array Danh sách sản phẩm liên quan
- */
 function getRelatedProducts($conn, $categoryId, $productId, $limit = 4) {
     $sql = "SELECT sp.*, dm.ten_danh_muc
             FROM san_pham sp
@@ -361,7 +261,6 @@ function getRelatedProducts($conn, $categoryId, $productId, $limit = 4) {
     
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Xử lý thông tin mỗi sản phẩm
     return array_map(function($p) {
         $p['gia_formatted'] = formatPrice($p['gia']);
         $p['gia_goc_formatted'] = formatPrice($p['gia_goc']);
@@ -375,14 +274,6 @@ function getRelatedProducts($conn, $categoryId, $productId, $limit = 4) {
     }, $products);
 }
 
-/**
- * Lấy tồn kho của một biến thể cụ thể (size + màu)
- * @param PDO $conn Kết nối database
- * @param int $productId ID sản phẩm
- * @param int $sizeId ID kích thước
- * @param int $colorId ID màu sắc
- * @return int Số lượng tồn kho
- */
 function getVariantStock($conn, $productId, $sizeId, $colorId) {
     $sql = "SELECT so_luong_ton 
             FROM bien_the_san_pham 
@@ -401,7 +292,6 @@ function getVariantStock($conn, $productId, $sizeId, $colorId) {
     return $result ? (int) $result['so_luong_ton'] : 0;
 }
 
-// ham lay danh sach danh gia cua mot san pham theo id cua san pham do
 function getReviewsByProductId($conn, $id, $limit = 5) {
     try {
         $sql = "SELECT dg.*, nd.ten AS ten_nguoi_dung, nd.anh_dai_dien
@@ -413,14 +303,12 @@ function getReviewsByProductId($conn, $id, $limit = 5) {
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC); // tra ve danh sach danh gia
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
-        return []; // neu bang chua ton tai thi tra ve mang rong
+        return [];
     }
 }
 
- //Lấy danh sách sản phẩm theo ID danh mục
- 
 function getProductsByCategory($conn, $categoryId) {
     $sql = "SELECT * FROM san_pham WHERE danh_muc_id = :cat_id AND trang_thai = 1";
     $stmt = $conn->prepare($sql);
@@ -428,7 +316,6 @@ function getProductsByCategory($conn, $categoryId) {
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Sử dụng lại logic map dữ liệu bạn đã viết ở hàm getallproduct
     return array_map(function($p) {
         return [
             'id' => $p['id'],
@@ -437,7 +324,7 @@ function getProductsByCategory($conn, $categoryId) {
             'price' => $p['gia'],
             'originalPrice' => $p['gia_goc'],
             'rating' => $p['trung_binh_sao'],
-            'image' => $p['hinh_anh_chinh'], // Sử dụng trực tiếp tên file từ database
+            'image' => $p['hinh_anh_chinh'],
             'category' => getCategoryKey($p['danh_muc_id']),
             'trung_binh_sao' => $p['trung_binh_sao'],
             'so_luong_danh_gia' => $p['so_luong_danh_gia'],
@@ -449,7 +336,7 @@ function getProductsByCategory($conn, $categoryId) {
         ];
     }, $products);
 }
-//Hàm lấy dánh sach người dùng cho trang quản lý người dùng CRUD đừng xóa
+
 function getAllUsers($conn) {
     $sql = "SELECT id, ten, email, so_dien_thoai, vai_tro FROM nguoi_dung";
     $stmt = $conn->prepare($sql);
@@ -457,12 +344,6 @@ function getAllUsers($conn) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/**
- * Hàm lấy thông tin người dùng theo ID
- * @param PDO $conn Kết nối database
- * @param int $id ID người dùng
- * @return array|bool Dữ liệu người dùng hoặc false nếu không tìm thấy
- */
 function getUserById($conn, $id) {
     $sql = "SELECT id, ten, email, so_dien_thoai, dia_chi, anh_dai_dien, vai_tro, trang_thai, ngay_tao 
             FROM nguoi_dung 
@@ -474,9 +355,11 @@ function getUserById($conn, $id) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// ============================================
-// HÀM XỬ LÝ NGƯỜI DÙNG (ĐĂNG NHẬP / ĐĂNG KÝ)
-// ============================================
+/**
+ * ========================================
+ * HÀM XỬ LÝ NGƯỜI DÙNG (ĐĂNG NHẬP / ĐĂNG KÝ)
+ * ========================================
+ */
 
 /**
  * Hàm đăng ký người dùng mới
@@ -502,7 +385,7 @@ function registerUser($conn, $ten, $email, $mat_khau) {
         $hashed_password = password_hash($mat_khau, PASSWORD_DEFAULT);
 
         // Thêm vào database
-        $sql_insert = "INSERT INTO nguoi_dung (ten, email, mat_khau) VALUES (:ten, :email, :mat_khau)";
+        $sql_insert = "INSERT INTO nguoi_dung (ten, email, mat_khau, vai_tro, trang_thai) VALUES (:ten, :email, :mat_khau, 'khach_hang', 'hoat_dong')";
         $stmt_insert = $conn->prepare($sql_insert);
         $stmt_insert->bindParam(':ten', $ten, PDO::PARAM_STR);
         $stmt_insert->bindParam(':email', $email, PDO::PARAM_STR);
@@ -534,18 +417,20 @@ function loginUser($conn, $email, $mat_khau) {
         
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // So sánh mật khẩu thường (không hash)
-        if ($user && $user['mat_khau'] === $mat_khau) {
+        // Kiểm tra user và mật khẩu sử dụng password_verify
+        if ($user && password_verify($mat_khau, $user['mat_khau'])) {
             
             if ($user['trang_thai'] === 'bi_khoa') {
                 return ['success' => false, 'message' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin.'];
             }
 
+            // Cập nhật lần đăng nhập cuối
             $sql_update = "UPDATE nguoi_dung SET lan_dang_nhap_cuoi = NOW() WHERE id = :id";
             $stmt_update = $conn->prepare($sql_update);
             $stmt_update->bindParam(':id', $user['id'], PDO::PARAM_INT);
             $stmt_update->execute();
 
+            // Xóa mật khẩu trước khi trả về
             unset($user['mat_khau']);
 
             return [

@@ -117,7 +117,7 @@ $displayProducts = array_slice($products, 0, 6);
                                 <a href="profile.php" class="user-icon-link me-2 text-decoration-none">
                                     <i class="fas fa-user-circle fa-lg"></i>
                                 </a>
-                                <a href="logout.php" class="btn btn-sm btn-outline-danger">
+                                <a href="logout.php" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-sign-out-alt"></i> Đăng xuất
                                 </a>
                             </div>
