@@ -56,7 +56,7 @@ if (isset($_POST['login_btn'])) {
 </head>
 
 <body>
- <!-- Navbar -->
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid px-4">
             <a class="navbar-brand" href="index.php">
@@ -78,14 +78,27 @@ if (isset($_POST['login_btn'])) {
         </div>
     </nav>
     <!-- LOGIN CONTAINER  -->
-     <div class="login-container">
+    <div class="login-container">
         <div class="login-card">
-        <!--header-->
-        <div class="login-header">
-            <h1><i class="fas fa-sing-in-alt"></i>Đăng Nhập</h1>
+            <!--header-->
+            <div class="login-header">
+                <h1><i class="fas fa-sing-in-alt"></i>Đăng Nhập</h1>
+                <p>Chào mừng bạn đã quay trở lại Shop-AthleteHub</p>
+            </div>
+            <!-- error/success message -->
+            <?php if (!empty($error_message)): ?>
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error_message); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($success_message)): ?>
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success_message); ?>
+                </div>
+            <?php endif; ?>
         </div>
-        </div>
-     </div>
+    </div>
 </body>
 
 </html>
