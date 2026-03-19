@@ -88,6 +88,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </nav>
+
+    <!-- register container -->
+     <div class="register-container">
+        <div class="register-card">
+            <!-- header -->
+             <div class="register-header">
+                <h1><i class="fas fa-user-plus"></i> Đăng ký</h1>
+                <p>Tạo tài khoản AthleteHub của bạn</p>
+             </div>
+        </div>
+     </div>
 </body>
 
 </html>
