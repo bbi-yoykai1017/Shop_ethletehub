@@ -103,6 +103,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error_message); ?>
                 </div>
             <?php endif; ?>
+
+           <?php if (!empty($success_message)): ?>
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success_message); ?>
+                <div style="margin-top: 10px;">
+                    <a href="login.php" class="btn btn-sm btn-primary">Đăng nhập ngay</a>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </body>
