@@ -30,6 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn = $db->connect();
 
         // goi ham dang ky 
+        $result = registerUser($conn,$ten, $email, $password);
+        
+        if ($result['success']) {
+            $success_message = "Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ";
+
+            // clean form 
+            $ten = '';
+            $email = '';
+            $password = '';
+            $confirm_password = '';
+        } else {
+            $error_message = $result['message'];
+        }
     }
 }
 ?>
@@ -41,6 +54,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+      <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+ 
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+ 
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
 </head>
 
 <body>
