@@ -1,18 +1,25 @@
 <?php
+session_start();
 require_once "Database.php";
+require_once "functions.php";
 $db = new Database();
 $conn = $db->connect();
 
-// thong bao
-$message = "";
-// lay du lieu tu nguoi dung
-if($_SERVER['REQUEST_METHOD'] == "POST") 
-   $ten = $_POST['ten'];
-   $email = $_POST['email'];
-   $so_dien_thoai = $_POST['so_dien_thoai'];
-   $dia_chi = $_POST['dia_chi'];
-   $mat_khau = $_POST['mat_khau'];
+if (isset($_SESSION['user_id'])) {
+    header('localhost: index.php');
+    exit;
+}
 
+// xu ly form dang ky
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $ten = trim($_POST['ten'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = trim($_POST['mat_khai'] ?? '');
+    $confirm_password = trim($_POST['comfirm_password'] ?? '');
+
+    // kiem tra input 
+   
+}
 ?>
 
 <!DOCTYPE html>
