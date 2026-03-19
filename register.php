@@ -90,15 +90,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
 
     <!-- register container -->
-     <div class="register-container">
+    <div class="register-container">
         <div class="register-card">
             <!-- header -->
-             <div class="register-header">
+            <div class="register-header">
                 <h1><i class="fas fa-user-plus"></i> Đăng ký</h1>
                 <p>Tạo tài khoản AthleteHub của bạn</p>
-             </div>
+            </div>
+            <!-- error/success message -->
+            <?php if (!empty($error_message)): ?>
+                <div class="alter alter-danger" role="alter">
+                    <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error_message); ?>
+                </div>
+            <?php endif; ?>
         </div>
-     </div>
+    </div>
 </body>
 
 </html>
