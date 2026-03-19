@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="register-card">
             <!-- header -->
             <div class="register-header">
-                <h1><i class="fas fa-user-plus"></i> Đăng ký</h1>
+                <h1> Đăng ký</h1>
                 <p>Tạo tài khoản AthleteHub của bạn</p>
             </div>
             <!-- error/success message -->
@@ -104,14 +104,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
 
-           <?php if (!empty($success_message)): ?>
-            <div class="alert alert-success" role="alert">
-                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success_message); ?>
-                <div style="margin-top: 10px;">
-                    <a href="login.php" class="btn btn-sm btn-primary">Đăng nhập ngay</a>
+            <?php if (!empty($success_message)): ?>
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success_message); ?>
+                    <div style="margin-top: 10px;">
+                        <a href="login.php" class="btn btn-sm btn-primary">Đăng nhập ngay</a>
+                    </div>
                 </div>
-            </div>
             <?php endif; ?>
+
+            <!-- register form -->
+
         </div>
     </div>
 </body>
