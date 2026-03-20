@@ -55,82 +55,83 @@ $displayProducts = array_slice($products, 0, 6);
                 </div>
                 <div class="col-12">
                     <!-- Mobile Menu Toggle -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-            <!-- Navbar Content -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <!-- Left Navigation Links -->
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="index.php">Trang chủ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="products.php">Sản phẩm</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#categories">Danh mục</a>
-                    </li>
-                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="CRUD.php">Quản trị</a>
-                        </li>
-                    <?php endif; ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about">Về chúng tôi</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Liên hệ</a>
-                    </li>
-                </ul>
+                    <!-- Navbar Content -->
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <!-- Left Navigation Links -->
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="index.php">Trang chủ</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="products.php">Sản phẩm</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#categories">Danh mục</a>
+                            </li>
+                            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="CRUD.php">Quản trị</a>
+                                </li>
+                            <?php endif; ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#about">Về chúng tôi</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#contact">Liên hệ</a>
+                            </li>
+                        </ul>
 
-                <!-- Search Bar (Centered) -->
-                <div class="navbar-search-container">
-                    <div class="navbar-search">
-                        <input type="text" placeholder="Tìm sản phẩm..." class="search-input">
-                        <button class="search-btn">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
+                        <!-- Search Bar (Centered) -->
+                        <div class="navbar-search-container">
+                            <div class="navbar-search">
+                                <input type="text" placeholder="Tìm sản phẩm..." class="search-input">
+                                <button class="search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
 
-                <!-- Right Icons -->
-                <div class="navbar-right">
-                    <div class="nav-notification">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">2</span>
-                    </div>
-
-                    <div class="cart-icon" onclick="window.location.href='cart.php'">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count"></span>
-                    </div>
-
-                    <div class="user-account-wrapper d-flex align-items-center">
-                        <?php if (isset($_SESSION['user_name'])): ?>
-                            <div class="user-info me-3">
-                                <span class="welcome-text">Xin chào, <strong><?php echo htmlspecialchars($_SESSION['user_name']); ?></strong></span>
+                        <!-- Right Icons -->
+                        <div class="navbar-right">
+                            <div class="nav-notification">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge">2</span>
                             </div>
 
-                            <div class="user-actions d-flex align-items-center">
-                                <a href="profile.php" class="user-icon-link me-2 text-decoration-none">
-                                    <i class="fas fa-user-circle fa-lg"></i>
-                                </a>
-                                <a href="logout.php" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                                </a>
+                            <div class="cart-icon" onclick="window.location.href='cart.php'">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="cart-count"></span>
                             </div>
-                        <?php else: ?>
-                            <div class="user-login">
-                                <a href="login.php" class="btn btn-sm btn-primary-custom">
-                                    <i class="fas fa-sign-in-alt"></i> Đăng nhập
-                                </a>
+
+                            <div class="user-account-wrapper d-flex align-items-center">
+
+
+                                <div class="user-actions d-flex align-items-center">
+                                    <a href="profile.php" class="user-icon-link me-2 text-decoration-none">
+                                        <i class="fas fa-user-circle fa-lg"></i>
+                                    </a>
+                                    <?php if (isset($_SESSION['user_name'])): ?>
+                                        <div class="user-info me-3">
+                                            <span class="welcome-text" style="color: white;">Xin chào, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+                                        </div>
+                                        <a href="logout.php" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                                        </a>
+                                </div>
+                            <?php else: ?>
+                                <div class="user-login">
+                                    <a href="login.php" class="btn btn-sm btn-primary-custom">
+                                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                                    </a>
+                                </div>
+                            <?php endif; ?>
                             </div>
-                        <?php endif; ?>
+                        </div>
                     </div>
-                </div>
-            </div>
                 </div>
             </div>
         </div>
