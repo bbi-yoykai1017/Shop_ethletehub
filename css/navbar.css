@@ -108,6 +108,7 @@
     border-color: var(--accent);
 }
 
+
 .search-input {
     background: transparent;
     border: none;
@@ -426,4 +427,5 @@
     .dropdown-cat-item:hover {
         padding-left: 20px;
     }
+    
 }

@@ -25,8 +25,8 @@ $items = getallproduct($conn);
 
 <body>
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-custom">
+    <nav class="navbar navbar-expand-lg navbar-custom"> 
+    <div class="container-custom">
             <a class="navbar-brand" href="index.php">
                 <i class="fas fa-dumbbell"></i>
                 AthleteHub
@@ -68,6 +68,11 @@ $items = getallproduct($conn);
 
                     <div class="user-account">
                         <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-login">
+                        <a href="login.php" class="btn btn-sm btn-primary-custom text-nowrap">
+                            <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                        </a>
                     </div>
                 </div>
             </div>
@@ -265,21 +270,21 @@ $items = getallproduct($conn);
                 </div>
             </div>
             <div class="footer-bottom">
-                 <div class="footer-copyright">
-                        &copy;
-                        <?php echo date("Y"); ?> <strong>AthleteHub</strong>. Bảo lưu mọi quyền.
-                    </div>
+                <div class="footer-copyright">
+                    &copy;
+                    <?php echo date("Y"); ?> <strong>AthleteHub</strong>. Bảo lưu mọi quyền.
+                </div>
             </div>
         </div>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
-    // Kiểm tra nếu chưa có thì mới gán, dùng 'var' hoặc gán thẳng vào 'window'
-    window.allProducts = <?php echo json_encode($items); ?>;
-</script>
+        // Kiểm tra nếu chưa có thì mới gán, dùng 'var' hoặc gán thẳng vào 'window'
+        window.allProducts = <?php echo json_encode($items); ?>;
+    </script>
     <script src="js/products-page.js"></script>
-    
+
 </body>
 
 </html>
