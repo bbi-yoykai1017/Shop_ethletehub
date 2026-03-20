@@ -101,40 +101,38 @@ $displayProducts = array_slice($products, 0, 6);
                                 <i class="fas fa-bell"></i>
                                 <span class="notification-badge">2</span>
                             </div>
-
                             <div class="cart-icon" onclick="window.location.href='cart.php'">
                                 <i class="fas fa-shopping-cart"></i>
                                 <span class="cart-count"></span>
                             </div>
-
                             <div class="user-account-wrapper d-flex align-items-center">
-
-
                                 <div class="user-actions d-flex align-items-center">
                                     <a href="profile.php" class="user-icon-link me-2 text-decoration-none">
                                         <i class="fas fa-user-circle fa-lg"></i>
                                     </a>
                                     <?php if (isset($_SESSION['user_name'])): ?>
-                                        <div class="user-info me-3">
-                                            <span class="welcome-text" style="color: white;">Xin chào, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+                                        <div class="user-logged-in d-flex align-items-center">
+                                            <span class="welcome-text text-nowrap me-2" style="color: white;">
+                                                Xin chào, <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                                            </span>
+
+                                            <a href="logout.php" class="btn btn-sm btn-outline-primary text-nowrap">
+                                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                                            </a>
                                         </div>
-                                        <a href="logout.php" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                                        </a>
+                                    <?php else: ?>
+                                        <div class="user-login">
+                                            <a href="login.php" class="btn btn-sm btn-primary-custom text-nowrap">
+                                                <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                                            </a>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
-                            <?php else: ?>
-                                <div class="user-login">
-                                    <a href="login.php" class="btn btn-sm btn-primary-custom">
-                                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
-                                    </a>
-                                </div>
-                            <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
     </nav>
 
     <!-- ========================
