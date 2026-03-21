@@ -188,6 +188,38 @@ if (isset($_POST['register_btn'])) {
             </div>
         </div>
     </div>
+     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // hien thi mat mat_khau
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passInput = document.getElementById('mat_khau');
+            const icon = this;
+
+            if (passInput.type === 'password') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passInput.type === 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+        // mat khau nhap lai
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function () {
+            const passInput = document.getElementById('mat_khau');
+            const icon = this;
+
+            if (passInput.type === 'password') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passInput.type === 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
 </body>
 
 </html>
