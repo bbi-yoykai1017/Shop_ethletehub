@@ -3,45 +3,54 @@ session_start();
 require_once "Database.php";
 require_once "functions.php";
 
+// Nếu đã đăng nhập rồi thì chuyển hướng về trang chủ
 if (isset($_SESSION['user_id'])) {
-    header('localhost: index.php');
-    exit;
+    header("Location: index.php");
+    exit();
 }
-
-// xu ly form dang ky
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $ten = trim($_POST['ten'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $password = trim($_POST['mat_khai'] ?? '');
-    $confirm_password = trim($_POST['comfirm_password'] ?? '');
-
-    // kiem tra input 
-    if (empty($ten) || empty($email) || empty($password) || empty($confirm_password)) {
-        $error_message = "Vui lòng nhập đầy đủ thông tin";
-    } elseif (strlen($password) < 6) {
-        $error_message = "Mật khẩu phải có trên 6 ký tự";
-    } elseif ($password != $confirm_password) {
-        $error_message = "Mật khẩu không trùng khớp";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error_message = "Email không hợp lệ";
+ 
+$error = "";
+$success = "";
+$form_data = [
+    'ten' => '',
+    'email' => '',
+];
+ 
+// Xử lý form đăng ký
+if (isset($_POST['register_btn'])) {
+    $ten = isset($_POST['ten']) ? trim($_POST['ten']) : '';
+    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+    $mat_khau = isset($_POST['mat_khau']) ? trim($_POST['mat_khau']) : '';
+    $confirm_password = isset($_POST['confirm_password']) ? trim($_POST['confirm_password']) : '';
+    
+    // Lưu lại form data
+    $form_data['ten'] = htmlspecialchars($ten);
+    $form_data['email'] = htmlspecialchars($email);
+    
+    // Validation client-side (nhưng cũng kiểm tra server)
+    if (empty($ten) || empty($email) || empty($mat_khau) || empty($confirm_password)) {
+        $error = "Vui lòng nhập đầy đủ thông tin!";
+    } elseif ($mat_khau !== $confirm_password) {
+        $error = "Mật khẩu không trùng khớp!";
     } else {
-        // khoi tao db
+        // Khởi tạo kết nối database
         $db = new Database();
         $conn = $db->connect();
-
-        // goi ham dang ky 
-        $result = registerUser($conn, $ten, $email, $password);
-
-        if ($result['success']) {
-            $success_message = "Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ";
-
-            // clean form 
-            $ten = '';
-            $email = '';
-            $password = '';
-            $confirm_password = '';
+        
+        if (!$conn) {
+            $error = "Lỗi kết nối cơ sở dữ liệu!";
         } else {
-            $error_message = $result['message'];
+            // Gọi hàm registerUser từ functions.php (đã cải tiến)
+            $result = registerUser($conn, $ten, $email, $mat_khau);
+            
+            if ($result['success']) {
+                $success = $result['message'];
+                // Clear form
+                $form_data['ten'] = '';
+                $form_data['email'] = '';
+            } else {
+                $error = $result['message'];
+            }
         }
     }
 }
