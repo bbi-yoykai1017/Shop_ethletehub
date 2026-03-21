@@ -252,6 +252,25 @@ if (isset($_POST['register_btn'])) {
             strengthDiv.className = `password-strength ${strengthClass}`;
             strengthDiv.innerHTML = `<div>${strengthText}</div><div class="password-strength-bar"><div class="bar"></div></div>`;
         });
+
+        // form validation 
+        document.getElementById('registerForm').addEventListener('submit'  function (e) {
+            const ten = document.getElementById('ten').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const confirmPassword = document.getElementById('confirm_password').value.trim();
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+
+             if (!ten || !email || !password || !confirmPassword) {
+                e.preventDefault();
+                alert('Vui lòng nhập đầy đủ thông tin!');
+            } else if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Mật khẩu không trùng khớp!');
+            } else if (!agreeTerms) {
+                e.preventDefault();
+                alert('Vui lòng chấp nhận Điều khoản dịch vụ!');
+        });
     </script>
 </body>
 
