@@ -3,11 +3,12 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .navbar-custom {
     background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
 }
 
 .navbar-brand {
@@ -20,12 +21,6 @@ body {
 }
 
 .register-container {
-     display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.register-wrapper {
     flex: 1;
     display: flex;
     align-items: center;
@@ -41,7 +36,6 @@ body {
     width: 100%;
     max-width: 500px;
     animation: slideUp 0.5s ease;
-    
 }
 
 @keyframes slideUp {
@@ -61,7 +55,7 @@ body {
     margin-bottom: 30px;
 }
 
-.register-header h2 {
+.register-header h1 {
     color: #333;
     font-size: 26px;
     font-weight: 700;
@@ -91,17 +85,15 @@ body {
     padding: 12px 15px;
     font-size: 14px;
     transition: all 0.3s ease;
-    background-color: #f9f9f9;
 }
 
 .form-control:focus {
-    background-color: white;
     border-color: #667eea;
     box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
 }
 
-.form-control::placeholder {
-    color: #999;
+.form-control.is-invalid {
+    border-color: #dc3545;
 }
 
 .input-group {
@@ -116,6 +108,12 @@ body {
     cursor: pointer;
     color: #667eea;
     font-size: 14px;
+    user-select: none;
+    transition: color 0.3s ease;
+}
+
+.input-group-icon:hover {
+    color: #764ba2;
 }
 
 .input-group .form-control {
@@ -162,10 +160,6 @@ body {
     font-size: 13px;
 }
 
-.terms-checkbox input {
-    margin-right: 5px;
-}
-
 .terms-checkbox a {
     color: #667eea;
     text-decoration: none;
@@ -210,11 +204,6 @@ body {
     transform: translateY(0);
 }
 
-.btn-register:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
 .alert {
     border-radius: 8px;
     border: none;
@@ -246,11 +235,16 @@ body {
     border-left: 4px solid #22863a;
 }
 
-.divider {
-    text-align: center;
-    margin: 25px 0;
-    color: #999;
+.error-message {
     font-size: 12px;
+    color: #dc3545;
+    margin-top: 5px;
+}
+
+.countdown {
+    color: #667eea;
+    font-weight: 600;
+    font-size: 18px;
 }
 
 .register-footer {
@@ -264,12 +258,10 @@ body {
     color: #667eea;
     text-decoration: none;
     font-weight: 600;
-    transition: color 0.3s ease;
 }
 
 .register-footer a:hover {
     color: #764ba2;
-    text-decoration: underline;
 }
 
 .footer {
@@ -285,11 +277,7 @@ body {
         padding: 30px 20px;
     }
 
-    .register-header h2 {
+    .register-header h1 {
         font-size: 22px;
-    }
-
-    .register-wrapper {
-        padding: 20px;
     }
 }
