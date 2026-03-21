@@ -3,21 +3,15 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .navbar-custom {
     background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
 }
 
 .navbar-brand {
     color: white !important;
     font-weight: 700;
-}
-
-.nav-link {
-    color: rgba(255, 255, 255, 0.8) !important;
 }
 
 .register-container {
@@ -35,19 +29,6 @@ body {
     padding: 40px;
     width: 100%;
     max-width: 500px;
-    animation: slideUp 0.5s ease;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .register-header {
@@ -59,7 +40,6 @@ body {
     color: #333;
     font-size: 26px;
     font-weight: 700;
-    margin-bottom: 10px;
 }
 
 .register-header p {
@@ -67,33 +47,23 @@ body {
     font-size: 14px;
 }
 
-.form-group {
-    margin-bottom: 20px;
-}
-
 .form-label {
     color: #333;
     font-weight: 600;
     margin-bottom: 8px;
     display: block;
-    font-size: 13px;
 }
 
 .form-control {
     border: 2px solid #e0e0e0;
     border-radius: 8px;
     padding: 12px 15px;
-    font-size: 14px;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
 }
 
 .form-control:focus {
     border-color: #667eea;
     box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
-}
-
-.form-control.is-invalid {
-    border-color: #dc3545;
 }
 
 .input-group {
@@ -108,12 +78,6 @@ body {
     cursor: pointer;
     color: #667eea;
     font-size: 14px;
-    user-select: none;
-    transition: color 0.3s ease;
-}
-
-.input-group-icon:hover {
-    color: #764ba2;
 }
 
 .input-group .form-control {
@@ -135,9 +99,7 @@ body {
 
 .password-strength-bar .bar {
     height: 100%;
-    width: 0;
-    transition: all 0.3s ease;
-    border-radius: 3px;
+    transition: all 0.3s;
 }
 
 .password-strength.weak .bar {
@@ -155,32 +117,6 @@ body {
     background: #2ed573;
 }
 
-.terms-checkbox {
-    margin-top: 15px;
-    font-size: 13px;
-}
-
-.terms-checkbox a {
-    color: #667eea;
-    text-decoration: none;
-}
-
-.terms-checkbox a:hover {
-    text-decoration: underline;
-}
-
-.form-check-input {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #e0e0e0;
-    cursor: pointer;
-}
-
-.form-check-input:checked {
-    background-color: #667eea;
-    border-color: #667eea;
-}
-
 .btn-register {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
@@ -188,11 +124,10 @@ body {
     padding: 12px;
     border-radius: 8px;
     font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
     width: 100%;
-    transition: all 0.3s ease;
-    margin-top: 10px;
+    margin-top: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
 .btn-register:hover {
@@ -200,27 +135,10 @@ body {
     box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
 
-.btn-register:active {
-    transform: translateY(0);
-}
-
 .alert {
     border-radius: 8px;
     border: none;
     margin-bottom: 20px;
-    animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .alert-danger {
@@ -233,12 +151,6 @@ body {
     background-color: #f0fdf4;
     color: #22863a;
     border-left: 4px solid #22863a;
-}
-
-.error-message {
-    font-size: 12px;
-    color: #dc3545;
-    margin-top: 5px;
 }
 
 .countdown {
@@ -260,24 +172,10 @@ body {
     font-weight: 600;
 }
 
-.register-footer a:hover {
-    color: #764ba2;
-}
-
 .footer {
     background: rgba(0, 0, 0, 0.3);
     color: rgba(255, 255, 255, 0.8);
     text-align: center;
     padding: 20px;
     margin-top: auto;
-}
-
-@media (max-width: 576px) {
-    .register-card {
-        padding: 30px 20px;
-    }
-
-    .register-header h1 {
-        font-size: 22px;
-    }
 }
