@@ -361,89 +361,132 @@ function getUserById($conn, $id) {
  * ========================================
  */
 
-/**
- * Hàm đăng ký người dùng mới
- * @param PDO $conn Kết nối database
- * @param string $ten Họ và tên
- * @param string $email Email
- * @param string $mat_khau Mật khẩu chưa mã hóa
- * @return array Mảng chứa trạng thái (success) và thông báo (message)
- */
 function registerUser($conn, $ten, $email, $mat_khau) {
     try {
-        // Kiểm tra xem email đã tồn tại chưa
-        $sql_check = "SELECT COUNT(*) FROM nguoi_dung WHERE email = :email";
+        // 1️ SANITIZE INPUT
+        $ten = trim($ten);
+        $email = strtolower(trim($email));
+ 
+        // 2️ VALIDATE INPUT
+        //  Kiểm tra tên
+        if (empty($ten)) {
+            return ['success' => false, 'message' => 'Vui lòng nhập tên!'];
+        }
+        if (strlen($ten) < 3) {
+            return ['success' => false, 'message' => 'Tên phải >= 3 ký tự'];
+        }
+ 
+        //  Kiểm tra email
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['success' => false, 'message' => 'Email không hợp lệ'];
+        }
+ 
+        //  Kiểm tra mật khẩu
+        if (empty($mat_khau)) {
+            return ['success' => false, 'message' => 'Vui lòng nhập mật khẩu!'];
+        }
+        if (strlen($mat_khau) < 6) {
+            return ['success' => false, 'message' => 'Mật khẩu phải >= 6 ký tự'];
+        }
+ 
+        // 3️ KIỂM TRA EMAIL ĐÃ TỒN TẠI
+        $sql_check = "SELECT id FROM nguoi_dung WHERE email = :email LIMIT 1";
         $stmt_check = $conn->prepare($sql_check);
         $stmt_check->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt_check->execute();
-        
-        if ($stmt_check->fetchColumn() > 0) {
-            return ['success' => false, 'message' => 'Email này đã được đăng ký!'];
+ 
+        if ($stmt_check->rowCount() > 0) {
+            return ['success' => false, 'message' => 'Email đã tồn tại!'];
         }
-
-        // Mã hóa mật khẩu
+ 
+        // 4️ HASH PASSWORD
         $hashed_password = password_hash($mat_khau, PASSWORD_DEFAULT);
-
-        // Thêm vào database
-        $sql_insert = "INSERT INTO nguoi_dung (ten, email, mat_khau, vai_tro, trang_thai) VALUES (:ten, :email, :mat_khau, 'khach_hang', 'hoat_dong')";
-        $stmt_insert = $conn->prepare($sql_insert);
-        $stmt_insert->bindParam(':ten', $ten, PDO::PARAM_STR);
-        $stmt_insert->bindParam(':email', $email, PDO::PARAM_STR);
-        $stmt_insert->bindParam(':mat_khau', $hashed_password, PDO::PARAM_STR);
+ 
+        // 5️ INSERT USER
+        $sql = "INSERT INTO nguoi_dung (ten, email, mat_khau, vai_tro, trang_thai) 
+                VALUES (:ten, :email, :mat_khau, 'khach_hang', 'hoat_dong')";
         
-        if ($stmt_insert->execute()) {
+        $stmt = $conn->prepare($sql);
+        
+        //  Thêm PDO::PARAM_STR
+        $stmt->bindParam(':ten', $ten, PDO::PARAM_STR);
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->bindParam(':mat_khau', $hashed_password, PDO::PARAM_STR);
+        
+        if ($stmt->execute()) {
+            //  Log thành công
+            error_log("New user registered: $email");
             return ['success' => true, 'message' => 'Đăng ký thành công!'];
         } else {
-            return ['success' => false, 'message' => 'Lỗi hệ thống, vui lòng thử lại sau.'];
+            return ['success' => false, 'message' => 'Lỗi hệ thống, vui lòng thử lại.'];
         }
+ 
     } catch (PDOException $e) {
-        return ['success' => false, 'message' => 'Lỗi CSDL: ' . $e->getMessage()];
+        //  LỖI DATABASE
+        error_log("Register error: " . $e->getMessage() . " - Code: " . $e->getCode());
+        
+        // Kiểm tra lỗi duplicate
+        if ($e->getCode() == 23000) {
+            return ['success' => false, 'message' => 'Email đã tồn tại!'];
+        }
+        
+        // Lỗi khác
+        return ['success' => false, 'message' => 'Lỗi hệ thống, vui lòng thử lại sau.'];
     }
 }
-
+ 
 /**
- * Hàm đăng nhập người dùng
- * @param PDO $conn Kết nối database
- * @param string $email Email
- * @param string $mat_khau Mật khẩu người dùng nhập
- * @return array Mảng chứa trạng thái (success), thông báo (message) và dữ liệu user (nếu thành công)
+ *  Hàm đăng nhập
  */
-    function loginUser($conn, $email, $mat_khau) {
-        try {
-            $sql = "SELECT * FROM nguoi_dung WHERE email = :email";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-            $stmt->execute();
-            
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            // Kiểm tra user và mật khẩu sử dụng password_verify
-            if ($user && password_verify($mat_khau, $user['mat_khau'])) {
-                
-                if ($user['trang_thai'] === 'bi_khoa') {
-                    return ['success' => false, 'message' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin.'];
-                }
-
-                // Cập nhật lần đăng nhập cuối
-                $sql_update = "UPDATE nguoi_dung SET lan_dang_nhap_cuoi = NOW() WHERE id = :id";
-                $stmt_update = $conn->prepare($sql_update);
-                $stmt_update->bindParam(':id', $user['id'], PDO::PARAM_INT);
-                $stmt_update->execute();
-
-                // Xóa mật khẩu trước khi trả về
-                unset($user['mat_khau']);
-
-                return [
-                    'success' => true, 
-                    'message' => 'Đăng nhập thành công',
-                    'user' => $user
-                ];
-            }
-
-            return ['success' => false, 'message' => 'Email hoặc mật khẩu không chính xác!'];
-            
-        } catch (PDOException $e) {
-            return ['success' => false, 'message' => 'Lỗi CSDL: ' . $e->getMessage()];
+function loginUser($conn, $email, $mat_khau) {
+    try {
+        // Kiểm tra input
+        if (empty($email) || empty($mat_khau)) {
+            return ['success' => false, 'message' => 'Vui lòng nhập email và mật khẩu!'];
         }
+ 
+        // Lấy user từ database
+        $sql = "SELECT * FROM nguoi_dung WHERE email = :email";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+ 
+        //  Kiểm tra user tồn tại VÀ password đúng
+        if ($user && password_verify($mat_khau, $user['mat_khau'])) {
+            
+            // Kiểm tra tài khoản bị khóa
+            if ($user['trang_thai'] === 'bi_khoa') {
+                return ['success' => false, 'message' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin.'];
+            }
+ 
+            // Cập nhật lần đăng nhập cuối
+            $sql_update = "UPDATE nguoi_dung SET lan_dang_nhap_cuoi = NOW() WHERE id = :id";
+            $stmt_update = $conn->prepare($sql_update);
+            $stmt_update->bindParam(':id', $user['id'], PDO::PARAM_INT);
+            $stmt_update->execute();
+ 
+            // Log thành công
+            error_log("User logged in: " . $user['email']);
+ 
+            // Xóa mật khẩu trước khi trả về
+            unset($user['mat_khau']);
+ 
+            return [
+                'success' => true, 
+                'message' => 'Đăng nhập thành công',
+                'user' => $user
+            ];
+        }
+ 
+        // Email không tồn tại hoặc password sai
+        error_log("Login failed for email: $email");
+        return ['success' => false, 'message' => 'Email hoặc mật khẩu không chính xác!'];
+        
+    } catch (PDOException $e) {
+        error_log("Login error: " . $e->getMessage());
+        return ['success' => false, 'message' => 'Lỗi cơ sở dữ liệu!'];
     }
+}
 ?>
