@@ -8,25 +8,25 @@ if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
 }
- 
+
 $error = "";
 $success = "";
 $form_data = [
     'ten' => '',
     'email' => '',
 ];
- 
+
 // Xử lý form đăng ký
 if (isset($_POST['register_btn'])) {
     $ten = isset($_POST['ten']) ? trim($_POST['ten']) : '';
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
     $mat_khau = isset($_POST['mat_khau']) ? trim($_POST['mat_khau']) : '';
     $confirm_password = isset($_POST['confirm_password']) ? trim($_POST['confirm_password']) : '';
-    
+
     // Lưu lại form data
     $form_data['ten'] = htmlspecialchars($ten);
     $form_data['email'] = htmlspecialchars($email);
-    
+
     // Validation client-side (nhưng cũng kiểm tra server)
     if (empty($ten) || empty($email) || empty($mat_khau) || empty($confirm_password)) {
         $error = "Vui lòng nhập đầy đủ thông tin!";
@@ -36,13 +36,13 @@ if (isset($_POST['register_btn'])) {
         // Khởi tạo kết nối database
         $db = new Database();
         $conn = $db->connect();
-        
+
         if (!$conn) {
             $error = "Lỗi kết nối cơ sở dữ liệu!";
         } else {
             // Gọi hàm registerUser từ functions.php (đã cải tiến)
             $result = registerUser($conn, $ten, $email, $mat_khau);
-            
+
             if ($result['success']) {
                 $success = $result['message'];
                 // Clear form
@@ -188,7 +188,7 @@ if (isset($_POST['register_btn'])) {
             </div>
         </div>
     </div>
-     <!-- Scripts -->
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
         // hien thi mat mat_khau
@@ -218,6 +218,39 @@ if (isset($_POST['register_btn'])) {
                 icon.classList.remove('fa-eye-slash');
                 icon.classList.add('fa-eye');
             }
+        });
+        // kiem tra do manh cua mat khau
+        document.getElementById('mat_khau').addEventListener('input', function () {
+            const pass = this.value;
+            const strengthDiv = document.getElementById('passwordStrength');
+
+            if (pass.length === 0) {
+                strengthDiv.innerHTML = '';
+                return;
+            }
+
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+            let strengthText = '';
+            let strengthClass = '';
+
+            if (strength <= 1) {
+                strengthText = 'Mật khẩu yếu';
+                strengthClass = 'weak';
+            } else if (strength === 2) {
+                strengthText = 'Mật khẩu trung bình';
+                strengthClass = 'medium';
+            } else {
+                strengthText = 'Mật khẩu mạnh';
+                strengthClass = 'strong';
+            }
+
+            strengthDiv.className = `password-strength ${strengthClass}`;
+            strengthDiv.innerHTML = `<div>${strengthText}</div><div class="password-strength-bar"><div class="bar"></div></div>`;
         });
     </script>
 </body>
