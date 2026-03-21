@@ -114,7 +114,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <!-- register form -->
-                
+            <form method="POST" action="register.php" id="registerForm">
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="ten" class="form-label">
+                        <i class="fas fa-user"></i> Họ và tên
+                    </label>
+                    <input type="text" class="form-control" id="ten" name="ten" placeholder="Nhập họ và tên của bạn"
+                        required minlength="3" value="<?php echo $form_data['ten']; ?>">
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Nhập email của bạn"
+                        required value="<?php echo $form_data['email']; ?>">
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="mat_khau" class="form-label">
+                        <i class="fas fa-lock"></i> Mật khẩu
+                    </label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="mat_khau" name="mat_khau"
+                            placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" required minlength="6">
+                        <i class="input-group-icon fa fa-eye" id="togglePassword"></i>
+                    </div>
+                    <div class="password-strength" id="passwordStrength"></div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirm_password" class="form-label">
+                        <i class="fas fa-lock"></i> Xác nhận mật khẩu
+                    </label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password"
+                            placeholder="Nhập lại mật khẩu" required minlength="6">
+                        <i class="input-group-icon fa fa-eye" id="toggleConfirmPassword"></i>
+                    </div>
+                </div>
+
+                <!-- Terms & Conditions -->
+                <div class="terms-checkbox">
+                    <label class="form-check">
+                        <input type="checkbox" class="form-check-input" id="agreeTerms" name="agree_terms" required>
+                        <span class="ms-2">Tôi đồng ý với <a href="#">Điều khoản dịch vụ</a> và <a href="#">Chính sách
+                                bảo mật</a></span>
+                    </label>
+                </div>
+
+                <!-- Register Button -->
+                <button type="submit" name="register_btn" class="btn-register">
+                    <i class="fas fa-user-plus"></i> Đăng ký
+                </button>
+            </form>
+            <!-- Login Link -->
+            <div class="register-footer">
+                Đã có tài khoản? <a href="login.php">Đăng nhập tại đây</a>
+            </div>
         </div>
     </div>
 </body>
