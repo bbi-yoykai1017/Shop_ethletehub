@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once 'Database.php';
-require_once 'functions.php';
+require_once 'model/functions.php';
 require_once 'auth.php'; // File này sẽ kiểm tra xem người dùng đã đăng nhập chưa, nếu chưa sẽ chuyển hướng về login.php
 
 /*
