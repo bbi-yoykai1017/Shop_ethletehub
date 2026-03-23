@@ -24,7 +24,7 @@ $listusers = getAllUsers($conn);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quản lý người dùng - EthleteHub</title>
 
-    
+
 
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
@@ -41,11 +41,48 @@ $listusers = getAllUsers($conn);
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
+    <style>
+.layout{
+    display:flex;
+    min-height:calc(100vh - 56px);
+}
+
+.sidebar{
+    width:240px;
+    background:#111827;
+    color:#fff;
+    padding:20px;
+}
+
+.sidebar ul{
+    list-style:none;
+    padding:0;
+}
+
+.sidebar a{
+    display:block;
+    padding:10px;
+    color:#d1d5db;
+    text-decoration:none;
+}
+
+.sidebar a:hover{
+    background:#1f2937;
+    color:#fff;
+}
+
+.main-content{
+    flex:1;
+    padding:30px;
+}
+</style>
 </head>
 
 <body style="background:#f4f6f9;">
 
+
     <!-- NAVBAR ADMIN -->
+
     <nav class="navbar navbar-dark bg-dark shadow">
         <div class="container-fluid px-4">
             <span class="navbar-brand fw-bold">
@@ -59,25 +96,34 @@ $listusers = getAllUsers($conn);
     </nav>
 
     <!-- CONTENT -->
-    <div class="container py-5">
+   <div class="layout">
 
-        <!-- CARD -->
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h4 class="text-center">ADMIN</h4>
+        <ul>
+            <li><a href="#">🏠 Dashboard</a></li>
+            <li><a href="frmthem.php">➕ Thêm người dùng</a></li>
+            <li><a href="#">📋 Danh sách</a></li>
+            <li><a href="#">👤 Người dùng</a></li>
+            <li><a href="#">⚙️ Cài đặt</a></li>
+            <li><a href="#">🚪 Đăng xuất</a></li>
+        </ul>
+    </aside>
+
+    <!-- NỘI DUNG -->
+    <div class="main-content">
+
         <div class="card shadow-lg border-0">
 
-            <!-- CARD HEADER -->
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-
-                <h4 class="mb-0">
-                    <i class="bi bi-people-fill"></i> Quản lý người dùng
-                </h4>
+                <h4 class="mb-0">Quản lý người dùng</h4>
 
                 <a href="frmthem.php" class="btn btn-light fw-semibold">
-                    <i class="bi bi-plus-circle"></i> Thêm người dùng
+                    ➕ Thêm người dùng
                 </a>
-
             </div>
 
-            <!-- TABLE -->
             <div class="card-body">
 
                 <div class="table-responsive">
@@ -98,7 +144,6 @@ $listusers = getAllUsers($conn);
                         <tbody>
 
                             <?php foreach ($listusers as $user) { ?>
-
                                 <tr>
                                     <td><?= $user['id'] ?></td>
                                     <td><?= $user['ten'] ?></td>
@@ -112,21 +157,17 @@ $listusers = getAllUsers($conn);
                                     </td>
 
                                     <td>
-
-                                        <a href="Update.php?id=<?= $user['id'] ?>"
-                                            class="btn btn-warning btn-sm">
-                                            <i class="bi bi-pencil-square">Sửa</i>
+                                        <a href="Update.php?id=<?= $user['id'] ?>" class="btn btn-warning btn-sm">
+                                            Sửa
                                         </a>
 
                                         <a onclick="return confirm('Xóa user <?= $user['id'] ?> ?')"
-                                            href="Delete.php?id=<?= $user['id'] ?>"
-                                            class="btn btn-danger btn-sm">
-                                            <i class="bi bi-trash">Xóa</i>
+                                           href="Delete.php?id=<?= $user['id'] ?>"
+                                           class="btn btn-danger btn-sm">
+                                            Xóa
                                         </a>
-
                                     </td>
                                 </tr>
-
                             <?php } ?>
 
                         </tbody>
@@ -140,6 +181,8 @@ $listusers = getAllUsers($conn);
         </div>
 
     </div>
+
+</div>
 
     <!-- FOOTER -->
     <footer class="bg-dark text-white text-center py-3">

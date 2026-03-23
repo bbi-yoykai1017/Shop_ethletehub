@@ -1,5 +1,5 @@
  <?php
-    require_once 'Database.php.php';
+    require_once 'Database.php';
 
  ?>
  <!DOCTYPE html>
@@ -52,5 +52,4 @@
          </form>
      </div>
  </body>
-
  </html>
