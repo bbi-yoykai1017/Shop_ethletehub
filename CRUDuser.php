@@ -138,7 +138,6 @@ $listusers = getAllUsers($conn);
         <aside class="sidebar">
             <h4 class="text-center">ADMIN</h4>
             <ul>
-                <li><a href="#">🏠 Dashboard</a></li>
                 <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>
                 <li><a href="CRUDbienthesp.php">👤 Quản lý biến thể sản phẩm </a></li>
                 <li><a href="CRUDuser.php">👤Quản lý khách hàng </a></li>
