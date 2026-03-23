@@ -42,40 +42,40 @@ $listusers = getAllUsers($conn);
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
     <style>
-.layout{
-    display:flex;
-    min-height:calc(100vh - 56px);
-}
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 56px);
+        }
 
-.sidebar{
-    width:240px;
-    background:#111827;
-    color:#fff;
-    padding:20px;
-}
+        .sidebar {
+            width: 240px;
+            background: #111827;
+            color: #fff;
+            padding: 20px;
+        }
 
-.sidebar ul{
-    list-style:none;
-    padding:0;
-}
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
 
-.sidebar a{
-    display:block;
-    padding:10px;
-    color:#d1d5db;
-    text-decoration:none;
-}
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            color: #d1d5db;
+            text-decoration: none;
+        }
 
-.sidebar a:hover{
-    background:#1f2937;
-    color:#fff;
-}
+        .sidebar a:hover {
+            background: #1f2937;
+            color: #fff;
+        }
 
-.main-content{
-    flex:1;
-    padding:30px;
-}
-</style>
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+    </style>
 </head>
 
 <body style="background:#f4f6f9;">
@@ -96,83 +96,91 @@ $listusers = getAllUsers($conn);
     </nav>
 
     <!-- CONTENT -->
-   <div class="layout">
+    <div class="layout">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <h4 class="text-center">ADMIN</h4>
-        <ul>
-            <li><a href="#">🏠 Dashboard</a></li>
-            <li><a href="frmthem.php">➕ Thêm người dùng</a></li>
-            <li><a href="#">📋 Danh sách</a></li>
-            <li><a href="#">👤 Người dùng</a></li>
-            <li><a href="#">⚙️ Cài đặt</a></li>
-            <li><a href="#">🚪 Đăng xuất</a></li>
-        </ul>
-    </aside>
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <h4 class="text-center">ADMIN</h4>
+            <ul>
+                <li><a href="#">🏠 Dashboard</a></li>
+                <li><a href="#">📋 Quản lý sản phẩm</a></li>
+                <li><a href="#">👤 Quản lý biến thể sản phẩm </a></li>
+                <li><a href="#">👤 Quản lý giá sản phẩm </a></li>
+                <li><a href="#">👤 Quản lý kho hàng </a></li>
+                <li><a href="#">👤 Quản lý hình ảnh sản phẩm </a></li>
+                <li><a href="#">👤 Quản lý thông số sản phẩm  </a></li>
+                <li><a href="#">👤Quản lý khách hàng </a></li>
+                <li><a href="#">👤 Quản lý mã giảm giá </a></li>
+                <li><a href="#">👤 Quản lý danh giá sản phẩm từ khách hàng </a></li>
+                <li><a href="#">⚙️ Cài đặt</a></li>
+                <li><a href="logout.php">🚪 Đăng xuất</a></li>
+            </ul>
+        </aside>
 
-    <!-- NỘI DUNG -->
-    <div class="main-content">
+        <!-- NỘI DUNG -->
+        <div class="main-content">
 
-        <div class="card shadow-lg border-0">
+            <div class="card shadow-lg border-0">
 
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">Quản lý người dùng</h4>
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Quản lý người dùng</h4>
 
-                <a href="frmthem.php" class="btn btn-light fw-semibold">
-                    ➕ Thêm người dùng
-                </a>
-            </div>
+                    <a href="frmthem.php" class="btn btn-light fw-semibold">
+                        ➕ Thêm người dùng
+                    </a>
+                </div>
 
-            <div class="card-body">
+                <div class="card-body">
 
-                <div class="table-responsive">
+                    <div class="table-responsive">
 
-                    <table class="table table-hover align-middle text-center">
+                        <table class="table table-hover align-middle text-center">
 
-                        <thead class="table-dark">
-                            <tr>
-                                <th>ID</th>
-                                <th>Tên</th>
-                                <th>Email</th>
-                                <th>SĐT</th>
-                                <th>Vai trò</th>
-                                <th width="180">Hành động</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            <?php foreach ($listusers as $user) { ?>
+                            <thead class="table-dark">
                                 <tr>
-                                    <td><?= $user['id'] ?></td>
-                                    <td><?= $user['ten'] ?></td>
-                                    <td><?= $user['email'] ?></td>
-                                    <td><?= $user['so_dien_thoai'] ?></td>
-
-                                    <td>
-                                        <span class="badge bg-info text-dark">
-                                            <?= $user['vai_tro'] ?>
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <a href="Update.php?id=<?= $user['id'] ?>" class="btn btn-warning btn-sm">
-                                            Sửa
-                                        </a>
-
-                                        <a onclick="return confirm('Xóa user <?= $user['id'] ?> ?')"
-                                           href="Delete.php?id=<?= $user['id'] ?>"
-                                           class="btn btn-danger btn-sm">
-                                            Xóa
-                                        </a>
-                                    </td>
+                                    <th>ID</th>
+                                    <th>Tên</th>
+                                    <th>Email</th>
+                                    <th>SĐT</th>
+                                    <th>Vai trò</th>
+                                    <th width="180">Hành động</th>
                                 </tr>
-                            <?php } ?>
+                            </thead>
 
-                        </tbody>
+                            <tbody>
 
-                    </table>
+                                <?php foreach ($listusers as $user) { ?>
+                                    <tr>
+                                        <td><?= $user['id'] ?></td>
+                                        <td><?= $user['ten'] ?></td>
+                                        <td><?= $user['email'] ?></td>
+                                        <td><?= $user['so_dien_thoai'] ?></td>
+
+                                        <td>
+                                            <span class="badge bg-info text-dark">
+                                                <?= $user['vai_tro'] ?>
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <a href="Update.php?id=<?= $user['id'] ?>" class="btn btn-warning btn-sm">
+                                                Sửa
+                                            </a>
+
+                                            <a onclick="return confirm('Xóa user <?= $user['id'] ?> ?')"
+                                                href="Delete.php?id=<?= $user['id'] ?>"
+                                                class="btn btn-danger btn-sm">
+                                                Xóa
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
 
                 </div>
 
@@ -181,8 +189,6 @@ $listusers = getAllUsers($conn);
         </div>
 
     </div>
-
-</div>
 
     <!-- FOOTER -->
     <footer class="bg-dark text-white text-center py-3">
