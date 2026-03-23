@@ -14,7 +14,42 @@ if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
 $db = new Database();
 $conn = $db->connect();
 $listusers = getAllUsers($conn);
-// ===== THÊM USER =====
+// ================= THÊM USER =================
+if (isset($_POST['add_user'])) {
+
+    $sql = "INSERT INTO users
+            (ten, email, so_dien_thoai, vai_tro)
+            VALUES (?, ?, ?, ?)";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->execute([
+        $_POST['ten'],
+        $_POST['email'],
+        $_POST['so_dien_thoai'],
+        $_POST['vai_tro']
+    ]);
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+
+// ================= XÓA USER =================
+if (isset($_GET['delete'])) {
+
+    $sql = "DELETE FROM users WHERE id = ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$_GET['delete']]);
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+
+// LẤY LẠI DANH SÁCH SAU CRUD
+$listusers = getAllUsers($conn);
 
 ?>
 <!DOCTYPE html>
@@ -121,10 +156,44 @@ $listusers = getAllUsers($conn);
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Quản lý người dùng</h4>
 
-                    <a href="frmthem.php" class="btn btn-light fw-semibold">
-                        ➕ Thêm người dùng
-                    </a>
+
                 </div>
+                <form method="POST" class="row g-2 mb-4">
+
+                    <div class="col-md-3">
+                        <input type="text" name="ten"
+                            class="form-control"
+                            placeholder="Tên" required>
+                    </div>
+
+                    <div class="col-md-3">
+                        <input type="email" name="email"
+                            class="form-control"
+                            placeholder="Email" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="text" name="so_dien_thoai"
+                            class="form-control"
+                            placeholder="SĐT" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <select name="vai_tro" class="form-select" required>
+                            <option value="">Vai trò</option>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button name="add_user"
+                            class="btn btn-success w-100">
+                            Thêm
+                        </button>
+                    </div>
+
+                </form>
 
                 <div class="card-body">
 
@@ -164,10 +233,10 @@ $listusers = getAllUsers($conn);
                                             </a>
 
                                             <a onclick="return confirm('Xóa user <?= $user['id'] ?> ?')"
-                                                href="Delete.php?id=<?= $user['id'] ?>"
-                                                class="btn btn-danger btn-sm">
-                                                Xóa
-                                            </a>
+   href="?delete=<?= $user['id'] ?>"
+   class="btn btn-danger btn-sm">
+    Xóa
+</a>
                                         </td>
                                     </tr>
                                 <?php } ?>
