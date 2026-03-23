@@ -2,20 +2,68 @@
 session_start();
 require_once 'Database.php';
 require_once 'model/functions.php';
-require_once 'auth.php'; // File này sẽ kiểm tra xem người dùng đã đăng nhập chưa, nếu chưa sẽ chuyển hướng về login.php
+require_once 'auth.php'; 
 
-/*
-// e kiem tra phan quyen vai tro o day nha a
-if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
-    header("Location: index.php");
-    exit;
-}*/
-//code cua a cu viet binh thuong nha 
 $db = new Database();
 $conn = $db->connect();
-$list = getAllDiscounts($conn);
-// ===== THÊM USER =====
 
+$update_mode = false;
+$edit_data = [
+    'id' => '', 'ma_code' => '', 'mo_ta' => '', 
+    'phan_tram_giam' => 0, 'so_tien_giam' => 0, 
+    'don_hang_toi_thieu' => 0, 'giam_toi_da' => 0,
+    'gioi_han_su_dung' => 0, 'da_su_dung' => 0
+];
+
+// ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
+if (isset($_GET['edit'])) {
+    $id = $_GET['edit'];
+    $sql = "SELECT * FROM ma_giam_gia WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result) {
+        $edit_data = $result;
+        $update_mode = true;
+    }
+}
+
+// ================= 2. XỬ LÝ THÊM HOẶC CẬP NHẬT =================
+if (isset($_POST['save_discount'])) {
+    $code = $_POST['ma_code'];
+    $mota = $_POST['mo_ta'];
+    $phan_tram = $_POST['phan_tram_giam'];
+    $so_tien = $_POST['so_tien_giam'];
+    $toi_thieu = $_POST['don_hang_toi_thieu'];
+    $toi_da = $_POST['giam_toi_da'];
+    $gioi_han = $_POST['gioi_han_su_dung'];
+
+    if (isset($_POST['id']) && !empty($_POST['id'])) {
+        // CẬP NHẬT
+        $id = $_POST['id'];
+        $sql = "UPDATE ma_giam_gia SET ma_code=?, mo_ta=?, phan_tram_giam=?, so_tien_giam=?, don_hang_toi_thieu=?, giam_toi_da=?, gioi_han_su_dung=? WHERE id=?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$code, $mota, $phan_tram, $so_tien, $toi_thieu, $toi_da, $gioi_han, $id]);
+    } else {
+        // THÊM MỚI (Mặc định da_su_dung = 0)
+        $sql = "INSERT INTO ma_giam_gia (ma_code, mo_ta, phan_tram_giam, so_tien_giam, don_hang_toi_thieu, giam_toi_da, gioi_han_su_dung, da_su_dung) VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$code, $mota, $phan_tram, $so_tien, $toi_thieu, $toi_da, $gioi_han]);
+    }
+    header("Location: CRUDgiamgia.php");
+    exit;
+}
+
+// ================= 3. XỬ LÝ XÓA =================
+if (isset($_GET['delete'])) {
+    $sql = "DELETE FROM ma_giam_gia WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$_GET['delete']]);
+    header("Location: CRUDgiamgia.php");
+    exit;
+}
+
+$list = getAllDiscounts($conn); 
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -139,6 +187,9 @@ $list = getAllDiscounts($conn);
                                      <th>Phần trăm giảm</th>
                                     <th>Số tiền giảm</th>
                                     <th>Đơn hàng tối thiểu</th>
+                                    <th>Giảm tối đa</th>
+                                    <th>Giới hạn sử dụng</th>
+                                    <th>Đã sử dụng</th>
                                     <th width="180">Hành động</th>
                                 </tr>
                             </thead>
@@ -152,11 +203,10 @@ $list = getAllDiscounts($conn);
                                         <td><?= $giamgia['mo_ta'] ?></td>
                                             <td><?= $giamgia['so_tien_giam'] ?></td>                                    
                                         <td><?= $giamgia['phan_tram_giam'] ?></td>
-                                           <td><?= $giamgia['don_hang_toi_thieu'] ?></td>
-                                        
-
-                                        
-
+                                        <td><?= $giamgia['giam_toi_da'] ?></td>
+                                           <td><?= $giamgia['don_hang_toi_thieu'] ?></td>                                      
+                                        <td><?= $giamgia['gioi_han_su_dung'] ?></td>
+                                        <td><?= $giamgia['da_su_dung'] ?></td>
                                         <td>
                                             <a href="Update.php?id=<?= $giamgia['id'] ?>" class="btn btn-warning btn-sm">
                                                 Sửa
