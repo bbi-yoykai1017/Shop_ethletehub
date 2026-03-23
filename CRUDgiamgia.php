@@ -103,11 +103,11 @@ $list = getAllDiscounts($conn);
         <aside class="sidebar">
             <h4 class="text-center">ADMIN</h4>
             <ul>
-                <li><a href="#">🏠 Dashboard</a></li>
+               <li><a href="#">🏠 Dashboard</a></li>
                 <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>        
                 <li><a href="#">👤 Quản lý giá sản phẩm </a></li>
                 <li><a href="#">👤 Quản lý kho hàng </a></li>
-                  <li><a href="#">👤 Quản lý biến thể sản phẩm </a></li>
+                  <li><a href="CRUDbienthesp.php">👤 Quản lý biến thể sản phẩm </a></li>
                 <li><a href="#">👤 Quản lý thông số sản phẩm  </a></li>
                 <li><a href="CRUDuser.php">👤Quản lý khách hàng </a></li>
                 <li><a href="CRUDgiamgia.php">👤 Quản lý mã giảm giá </a></li>
