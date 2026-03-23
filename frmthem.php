@@ -25,17 +25,17 @@
          <form action="" method="post">
              <div class="form-group">
                  <label for="field1">Ten</label>
-                 <input id="field1" name="field1" type="text" placeholder="Nhập..." />
+                 <input id="field1" name="field1" type="text"  />
              </div>
 
              <div class="form- group">
                  <label for="field2">Email</label>
-                 <input id="field2" name="field2" type="text" placeholder="Nhập..." />
+                 <input id="field2" name="field2" type="text"  />
              </div>
 
              <div class="form-group">
                  <label for="field3">SDT</label>
-                 <input id="field3" name="field3" placeholder="Nhập nội dung..."></input>
+                 <input id="field3" name="field3" type="text" ></input>
              </div>
 
              <div class="form-group">
