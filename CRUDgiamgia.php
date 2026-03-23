@@ -42,18 +42,20 @@ if (isset($_POST['save_discount'])) {
     $toi_thieu = $_POST['don_hang_toi_thieu'];
     $toi_da = $_POST['giam_toi_da'];
     $gioi_han = $_POST['gioi_han_su_dung'];
-        $da_su_dung = $_POST['da_su_dung'];
+    $da_su_dung = $_POST['da_su_dung'];
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
-        // CẬP NHẬT
+        // CẬP NHẬT: 9 cột tương ứng 9 dấu hỏi
         $id = $_POST['id'];
         $sql = "UPDATE ma_giam_gia SET ma_code=?, mo_ta=?, phan_tram_giam=?, so_tien_giam=?, don_hang_toi_thieu=?, giam_toi_da=?, gioi_han_su_dung=?, da_su_dung=? WHERE id=?";
         $stmt = $conn->prepare($sql);
+        // Truyền đúng 9 biến theo thứ tự
         $stmt->execute([$code, $mota, $phan_tram, $so_tien, $toi_thieu, $toi_da, $gioi_han, $da_su_dung, $id]);
     } else {
-        // THÊM MỚI (Mặc định da_su_dung = 0)
-        $sql = "INSERT INTO ma_giam_gia (ma_code, mo_ta, phan_tram_giam, so_tien_giam, don_hang_toi_thieu, giam_toi_da, gioi_han_su_dung, da_su_dung) VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
+        // THÊM MỚI: 8 cột tương ứng 8 dấu hỏi
+        $sql = "INSERT INTO ma_giam_gia (ma_code, mo_ta, phan_tram_giam, so_tien_giam, don_hang_toi_thieu, giam_toi_da, gioi_han_su_dung, da_su_dung) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
+        // Truyền đúng 8 biến
         $stmt->execute([$code, $mota, $phan_tram, $so_tien, $toi_thieu, $toi_da, $gioi_han, $da_su_dung]);
     }
     header("Location: CRUDgiamgia.php");
@@ -206,12 +208,12 @@ $list = getAllDiscounts($conn);
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">Giới hạn sử dụng</label>
                                 <input type="number" name="gioi_han_su_dung" class="form-control" value="<?= $edit_data['gioi_han_su_dung'] ?>">
-                            </div>           
-                              <div class="col-md-3">
+                            </div>
+                            <div class="col-md-3">
                                 <label class="form-label fw-bold">Đã sử dụng</label>
                                 <input type="number" name="da_su_dung" class="form-control" value="<?= $edit_data['da_su_dung'] ?>">
                             </div>
-                            
+
 
                             <div class="col-12 text-end">
                                 <?php if ($update_mode): ?>
@@ -223,60 +225,51 @@ $list = getAllDiscounts($conn);
                             </div>
                         </form>
                     </div>
+                </div>
+
+                <table class="table table-hover align-middle text-center">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Mã Code</th>
+                            <th>Mô tả</th>
+                            <th>Phần trăm giảm</th>
+                            <th>Số tiền giảm</th>
+                            <th>Đơn hàng tối thiểu</th>
+                            <th>Giảm tối đa</th>
+                            <th>Giới hạn sử dụng</th>
+                            <th>Đã sử dụng</th>
+                            <th width="180">Hành động</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <?php foreach ($list as $giamgia) { ?>
+                            <tr>
+                                <td><?= $giamgia['id'] ?></td>
+                                <td><strong><?= $giamgia['ma_code'] ?></strong></td>
+                                <td><?= $giamgia['mo_ta'] ?></td>
+                                <td><?= $giamgia['phan_tram_giam'] ?>%</td>
+                                <td><?= number_format($giamgia['so_tien_giam']) ?></td>
+                                <td><?= number_format($giamgia['don_hang_toi_thieu']) ?></td>
+                                <td><?= number_format($giamgia['giam_toi_da']) ?></td>
+                                <td><?= $giamgia['gioi_han_su_dung'] ?></td>
+                                <td><?= $giamgia['da_su_dung'] ?></td>
+                                <td>
+                                    <a href="?edit=<?= $giamgia['id'] ?>" class="btn btn-sm btn-warning">Sửa</a>
+                                    <a href="?delete=<?= $giamgia['id'] ?>" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Xóa mã <?= $giamgia['ma_code'] ?>?')">Xóa</a>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+
+                </table>
+
             </div>
 
-            <table class="table table-hover align-middle text-center">
-
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Mã Code</th>
-                        <th>Mô tả</th>
-                        <th>Phần trăm giảm</th>
-                        <th>Số tiền giảm</th>
-                        <th>Đơn hàng tối thiểu</th>
-                        <th>Giảm tối đa</th>
-                        <th>Giới hạn sử dụng</th>
-                        <th>Đã sử dụng</th>
-                        <th width="180">Hành động</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <?php foreach ($list as $giamgia) { ?>
-                        <tr>
-                            <td><?= $giamgia['id'] ?></td>
-                            <td><?= $giamgia['ma_code'] ?></td>
-                            <td><?= $giamgia['mo_ta'] ?></td>
-                               <td><?= $giamgia['phan_tram_giam'] ?></td>
-                            <td><?= $giamgia['so_tien_giam'] ?></td>
-                         
-                            <td><?= $giamgia['giam_toi_da'] ?></td>
-                            <td><?= $giamgia['don_hang_toi_thieu'] ?></td>
-                            <td><?= $giamgia['gioi_han_su_dung'] ?></td>
-                            <td><?= $giamgia['da_su_dung'] ?></td>
-                            <td>
-                                <a href="Update.php?id=<?= $giamgia['id'] ?>" class="btn btn-warning btn-sm">
-                                    Sửa
-                                </a>
-
-                                <a onclick="return confirm('Xóa sản phẩm <?= $giamgia['id'] ?> ?')"
-                                    href="Delete.php?id=<?= $giamgia['id'] ?>"
-                                    class="btn btn-danger btn-sm">
-                                    Xóa
-                                </a>
-                            </td>
-                        </tr>
-                    <?php } ?>
-
-                </tbody>
-
-            </table>
-
         </div>
-
-    </div>
 
     </div>
 
