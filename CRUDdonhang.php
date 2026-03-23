@@ -103,9 +103,9 @@ $listproduct = getAllOrders($conn);
         <aside class="sidebar">
             <h4 class="text-center">ADMIN</h4>
             <ul>
-                 <li><a href="#">🏠 Dashboard</a></li>
-                <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>        
-                  <li><a href="CRUDbienthesp.php">👤 Quản lý biến thể sản phẩm </a></li>
+                <li><a href="#">🏠 Dashboard</a></li>
+                <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>
+                <li><a href="CRUDbienthesp.php">👤 Quản lý biến thể sản phẩm </a></li>
                 <li><a href="CRUDuser.php">👤Quản lý khách hàng </a></li>
                 <li><a href="CRUDgiamgia.php">👤 Quản lý mã giảm giá </a></li>
                 <li><a href="#">⚙️ Cài đặt</a></li>
@@ -121,10 +121,56 @@ $listproduct = getAllOrders($conn);
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Quản lý đơn hàng</h4>
 
-                    <a href="frmthem.php" class="btn btn-light fw-semibold">
-                        ➕ Thêm đơn hàng
-                    </a>
+
                 </div>
+                <h5 class="mb-3">➕ Thêm đơn hàng</h5>
+
+                <form method="POST" class="row g-2 mb-4">
+
+                    <div class="col-md-2">
+                        <input type="number" name="nguoi_dung_id"
+                            class="form-control"
+                            placeholder="ID User" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="text" name="ma_don_hang"
+                            class="form-control"
+                            placeholder="Mã đơn" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="number" name="tong_tien"
+                            class="form-control"
+                            placeholder="Tổng tiền" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="number" name="tien_giam"
+                            class="form-control"
+                            placeholder="Tiền giảm" value="0">
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="number" name="thanh_tien"
+                            class="form-control"
+                            placeholder="Thành tiền" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="text" name="phuong_thuc_thanh_toan"
+                            class="form-control"
+                            placeholder="Thanh toán" required>
+                    </div>
+
+                    <div class="col-md-12">
+                        <button name="add_order"
+                            class="btn btn-success w-100">
+                            Thêm đơn hàng
+                        </button>
+                    </div>
+
+                </form>
 
                 <div class="card-body">
 
@@ -139,8 +185,8 @@ $listproduct = getAllOrders($conn);
                                     <th>Mã đơn hàng</th>
                                     <th>Tổng tiền </th>
                                     <th>Tiền giảm</th>
-                                      <th>Thành tiền</th>
-                                      <th>Phương thức thanh toán</th>
+                                    <th>Thành tiền</th>
+                                    <th>Phương thức thanh toán</th>
                                     <th width="180">Hành động</th>
                                 </tr>
                             </thead>
@@ -157,7 +203,7 @@ $listproduct = getAllOrders($conn);
                                         <td><?= $donhang['thanh_tien'] ?></td>
                                         <td><?= $donhang['phuong_thuc_thanh_toan'] ?></td>
 
-                                        
+
 
                                         <td>
                                             <a href="Update.php?id=<?= $donhang['id'] ?>" class="btn btn-warning btn-sm">
@@ -165,7 +211,7 @@ $listproduct = getAllOrders($conn);
                                             </a>
 
                                             <a onclick="return confirm('Xóa đơn hàng <?= $donhang['id'] ?> ?')"
-                                                href="Delete.php?id=<?= $donhang['id'] ?>"
+                                                href="?delete=<?= $donhang['id'] ?>"
                                                 class="btn btn-danger btn-sm">
                                                 Xóa
                                             </a>
