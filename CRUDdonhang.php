@@ -14,7 +14,45 @@ if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
 $db = new Database();
 $conn = $db->connect();
 $listproduct = getAllOrders($conn);
-// ===== THÊM USER =====
+// ================= THÊM ĐƠN HÀNG =================
+if (isset($_POST['add_order'])) {
+
+    $sql = "INSERT INTO don_hang
+            (nguoi_dung_id, ma_don_hang, tong_tien,
+             tien_giam, thanh_tien, phuong_thuc_thanh_toan)
+            VALUES (?, ?, ?, ?, ?, ?)";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->execute([
+        $_POST['nguoi_dung_id'],
+        $_POST['ma_don_hang'],
+        $_POST['tong_tien'],
+        $_POST['tien_giam'],
+        $_POST['thanh_tien'],
+        $_POST['phuong_thuc_thanh_toan']
+    ]);
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+
+// ================= XÓA ĐƠN HÀNG =================
+if (isset($_GET['delete'])) {
+
+    $sql = "DELETE FROM don_hang WHERE id = ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$_GET['delete']]);
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+
+// LẤY LẠI DANH SÁCH SAU CRUD
+$listproduct = getAllOrders($conn);
 
 ?>
 <!DOCTYPE html>
@@ -107,6 +145,7 @@ $listproduct = getAllOrders($conn);
                 <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>
                 <li><a href="CRUDbienthesp.php">👤 Quản lý biến thể sản phẩm </a></li>
                 <li><a href="CRUDuser.php">👤Quản lý khách hàng </a></li>
+                <li><a href="CRUDdonhang.php">👤 Quản lý đơn hàng </a></li>
                 <li><a href="CRUDgiamgia.php">👤 Quản lý mã giảm giá </a></li>
                 <li><a href="#">⚙️ Cài đặt</a></li>
                 <li><a href="logout.php">🚪 Đăng xuất</a></li>
