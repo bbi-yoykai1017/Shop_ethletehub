@@ -14,6 +14,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
 $db = new Database();
 $conn = $db->connect();
 $listusers = getAllUsers($conn);
+// ===== THÊM USER =====
 
 ?>
 <!DOCTYPE html>
@@ -103,11 +104,10 @@ $listusers = getAllUsers($conn);
             <h4 class="text-center">ADMIN</h4>
             <ul>
                 <li><a href="#">🏠 Dashboard</a></li>
-                <li><a href="#">📋 Quản lý sản phẩm</a></li>
-                <li><a href="#">👤 Quản lý biến thể sản phẩm </a></li>
+                <li><a href="#">📋 Quản lý sản phẩm</a></li>        
                 <li><a href="#">👤 Quản lý giá sản phẩm </a></li>
                 <li><a href="#">👤 Quản lý kho hàng </a></li>
-                <li><a href="#">👤 Quản lý hình ảnh sản phẩm </a></li>
+                  <li><a href="#">👤 Quản lý biến thể sản phẩm </a></li>
                 <li><a href="#">👤 Quản lý thông số sản phẩm  </a></li>
                 <li><a href="#">👤Quản lý khách hàng </a></li>
                 <li><a href="#">👤 Quản lý mã giảm giá </a></li>
