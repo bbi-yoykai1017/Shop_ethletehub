@@ -166,22 +166,20 @@ $listproduct = getAllProducts($conn);
         <!-- NỘI DUNG -->
         <div class="main-content">
 
-            <div class="card shadow-lg border-0">
-
+            <div class="card shadow border-0 mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><?= $update_mode ? "Cập nhật sản phẩm" : "Thêm sản phẩm mới" ?></h4>
+                    <h5 class="mb-0"><?= $update_mode ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới" ?></h5>
                 </div>
                 <div class="card-body">
                     <form method="POST" class="row g-3">
                         <input type="hidden" name="id" value="<?= $edit_product['id'] ?>">
-
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Tên sản phẩm</label>
                             <input type="text" name="ten" class="form-control" value="<?= $edit_product['ten'] ?>" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Mô tả</label>
-                            <input type="text" name="mo_ta" class="form-control" value="<?= $edit_product['mo_ta'] ?>" required>
+                            <label class="form-label fw-bold">Mô tả ngắn</label>
+                            <input type="text" name="mo_ta" class="form-control" value="<?= $edit_product['mo_ta'] ?>">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Giá bán</label>
@@ -189,91 +187,85 @@ $listproduct = getAllProducts($conn);
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Giá gốc</label>
-                            <input type="number" name="gia_goc" class="form-control" value="<?= $edit_product['gia_goc'] ?>" required>
+                            <input type="number" name="gia_goc" class="form-control" value="<?= $edit_product['gia_goc'] ?>">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">Trung bình sao</label>
-                            <input type="number" name="trung_binh_sao" class="form-control" value="<?= $edit_product['trung_binh_sao'] ?>">
+                            <label class="form-label fw-bold">Sao (1-5)</label>
+                            <input type="number" step="0.1" name="trung_binh_sao" class="form-control" value="<?= $edit_product['trung_binh_sao'] ?>">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">Số lượng đánh giá</label>
+                            <label class="form-label fw-bold">Lượt đánh giá</label>
                             <input type="number" name="so_luong_danh_gia" class="form-control" value="<?= $edit_product['so_luong_danh_gia'] ?>">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Tên file hình ảnh </label>
-                            <input type="text" name="hinh_anh_chinh" class="form-control" value="<?= $edit_product['hinh_anh_chinh'] ?>">
+                            <label class="form-label fw-bold">Tên file ảnh</label>
+                            <input type="text" name="hinh_anh_chinh" class="form-control" value="<?= $edit_product['hinh_anh_chinh'] ?>" placeholder="hinh1.jpg">
                         </div>
-
-                        <div class="col-12 text-end">
+                        <div class="col-md-4 d-flex align-items-end">
                             <?php if ($update_mode): ?>
-                                <a href="CRUDproduct.php" class="btn btn-secondary">Hủy</a>
-                                <button name="save_product" class="btn btn-warning">Cập nhật sản phẩm</button>
+                                <button name="save_product" class="btn btn-warning w-50 me-2">Cập nhật</button>
+                                <a href="CRUDproduct.php" class="btn btn-secondary w-50">Hủy</a>
                             <?php else: ?>
-                                <button name="save_product" class="btn btn-success">Thêm sản phẩm</button>
+                                <button name="save_product" class="btn btn-success w-100">Lưu sản phẩm</button>
                             <?php endif; ?>
                         </div>
                     </form>
-                    <div class="table-responsive">
-
-                        <table class="table table-hover align-middle text-center">
-
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Tên sản phẩm</th>
-                                    <th>Mô tả</th>
-                                    <th>Giá bán</th>
-                                    <th>Giá gốc</th>
-                                    <th>Trung bình sao</th>
-                                    <th>Số lượng đánh giá</th>
-                                    <th>Hình ảnh</th>
-                                    <th width="180">Hành động</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                <?php foreach ($listproduct as $product) { ?>
-                                    <tr>
-                                        <td><?= $product['id'] ?></td>
-                                        <td><?= $product['ten'] ?></td>
-                                        <td><?= $product['mo_ta'] ?></td>
-                                        <td><?= $product['gia'] ?></td>
-                                        <td><?= $product['gia_goc'] ?></td>
-                                        <td><?= $product['trung_binh_sao'] ?></td>
-                                        <td><?= $product['so_luong_danh_gia'] ?></td>
-                                        <td>
-                                            <img src="./public/<?php echo htmlspecialchars($product['hinh_anh_chinh']); ?>"
-                                                alt="<?= $product['ten'] ?>" width="80" height="80">
-                                        </td>
-
-
-
-                                        <td>
-                                            <a href="Update.php?id=<?= $product['id'] ?>" class="btn btn-warning btn-sm">
-                                                Sửa
-                                            </a>
-
-                                            <a onclick="return confirm('Xóa sản phẩm <?= $product['id'] ?> ?')"
-                                                href="Delete.php?id=<?= $product['id'] ?>"
-                                                class="btn btn-danger btn-sm">
-                                                Xóa
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
                 </div>
+            </div>
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle text-center">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Mô tả</th>
+                            <th>Giá bán</th>
+                            <th>Giá gốc</th>
+                            <th>Trung bình sao</th>
+                            <th>Số lượng đánh giá</th>
+                            <th>Hình ảnh</th>
+                            <th width="180">Hành động</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <?php foreach ($listproduct as $product) { ?>
+                            <tr>
+                                <td><?= $product['id'] ?></td>
+                                <td><?= $product['ten'] ?></td>
+                                <td><?= $product['mo_ta'] ?></td>
+                                <td><?= $product['gia'] ?></td>
+                                <td><?= $product['gia_goc'] ?></td>
+                                <td><?= $product['trung_binh_sao'] ?></td>
+                                <td><?= $product['so_luong_danh_gia'] ?></td>
+                                <td>
+                                    <img src="./public/<?php echo htmlspecialchars($product['hinh_anh_chinh']); ?>"
+                                        alt="<?= $product['ten'] ?>" width="80" height="80">
+                                </td>
+
+
+
+                                <td>
+                                <a href="?edit=<?= $product['id'] ?>" class="btn btn-sm btn-outline-warning">Sửa</a>
+                                <a href="?delete=<?= $product['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa sản phẩm này?')">Xóa</a>
+                            </td>
+                            </tr>
+                        <?php } ?>
+
+                    </tbody>
+
+                </table>
 
             </div>
 
         </div>
+
+    </div>
+
+    </div>
 
     </div>
 
