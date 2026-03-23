@@ -13,5 +13,15 @@
                 $_SESSION[$this->sessionKey] = [];
             }
         }
+
+        // them san pham vao gio hang
+        public function addCart($productId, $productName, $price, $image, $quantity = 1, $size = '', $color = '', ) {
+            $carKey = $this->generaCarKey($productId,$size,$color);
+        }
+
+        // tao key duy nhat cho san pham 
+        public function generaCarKey($productId,$size,$color) {
+
+        }
     }
 ?>
