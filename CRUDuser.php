@@ -2,57 +2,60 @@
 session_start();
 require_once 'Database.php';
 require_once 'model/functions.php';
-require_once 'auth.php'; // File này sẽ kiểm tra xem người dùng đã đăng nhập chưa, nếu chưa sẽ chuyển hướng về login.php
+require_once 'auth.php'; 
 
-/*
-// e kiem tra phan quyen vai tro o day nha a
-if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
-    header("Location: index.php");
-    exit;
-}*/
-//code cua a cu viet binh thuong nha 
 $db = new Database();
 $conn = $db->connect();
-$listusers = getAllUsers($conn);
-// ================= THÊM USER =================
-// ================= THÊM USER =================
-if (isset($_POST['add_user'])) {
 
-    $sql = "INSERT INTO nguoi_dung
-            (ten, email, so_dien_thoai, vai_tro)
-            VALUES (?, ?, ?, ?)";
+$update_mode = false;
+$edit_user = ['id' => '', 'ten' => '', 'email' => '', 'so_dien_thoai' => ''];
 
+// ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
+if (isset($_GET['edit'])) {
+    $id = $_GET['edit'];
+    $sql = "SELECT * FROM nguoi_dung WHERE id = ?";
     $stmt = $conn->prepare($sql);
+    $stmt->execute([$id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result) {
+        $edit_user = $result;
+        $update_mode = true; // Bật chế độ cập nhật
+    }
+}
 
-    // Thay vì lấy $_POST['vai_tro'], ta ép cứng giá trị là 'user'
-    $stmt->execute([
-        $_POST['ten'],
-        $_POST['email'],
-        $_POST['so_dien_thoai'],
-        'khach_hang' // Luôn luôn thêm với quyền khách hàng
-    ]);
+// ================= 2. XỬ LÝ THÊM HOẶC CẬP NHẬT =================
+if (isset($_POST['save_user'])) {
+    $ten = $_POST['ten'];
+    $email = $_POST['email'];
+    $sdt = $_POST['so_dien_thoai'];
+    $vai_tro = 'khach_hang'; // Luôn cố định là user
 
-    header("Location: " . $_SERVER['PHP_SELF']);
+    if (isset($_POST['id']) && !empty($_POST['id'])) {
+        // CẬP NHẬT
+        $id = $_POST['id'];
+        $sql = "UPDATE nguoi_dung SET ten=?, email=?, so_dien_thoai=?, vai_tro=? WHERE id=?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$ten, $email, $sdt, $vai_tro, $id]);
+    } else {
+        // THÊM MỚI
+        $sql = "INSERT INTO nguoi_dung (ten, email, so_dien_thoai, vai_tro) VALUES (?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$ten, $email, $sdt, $vai_tro]);
+    }
+    header("Location: CRUDuser.php");
     exit;
 }
 
-
-// ================= XÓA USER =================
+// ================= 3. XỬ LÝ XÓA =================
 if (isset($_GET['delete'])) {
-
     $sql = "DELETE FROM nguoi_dung WHERE id = ?";
-
     $stmt = $conn->prepare($sql);
     $stmt->execute([$_GET['delete']]);
-
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header("Location: CRUDuser.php");
     exit;
 }
 
-
-// LẤY LẠI DANH SÁCH SAU CRUD
 $listusers = getAllUsers($conn);
-
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -80,39 +83,11 @@ $listusers = getAllUsers($conn);
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
     <style>
-        .layout {
-            display: flex;
-            min-height: calc(100vh - 56px);
-        }
-
-        .sidebar {
-            width: 240px;
-            background: #111827;
-            color: #fff;
-            padding: 20px;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .sidebar a {
-            display: block;
-            padding: 10px;
-            color: #d1d5db;
-            text-decoration: none;
-        }
-
-        .sidebar a:hover {
-            background: #1f2937;
-            color: #fff;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 30px;
-        }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; background: #111827; color: #fff; padding: 20px; }
+        .sidebar a { display: block; padding: 10px; color: #d1d5db; text-decoration: none; }
+        .sidebar a:hover { background: #1f2937; color: #fff; }
+        .main-content { flex: 1; padding: 30px; background: #f4f6f9; }
     </style>
 </head>
 
@@ -151,57 +126,41 @@ $listusers = getAllUsers($conn);
         </aside>
 
         <!-- NỘI DUNG -->
-        <div class="main-content">
-
-            <div class="card shadow-lg border-0">
-
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Quản lý người dùng</h4>
-
-
+        <main class="main-content">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><?= $update_mode ? "Cập nhật người dùng" : "Thêm người dùng mới" ?></h4>
                 </div>
-                <form method="POST" class="row g-2 mb-4">
-
-                    <div class="col-md-3">
-                        <input type="text" name="ten"
-                            class="form-control"
-                            placeholder="Tên" required>
-                    </div>
-
-                    <div class="col-md-3">
-                        <input type="email" name="email"
-                            class="form-control"
-                            placeholder="Email" required>
-                    </div>
-
-                    <div class="col-md-2">
-                        <input type="text" name="so_dien_thoai"
-                            class="form-control"
-                            placeholder="SĐT" required>
-                    </div>
-
-                    <div class="col-md-2">
-                        <select name="vai_tro" class="form-select" required>
-                            <option value="">Vai trò</option>
-                            <option value="khach_hang">Khách hàng</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-2">
-                        <button name="add_user"
-                            class="btn btn-success w-100">
-                            Thêm
-                        </button>
-                    </div>
-
-                </form>
-
                 <div class="card-body">
+                    <form method="POST" class="row g-3 mb-4">
+                        <input type="hidden" name="id" value="<?= $edit_user['id'] ?>">
+
+                        <div class="col-md-3">
+                            <input type="text" name="ten" class="form-control" placeholder="Tên" value="<?= $edit_user['ten'] ?>" required>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="email" name="email" class="form-control" placeholder="Email" value="<?= $edit_user['email'] ?>" required>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" name="so_dien_thoai" class="form-control" placeholder="SĐT" value="<?= $edit_user['so_dien_thoai'] ?>" required>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" disabled>
+                                <option>Khách Hàng</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <?php if ($update_mode): ?>
+                                <button name="save_user" class="btn btn-warning w-100">Cập nhật</button>
+                                <a href="CRUDuser.php" class="btn btn-secondary btn-sm d-block text-center mt-1">Hủy</a>
+                            <?php else: ?>
+                                <button name="save_user" class="btn btn-success w-100">Thêm mới</button>
+                            <?php endif; ?>
+                        </div>
+                    </form>
 
                     <div class="table-responsive">
-
                         <table class="table table-hover align-middle text-center">
-
                             <thead class="table-dark">
                                 <tr>
                                     <th>ID</th>
@@ -209,50 +168,29 @@ $listusers = getAllUsers($conn);
                                     <th>Email</th>
                                     <th>SĐT</th>
                                     <th>Vai trò</th>
-                                    <th width="180">Hành động</th>
+                                    <th>Hành động</th>
                                 </tr>
                             </thead>
-
                             <tbody>
-
-                                <?php foreach ($listusers as $user) { ?>
+                                <?php foreach ($listusers as $user): ?>
                                     <tr>
                                         <td><?= $user['id'] ?></td>
                                         <td><?= $user['ten'] ?></td>
                                         <td><?= $user['email'] ?></td>
                                         <td><?= $user['so_dien_thoai'] ?></td>
-
+                                        <td><span class="badge bg-info text-dark"><?= $user['vai_tro'] ?></span></td>
                                         <td>
-                                            <span class="badge bg-info text-dark">
-                                                <?= $user['vai_tro'] ?>
-                                            </span>
-                                        </td>
-
-                                        <td>
-                                            <a href="Update.php?id=<?= $user['id'] ?>" class="btn btn-warning btn-sm">
-                                                Sửa
-                                            </a>
-
-                                            <a onclick="return confirm('Xóa người dùng  <?= $user['id'] ?> ?')"
-                                                href="?delete=<?= $user['id'] ?>"
-                                                class="btn btn-danger btn-sm">
-                                                Xóa
-                                            </a>
+                                            <a href="?edit=<?= $user['id'] ?>" class="btn btn-sm btn-outline-warning">Sửa</a>
+                                            <a href="?delete=<?= $user['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa người dùng này?')">Xóa</a>
                                         </td>
                                     </tr>
-                                <?php } ?>
-
+                                <?php endforeach; ?>
                             </tbody>
-
                         </table>
-
                     </div>
-
                 </div>
-
             </div>
-
-        </div>
+        </main>
 
     </div>
 
