@@ -42,18 +42,19 @@ if (isset($_POST['save_discount'])) {
     $toi_thieu = $_POST['don_hang_toi_thieu'];
     $toi_da = $_POST['giam_toi_da'];
     $gioi_han = $_POST['gioi_han_su_dung'];
+        $da_su_dung = $_POST['da_su_dung'];
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
         // CẬP NHẬT
         $id = $_POST['id'];
-        $sql = "UPDATE ma_giam_gia SET ma_code=?, mo_ta=?, phan_tram_giam=?, so_tien_giam=?, don_hang_toi_thieu=?, giam_toi_da=?, gioi_han_su_dung=? WHERE id=?";
+        $sql = "UPDATE ma_giam_gia SET ma_code=?, mo_ta=?, phan_tram_giam=?, so_tien_giam=?, don_hang_toi_thieu=?, giam_toi_da=?, gioi_han_su_dung=?, da_su_dung=? WHERE id=?";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$code, $mota, $phan_tram, $so_tien, $toi_thieu, $toi_da, $gioi_han, $id]);
+        $stmt->execute([$code, $mota, $phan_tram, $so_tien, $toi_thieu, $toi_da, $gioi_han, $da_su_dung, $id]);
     } else {
         // THÊM MỚI (Mặc định da_su_dung = 0)
         $sql = "INSERT INTO ma_giam_gia (ma_code, mo_ta, phan_tram_giam, so_tien_giam, don_hang_toi_thieu, giam_toi_da, gioi_han_su_dung, da_su_dung) VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$code, $mota, $phan_tram, $so_tien, $toi_thieu, $toi_da, $gioi_han]);
+        $stmt->execute([$code, $mota, $phan_tram, $so_tien, $toi_thieu, $toi_da, $gioi_han, $da_su_dung]);
     }
     header("Location: CRUDgiamgia.php");
     exit;
@@ -187,26 +188,30 @@ $list = getAllDiscounts($conn);
                                 <input type="text" name="mo_ta" class="form-control" value="<?= $edit_data['mo_ta'] ?>">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label fw-bold">Giới hạn sử dụng</label>
-                                <input type="number" name="gioi_han_su_dung" class="form-control" value="<?= $edit_data['gioi_han_su_dung'] ?>">
-                            </div>
-
-                            <div class="col-md-3">
                                 <label class="form-label fw-bold">Phần trăm giảm (%)</label>
                                 <input type="number" name="phan_tram_giam" class="form-control" value="<?= $edit_data['phan_tram_giam'] ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Số tiền giảm </label>
+                                <input type="number" name="so_tien_giam" class="form-control" value="<?= $edit_data['so_tien_giam'] ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Đơn tối thiểu </label>
+                                <input type="number" name="don_hang_toi_thieu" class="form-control" value="<?= $edit_data['don_hang_toi_thieu'] ?>">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">Giảm tối đa (đ)</label>
                                 <input type="number" name="giam_toi_da" class="form-control" value="<?= $edit_data['giam_toi_da'] ?>">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label fw-bold">Số tiền giảm cố định (đ)</label>
-                                <input type="number" name="so_tien_giam" class="form-control" value="<?= $edit_data['so_tien_giam'] ?>">
+                                <label class="form-label fw-bold">Giới hạn sử dụng</label>
+                                <input type="number" name="gioi_han_su_dung" class="form-control" value="<?= $edit_data['gioi_han_su_dung'] ?>">
+                            </div>           
+                              <div class="col-md-3">
+                                <label class="form-label fw-bold">Đã sử dụng</label>
+                                <input type="number" name="da_su_dung" class="form-control" value="<?= $edit_data['da_su_dung'] ?>">
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Đơn tối thiểu (đ)</label>
-                                <input type="number" name="don_hang_toi_thieu" class="form-control" value="<?= $edit_data['don_hang_toi_thieu'] ?>">
-                            </div>
+                            
 
                             <div class="col-12 text-end">
                                 <?php if ($update_mode): ?>
@@ -244,8 +249,9 @@ $list = getAllDiscounts($conn);
                             <td><?= $giamgia['id'] ?></td>
                             <td><?= $giamgia['ma_code'] ?></td>
                             <td><?= $giamgia['mo_ta'] ?></td>
+                               <td><?= $giamgia['phan_tram_giam'] ?></td>
                             <td><?= $giamgia['so_tien_giam'] ?></td>
-                            <td><?= $giamgia['phan_tram_giam'] ?></td>
+                         
                             <td><?= $giamgia['giam_toi_da'] ?></td>
                             <td><?= $giamgia['don_hang_toi_thieu'] ?></td>
                             <td><?= $giamgia['gioi_han_su_dung'] ?></td>
