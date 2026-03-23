@@ -99,16 +99,24 @@ $list = getAllDiscounts($conn);
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
     <style>
+        :root {
+            --sidebar-width: 240px;
+        }
+
         .layout {
             display: flex;
             min-height: calc(100vh - 56px);
+            transition: all 0.3s;
         }
 
+        /* Sidebar mặc định trên Desktop */
         .sidebar {
-            width: 240px;
+            width: var(--sidebar-width);
             background: #111827;
             color: #fff;
             padding: 20px;
+            flex-shrink: 0;
+            transition: all 0.3s;
         }
 
         .sidebar ul {
@@ -118,19 +126,70 @@ $list = getAllDiscounts($conn);
 
         .sidebar a {
             display: block;
-            padding: 10px;
+            padding: 12px 15px;
             color: #d1d5db;
             text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
         }
 
-        .sidebar a:hover {
-            background: #1f2937;
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #374151;
             color: #fff;
         }
 
         .main-content {
             flex: 1;
-            padding: 30px;
+            padding: 20px;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* RESPONSIVE CHO MOBILE & TABLET */
+        @media (max-width: 991.98px) {
+            .layout {
+                flex-direction: column;
+                /* Chuyển thành hàng dọc trên mobile */
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 10px 20px;
+            }
+
+            .sidebar ul {
+                display: flex;
+                overflow-x: auto;
+                /* Cho phép vuốt ngang menu trên mobile */
+                white-space: nowrap;
+                padding-bottom: 10px;
+            }
+
+            .sidebar ul li {
+                margin-right: 10px;
+            }
+
+            .sidebar h4 {
+                display: none;
+                /* Ẩn chữ ADMIN để tiết kiệm diện tích */
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            /* Chỉnh lại form input trên mobile */
+            .card-body form .col-md-3,
+            .card-body form .col-md-2 {
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Hiệu ứng cho Table trên màn hình nhỏ */
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -159,9 +218,9 @@ $list = getAllDiscounts($conn);
         <aside class="sidebar">
             <ul>
                 <li><a href="CRUDproduct.php"><i class="fas fa-box me-2"></i> Sản phẩm</a></li>
-                <li><a href="CRUDuser.php" class="active"><i class="fas fa-users me-2"></i> Khách hàng</a></li>
+                <li><a href="CRUDuser.php" ><i class="fas fa-users me-2"></i> Khách hàng</a></li>
                 <li><a href="CRUDdonhang.php"><i class="fas fa-shopping-cart me-2"></i> Đơn hàng</a></li>
-                <li><a href="CRUDgiamgia.php"><i class="fas fa-tags me-2"></i> Mã giảm giá</a></li>
+                <li><a href="CRUDgiamgia.php" class="active"><i class="fas fa-tags me-2"></i> Mã giảm giá</a></li>
                 <li class="d-lg-none"><a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
             </ul>
         </aside>
