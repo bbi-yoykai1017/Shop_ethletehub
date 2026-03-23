@@ -2,7 +2,7 @@
 session_start();
 require_once 'Database.php';
 require_once 'model/functions.php';
-require_once 'auth.php'; 
+require_once 'auth.php';
 
 $db = new Database();
 $conn = $db->connect();
@@ -83,16 +83,24 @@ $listusers = getAllUsers($conn);
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
     <style>
+        :root {
+            --sidebar-width: 240px;
+        }
+
         .layout {
             display: flex;
             min-height: calc(100vh - 56px);
+            transition: all 0.3s;
         }
 
+        /* Sidebar mặc định trên Desktop */
         .sidebar {
-            width: 240px;
+            width: var(--sidebar-width);
             background: #111827;
             color: #fff;
             padding: 20px;
+            flex-shrink: 0;
+            transition: all 0.3s;
         }
 
         .sidebar ul {
@@ -102,19 +110,70 @@ $listusers = getAllUsers($conn);
 
         .sidebar a {
             display: block;
-            padding: 10px;
+            padding: 12px 15px;
             color: #d1d5db;
             text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
         }
 
-        .sidebar a:hover {
-            background: #1f2937;
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #374151;
             color: #fff;
         }
 
         .main-content {
             flex: 1;
-            padding: 30px;
+            padding: 20px;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* RESPONSIVE CHO MOBILE & TABLET */
+        @media (max-width: 991.98px) {
+            .layout {
+                flex-direction: column;
+                /* Chuyển thành hàng dọc trên mobile */
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 10px 20px;
+            }
+
+            .sidebar ul {
+                display: flex;
+                overflow-x: auto;
+                /* Cho phép vuốt ngang menu trên mobile */
+                white-space: nowrap;
+                padding-bottom: 10px;
+            }
+
+            .sidebar ul li {
+                margin-right: 10px;
+            }
+
+            .sidebar h4 {
+                display: none;
+                /* Ẩn chữ ADMIN để tiết kiệm diện tích */
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            /* Chỉnh lại form input trên mobile */
+            .card-body form .col-md-3,
+            .card-body form .col-md-2 {
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Hiệu ứng cho Table trên màn hình nhỏ */
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -139,86 +198,105 @@ $listusers = getAllUsers($conn);
     <!-- CONTENT -->
     <div class="layout">
 
-        <!-- SIDEBAR -->
         <aside class="sidebar">
-            <h4 class="text-center">ADMIN</h4>
+            <h4 class="text-center mb-4 d-none d-lg-block">DASHBOARD</h4>
             <ul>
-                <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>             
-                <li><a href="CRUDuser.php">👤Quản lý khách hàng </a></li>
-                <li><a href="CRUDdonhang.php">👤 Quản lý đơn hàng </a></li>
-                <li><a href="CRUDgiamgia.php">👤 Quản lý mã giảm giá </a></li>
-                <li><a href="#">⚙️ Cài đặt</a></li>
-                <li><a href="logout.php">🚪 Đăng xuất</a></li>
+                <li><a href="CRUDproduct.php"><i class="fas fa-box me-2"></i> Sản phẩm</a></li>
+                <li><a href="CRUDuser.php" class="active"><i class="fas fa-users me-2"></i> Khách hàng</a></li>
+                <li><a href="CRUDdonhang.php"><i class="fas fa-shopping-cart me-2"></i> Đơn hàng</a></li>
+                <li><a href="CRUDgiamgia.php"><i class="fas fa-tags me-2"></i> Mã giảm giá</a></li>
+                <li class="d-lg-none"><a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
             </ul>
         </aside>
 
-        <!-- NỘI DUNG -->
         <main class="main-content">
-            <div class="card shadow border-0">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><?= $update_mode ? "Cập nhật người dùng" : "Thêm người dùng mới" ?></h4>
-                </div>
-                <div class="card-body">
-                    <form method="POST" class="row g-3 mb-4">
-                        <input type="hidden" name="id" value="<?= $edit_user['id'] ?>">
+            <div class="container-fluid p-0">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0">
+                            <i class="fas <?= $update_mode ? 'fa-user-edit' : 'fa-user-plus' ?> me-2"></i>
+                            <?= $update_mode ? "Cập nhật người dùng" : "Thêm người dùng mới" ?>
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" class="row g-3 mb-4">
+                            <input type="hidden" name="id" value="<?= $edit_user['id'] ?>">
 
-                        <div class="col-md-3">
-                            <input type="text" name="ten" class="form-control" placeholder="Tên" value="<?= $edit_user['ten'] ?>" required>
-                        </div>
-                        <div class="col-md-3">
-                            <input type="email" name="email" class="form-control" placeholder="Email" value="<?= $edit_user['email'] ?>" required>
-                        </div>
-                        <div class="col-md-2">
-                            <input type="text" name="so_dien_thoai" class="form-control" placeholder="SĐT" value="<?= $edit_user['so_dien_thoai'] ?>" required>
-                        </div>
-                        <div class="col-md-2">
-                            <select class="form-select" disabled>
-                                <option>Khách Hàng</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <?php if ($update_mode): ?>
-                                <button name="save_user" class="btn btn-warning w-100">Cập nhật</button>
-                                <a href="CRUDuser.php" class="btn btn-secondary btn-sm d-block text-center mt-1">Hủy</a>
-                            <?php else: ?>
-                                <button name="save_user" class="btn btn-success w-100">Thêm mới</button>
-                            <?php endif; ?>
-                        </div>
-                    </form>
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <label class="form-label small fw-bold">Tên khách hàng</label>
+                                <input type="text" name="ten" class="form-control" placeholder="Nhập tên..." value="<?= $edit_user['ten'] ?>" required>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <label class="form-label small fw-bold">Email</label>
+                                <input type="email" name="email" class="form-control" placeholder="name@example.com" value="<?= $edit_user['email'] ?>" required>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-2">
+                                <label class="form-label small fw-bold">Số điện thoại</label>
+                                <input type="text" name="so_dien_thoai" class="form-control" placeholder="SĐT" value="<?= $edit_user['so_dien_thoai'] ?>" required>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-2">
+                                <label class="form-label small fw-bold">Vai trò</label>
+                                <select class="form-select" disabled>
+                                    <option>Khách Hàng</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2 d-flex align-items-end">
+                                <?php if ($update_mode): ?>
+                                    <div class="w-100">
+                                        <button name="save_user" class="btn btn-warning w-100 mb-1">Cập nhật</button>
+                                        <a href="CRUDuser.php" class="btn btn-light btn-sm w-100 border">Hủy</a>
+                                    </div>
+                                <?php else: ?>
+                                    <button name="save_user" class="btn btn-success w-100"><i class="fas fa-plus me-1"></i> Thêm mới</button>
+                                <?php endif; ?>
+                            </div>
+                        </form>
 
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle text-center">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Tên</th>
-                                    <th>Email</th>
-                                    <th>SĐT</th>
-                                    <th>Vai trò</th>
-                                    <th>Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($listusers as $user): ?>
+                        <hr>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
                                     <tr>
-                                        <td><?= $user['id'] ?></td>
-                                        <td><?= $user['ten'] ?></td>
-                                        <td><?= $user['email'] ?></td>
-                                        <td><?= $user['so_dien_thoai'] ?></td>
-                                        <td><span class="badge bg-info text-dark"><?= $user['vai_tro'] ?></span></td>
-                                        <td>
-                                            <a href="?edit=<?= $user['id'] ?>" class="btn btn-sm btn-outline-warning">Sửa</a>
-                                            <a href="?delete=<?= $user['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa người dùng này?')">Xóa</a>
-                                        </td>
+                                        <th class="text-center">ID</th>
+                                        <th>Thông tin khách hàng</th>
+                                        <th class="text-center d-none d-md-table-cell">SĐT</th>
+                                        <th class="text-center">Vai trò</th>
+                                        <th class="text-end">Hành động</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($listusers as $user): ?>
+                                        <tr>
+                                            <td class="text-center fw-bold text-muted"><?= $user['id'] ?></td>
+                                            <td>
+                                                <div class="fw-bold"><?= htmlspecialchars($user['ten']) ?></div>
+                                                <div class="small text-muted"><?= htmlspecialchars($user['email']) ?></div>
+                                            </td>
+                                            <td class="text-center d-none d-md-table-cell"><?= htmlspecialchars($user['so_dien_thoai']) ?></td>
+                                            <td class="text-center">
+                                                <span class="badge rounded-pill bg-light text-dark border"><?= $user['vai_tro'] ?></span>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="btn-group">
+                                                    <a href="?edit=<?= $user['id'] ?>" class="btn btn-sm btn-outline-warning" title="Sửa">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="?delete=<?= $user['id'] ?>" class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Xóa người dùng này?')" title="Xóa">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
-
     </div>
 
     <!-- FOOTER -->
