@@ -23,7 +23,7 @@ $list = getAllDiscounts($conn);
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản lý sản phẩm - EthleteHub</title>
+    <title>Quản lý giảm giá- EthleteHub</title>
 
 
 
@@ -123,10 +123,10 @@ $list = getAllDiscounts($conn);
             <div class="card shadow-lg border-0">
 
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Quản lý sản phẩm</h4>
+                    <h4 class="mb-0">Quản lý mã giảm giá</h4>
 
                     <a href="frmthem.php" class="btn btn-light fw-semibold">
-                        ➕ Thêm sản phẩm
+                        ➕ Thêm mã giảm giá
                     </a>
                 </div>
 
