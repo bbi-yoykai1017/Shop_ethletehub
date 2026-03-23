@@ -46,10 +46,10 @@ class Cart {
     }
 
     /**
-     * Lấy toàn bộ giỏ hàng
+     * lay tat ca san pham trong gio hang
      */
-    public function getCart() {
-        return $_SESSION[$this->sessionKey] ?? [];
+    public function getAllCart() {
+        return isset($_SESSION[$this->sessionKey]) ? $_SESSION[$this->sessionKey] : [];
     }
 
     /**
@@ -75,10 +75,13 @@ class Cart {
     public function removeItem($cartKey) {
         if (isset($_SESSION[$this->sessionKey][$cartKey])) {
             unset($_SESSION[$this->sessionKey][$cartKey]);
+            return true;
         }
+        return false;
     }
 
-   
+
+
 }
 ?>
 
