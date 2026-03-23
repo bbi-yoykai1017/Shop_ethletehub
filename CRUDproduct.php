@@ -131,8 +131,14 @@ $listproduct = getAllProducts($conn);
         <div class="main-content">
 
             <div class="card shadow border-0 mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><?= $update_mode ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới" ?></h5>
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">
+                        <?php if ($update_mode): ?>
+                            <i class="fas fa-edit me-2"></i> Chỉnh sửa sản phẩm
+                        <?php else: ?>
+                            <i class="fas fa-plus-circle me-2"></i> Thêm sản phẩm mới
+                        <?php endif; ?>
+                    </h5>
                 </div>
                 <div class="card-body">
                     <form method="POST" class="row g-3">
@@ -213,9 +219,9 @@ $listproduct = getAllProducts($conn);
 
 
                                 <td>
-                                <a href="?edit=<?= $product['id'] ?>" class="btn btn-sm btn-outline-warning">Sửa</a>
-                                <a href="?delete=<?= $product['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa sản phẩm này?')">Xóa</a>
-                            </td>
+                                    <a href="?edit=<?= $product['id'] ?>" class="btn btn-sm btn-outline-warning">Sửa</a>
+                                    <a href="?delete=<?= $product['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa sản phẩm này?')">Xóa</a>
+                                </td>
                             </tr>
                         <?php } ?>
 
