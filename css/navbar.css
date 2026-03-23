@@ -371,6 +371,7 @@
     font-weight: var(--font-weight-bold);
 }
 
+
 /* Responsive */
 @media (max-width: 992px) {
     .categories-controls {
