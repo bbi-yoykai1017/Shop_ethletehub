@@ -2,15 +2,19 @@
 session_start();
 require_once 'Database.php';
 require_once 'model/functions.php';
-require_once 'auth.php'; 
+require_once 'auth.php';
 
 $db = new Database();
 $conn = $db->connect();
 
 $update_mode = false;
 $edit_order = [
-    'id' => '', 'nguoi_dung_id' => '', 'ma_don_hang' => '', 
-    'tong_tien' => '', 'tien_giam' => 0, 'thanh_tien' => '', 
+    'id' => '',
+    'nguoi_dung_id' => '',
+    'ma_don_hang' => '',
+    'tong_tien' => '',
+    'tien_giam' => 0,
+    'thanh_tien' => '',
     'phuong_thuc_thanh_toan' => ''
 ];
 
@@ -60,6 +64,7 @@ if (isset($_GET['delete'])) {
     header("Location: CRUDdonhang.php");
     exit;
 }
+$listorders = getAllOrders($conn);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -147,8 +152,8 @@ if (isset($_GET['delete'])) {
         <aside class="sidebar">
             <h4 class="text-center">ADMIN</h4>
             <ul>
-               
-               <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>             
+
+                <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>
                 <li><a href="CRUDuser.php">👤Quản lý khách hàng </a></li>
                 <li><a href="CRUDdonhang.php">👤 Quản lý đơn hàng </a></li>
                 <li><a href="CRUDgiamgia.php">👤 Quản lý mã giảm giá </a></li>
@@ -160,120 +165,117 @@ if (isset($_GET['delete'])) {
         <!-- NỘI DUNG -->
         <div class="main-content">
 
-            <div class="card shadow-lg border-0">
-
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Quản lý đơn hàng</h4>
-
-
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><?= $update_mode ? "Chỉnh sửa đơn hàng: " . $edit_order['ma_don_hang'] : "Thêm đơn hàng mới" ?></h5>
                 </div>
-                <h5 class="mb-3">➕ Thêm đơn hàng</h5>
-
-                <form method="POST" class="row g-2 mb-4">
-
-                    <div class="col-md-2">
-                        <input type="number" name="nguoi_dung_id"
-                            class="form-control"
-                            placeholder="ID User" required>
-                    </div>
-
-                    <div class="col-md-2">
-                        <input type="text" name="ma_don_hang"
-                            class="form-control"
-                            placeholder="Mã đơn" required>
-                    </div>
-
-                    <div class="col-md-2">
-                        <input type="number" name="tong_tien"
-                            class="form-control"
-                            placeholder="Tổng tiền" required>
-                    </div>
-
-                    <div class="col-md-2">
-                        <input type="number" name="tien_giam"
-                            class="form-control"
-                            placeholder="Tiền giảm" value="0">
-                    </div>
-
-                    <div class="col-md-2">
-                        <input type="number" name="thanh_tien"
-                            class="form-control"
-                            placeholder="Thành tiền" required>
-                    </div>
-
-                    <div class="col-md-2">
-                        <input type="text" name="phuong_thuc_thanh_toan"
-                            class="form-control"
-                            placeholder="Thanh toán" required>
-                    </div>
-
-                    <div class="col-md-12">
-                        <button name="add_order"
-                            class="btn btn-success w-100">
-                            Thêm đơn hàng
-                        </button>
-                    </div>
-
-                </form>
-
                 <div class="card-body">
+                    <form method="POST" class="row g-3">
+                        <input type="hidden" name="id" value="<?= $edit_order['id'] ?>">
 
-                    <div class="table-responsive">
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">ID Người dùng</label>
+                            <input type="number" name="nguoi_dung_id" class="form-control" value="<?= $edit_order['nguoi_dung_id'] ?>" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Mã đơn hàng</label>
+                            <input type="text" name="ma_don_hang" class="form-control" value="<?= $edit_order['ma_don_hang'] ?>" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Tổng tiền</label>
+                            <input type="number" name="tong_tien" class="form-control" value="<?= $edit_order['tong_tien'] ?>" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Tiền giảm</label>
+                            <input type="number" name="tien_giam" class="form-control" value="<?= $edit_order['tien_giam'] ?>">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Thanh toán</label>
+                            <select name="phuong_thuc_thanh_toan" class="form-select">
+                                <option value="tien_mat" <?= $edit_order['phuong_thuc_thanh_toan'] == 'tien_mat' ? 'selected' : '' ?>>COD (Tiền mặt)</option>
+                                <option value="credit_card" <?= $edit_order['phuong_thuc_thanh_toan'] == 'credit_card' ? 'selected' : '' ?>>Thẻ tín dụng</option>
+                                <option value="bank_transfer" <?= $edit_order['phuong_thuc_thanh_toan'] == 'bank_transfer' ? 'selected' : '' ?>>Chuyển khoản</option>
+                                <option value="e_wallet" <?= $edit_order['phuong_thuc_thanh_toan'] == 'e_wallet' ? 'selected' : '' ?>>Ví điện tử</option>
 
-                        <table class="table table-hover align-middle text-center">
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Thành tiền</label>
+                            <input type="number" name="thanh_tien" class="form-control" value="<?= $edit_order['thanh_tien'] ?>" required>
+                        </div>
 
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th> ID người dùng</th>
-                                    <th>Mã đơn hàng</th>
-                                    <th>Tổng tiền </th>
-                                    <th>Tiền giảm</th>
-                                    <th>Thành tiền</th>
-                                    <th>Phương thức thanh toán</th>
-                                    <th width="180">Hành động</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                <?php foreach ($listproduct as $donhang) { ?>
-                                    <tr>
-                                        <td><?= $donhang['id'] ?></td>
-                                        <td><?= $donhang['nguoi_dung_id'] ?></td>
-                                        <td><?= $donhang['ma_don_hang'] ?></td>
-                                        <td><?= $donhang['tong_tien'] ?></td>
-                                        <td><?= $donhang['tien_giam'] ?></td>
-                                        <td><?= $donhang['thanh_tien'] ?></td>
-                                        <td><?= $donhang['phuong_thuc_thanh_toan'] ?></td>
-
-
-
-                                        <td>
-                                            <a href="Update.php?id=<?= $donhang['id'] ?>" class="btn btn-warning btn-sm">
-                                                Sửa
-                                            </a>
-
-                                            <a onclick="return confirm('Xóa đơn hàng <?= $donhang['id'] ?> ?')"
-                                                href="?delete=<?= $donhang['id'] ?>"
-                                                class="btn btn-danger btn-sm">
-                                                Xóa
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
+                        <div class="col-md-10 d-flex align-items-end justify-content-end">
+                            <?php if ($update_mode): ?>
+                                <button name="save_order" class="btn btn-warning me-2">Cập nhật đơn hàng</button>
+                                <a href="CRUDdonhang.php" class="btn btn-secondary">Hủy</a>
+                            <?php else: ?>
+                                <button name="save_order" class="btn btn-success">Thêm đơn hàng</button>
+                            <?php endif; ?>
+                        </div>
+                    </form>
                 </div>
+            </div>
+
+
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle text-center">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th> ID người dùng</th>
+                            <th>Mã đơn hàng</th>
+                            <th>Tổng tiền </th>
+                            <th>Tiền giảm</th>
+                            <th>Thành tiền</th>
+                            <th>Phương thức thanh toán</th>
+                            <th>Trạng thái</th>
+                            <th width="180">Hành động</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <?php foreach ($listorders as $donhang) { ?>
+                            <tr>
+                                <td><?= $donhang['id'] ?></td>
+                                <td><?= $donhang['nguoi_dung_id'] ?></td>
+                                <td><?= $donhang['ma_don_hang'] ?></td>
+                                <td><?= $donhang['tong_tien'] ?></td>
+                                <td><?= $donhang['tien_giam'] ?></td>
+                                <td><?= $donhang['thanh_tien'] ?></td>
+                                <td><?= $donhang['phuong_thuc_thanh_toan'] ?></td>
+
+                                <td><?= $donhang['trang_thai'] ?></td>
+
+
+                                <td>
+                                    <a href="Update.php?id=<?= $donhang['id'] ?>" class="btn btn-warning btn-sm">
+                                        Sửa
+                                    </a>
+
+                                    <a onclick="return confirm('Xóa đơn hàng <?= $donhang['id'] ?> ?')"
+                                        href="?delete=<?= $donhang['id'] ?>"
+                                        class="btn btn-danger btn-sm">
+                                        Xóa
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php } ?>
+
+                    </tbody>
+
+                </table>
 
             </div>
 
         </div>
+
+    </div>
+
+    </div>
 
     </div>
 
