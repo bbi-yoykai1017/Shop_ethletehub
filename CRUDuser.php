@@ -15,19 +15,21 @@ $db = new Database();
 $conn = $db->connect();
 $listusers = getAllUsers($conn);
 // ================= THÊM USER =================
+// ================= THÊM USER =================
 if (isset($_POST['add_user'])) {
 
-    $sql = "INSERT INTO users
+    $sql = "INSERT INTO nguoi_dung
             (ten, email, so_dien_thoai, vai_tro)
             VALUES (?, ?, ?, ?)";
 
     $stmt = $conn->prepare($sql);
 
+    // Thay vì lấy $_POST['vai_tro'], ta ép cứng giá trị là 'user'
     $stmt->execute([
         $_POST['ten'],
         $_POST['email'],
         $_POST['so_dien_thoai'],
-        $_POST['vai_tro']
+        'khach_hang' // Luôn luôn thêm với quyền khách hàng
     ]);
 
     header("Location: " . $_SERVER['PHP_SELF']);
@@ -38,7 +40,7 @@ if (isset($_POST['add_user'])) {
 // ================= XÓA USER =================
 if (isset($_GET['delete'])) {
 
-    $sql = "DELETE FROM users WHERE id = ?";
+    $sql = "DELETE FROM nguoi_dung WHERE id = ?";
 
     $stmt = $conn->prepare($sql);
     $stmt->execute([$_GET['delete']]);
@@ -181,8 +183,7 @@ $listusers = getAllUsers($conn);
                     <div class="col-md-2">
                         <select name="vai_tro" class="form-select" required>
                             <option value="">Vai trò</option>
-                            <option value="admin">Admin</option>
-                            <option value="user">User</option>
+                            <option value="khach_hang">Khách hàng</option>
                         </select>
                     </div>
 
@@ -232,7 +233,7 @@ $listusers = getAllUsers($conn);
                                                 Sửa
                                             </a>
 
-                                            <a onclick="return confirm('Xóa user <?= $user['id'] ?> ?')"
+                                            <a onclick="return confirm('Xóa người dùng  <?= $user['id'] ?> ?')"
                                                 href="?delete=<?= $user['id'] ?>"
                                                 class="btn btn-danger btn-sm">
                                                 Xóa
