@@ -76,44 +76,9 @@ class Cart {
         if (isset($_SESSION[$this->sessionKey][$cartKey])) {
             unset($_SESSION[$this->sessionKey][$cartKey]);
         }
-        echo "Xóa thành công!";
     }
 
-    /**
-     * Xóa toàn bộ giỏ hàng
-     */
-    public function clearCart() {
-        $_SESSION[$this->sessionKey] = [];
-    }
-
-    /**
-     * Tổng số lượng sản phẩm trong giỏ
-     */
-    public function totalItems() {
-        $total = 0;
-        foreach ($this->getCart() as $item) {
-            $total += $item['quantity'];
-        }
-        return $total;
-    }
-
-    /**
-     * Tổng tiền giỏ hàng
-     */
-    public function totalPrice() {
-        $total = 0;
-        foreach ($this->getCart() as $item) {
-            $total += $item['price'] * $item['quantity'];
-        }
-        return number_format($total, 0, ',', '.');
-    }
-
-    /**
-     * Số lượng items (số dòng sản phẩm khác nhau)
-     */
-    public function countItems() {
-        return count($this->getCart());
-    }
+   
 }
 ?>
 
