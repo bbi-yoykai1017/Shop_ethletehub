@@ -8,7 +8,7 @@ $db = new Database();
 $conn = $db->connect();
 
 $update_mode = false;
-// Thêm đầy đủ các trường vào mảng rỗng để tránh lỗi "Undefined index"
+
 $edit_product = [
     'id' => '',
     'ten' => '',

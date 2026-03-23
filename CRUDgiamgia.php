@@ -45,17 +45,17 @@ if (isset($_POST['save_discount'])) {
     $da_su_dung = $_POST['da_su_dung'];
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
-        // CẬP NHẬT: 9 cột tương ứng 9 dấu hỏi
+        
         $id = $_POST['id'];
         $sql = "UPDATE ma_giam_gia SET ma_code=?, mo_ta=?, phan_tram_giam=?, so_tien_giam=?, don_hang_toi_thieu=?, giam_toi_da=?, gioi_han_su_dung=?, da_su_dung=? WHERE id=?";
         $stmt = $conn->prepare($sql);
-        // Truyền đúng 9 biến theo thứ tự
+       
         $stmt->execute([$code, $mota, $phan_tram, $so_tien, $toi_thieu, $toi_da, $gioi_han, $da_su_dung, $id]);
     } else {
-        // THÊM MỚI: 8 cột tương ứng 8 dấu hỏi
+      
         $sql = "INSERT INTO ma_giam_gia (ma_code, mo_ta, phan_tram_giam, so_tien_giam, don_hang_toi_thieu, giam_toi_da, gioi_han_su_dung, da_su_dung) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        // Truyền đúng 8 biến
+      
         $stmt->execute([$code, $mota, $phan_tram, $so_tien, $toi_thieu, $toi_da, $gioi_han, $da_su_dung]);
     }
     header("Location: CRUDgiamgia.php");
