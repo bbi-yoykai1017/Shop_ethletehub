@@ -119,9 +119,9 @@ $listorders = getAllOrders($conn);
 
         <!-- SIDEBAR -->
         <aside class="sidebar">
-           <ul>
+            <ul>
                 <li><a href="CRUDproduct.php"><i class="fas fa-box me-2"></i> Sản phẩm</a></li>
-                <li><a href="CRUDuser.php" ><i class="fas fa-users me-2"></i> Khách hàng</a></li>
+                <li><a href="CRUDuser.php"><i class="fas fa-users me-2"></i> Khách hàng</a></li>
                 <li><a href="CRUDdonhang.php" class="active"><i class="fas fa-shopping-cart me-2"></i> Đơn hàng</a></li>
                 <li><a href="CRUDgiamgia.php"><i class="fas fa-tags me-2"></i> Mã giảm giá</a></li>
                 <li class="d-lg-none"><a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
@@ -132,8 +132,14 @@ $listorders = getAllOrders($conn);
         <div class="main-content">
 
             <div class="card shadow border-0 mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><?= $update_mode ? "Chỉnh sửa đơn hàng: " . $edit_order['ma_don_hang'] : "Thêm đơn hàng mới" ?></h5>
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">
+                        <?php if ($update_mode): ?>
+                            <i class="fas fa-file-invoice me-2"></i> Chỉnh sửa đơn hàng <span class="badge bg-light text-primary"></span>
+                        <?php else: ?>
+                            <i class="fas fa-cart-plus me-2"></i> Thêm đơn hàng mới
+                        <?php endif; ?>
+                    </h5>
                 </div>
                 <div class="card-body">
                     <form method="POST" class="row g-3">
