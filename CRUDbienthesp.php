@@ -14,7 +14,45 @@ if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
 $db = new Database();
 $conn = $db->connect();
 $listproduct = getAllVariants($conn);
-// ===== THÊM USER =====
+// ================= THÊM BIẾN THỂ =================
+if (isset($_POST['add_variant'])) {
+
+    $sql = "INSERT INTO bien_the_san_pham
+            (san_pham_id, kich_thuoc_id, mau_sac_id, so_luong_ton)
+            VALUES (?, ?, ?, ?)";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->execute([
+        $_POST['san_pham_id'],
+        $_POST['kich_thuoc_id'],
+        $_POST['mau_sac_id'],
+        $_POST['so_luong_ton']
+    ]);
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+
+// ================= XÓA BIẾN THỂ =================
+if (isset($_GET['delete'])) {
+
+    $sql = "DELETE FROM bien_the_san_pham WHERE id = ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$_GET['delete']]);
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+
+// ================= LẤY DANH SÁCH =================
+$sql = "SELECT * FROM bien_the_san_pham";
+$stmt = $conn->query($sql);
+
+$listproduct = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>
@@ -103,9 +141,9 @@ $listproduct = getAllVariants($conn);
         <aside class="sidebar">
             <h4 class="text-center">ADMIN</h4>
             <ul>
-                 <li><a href="#">🏠 Dashboard</a></li>
-                <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>        
-                  <li><a href="CRUDbienthesp.php">👤 Quản lý biến thể sản phẩm </a></li>
+                <li><a href="#">🏠 Dashboard</a></li>
+                <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>
+                <li><a href="CRUDbienthesp.php">👤 Quản lý biến thể sản phẩm </a></li>
                 <li><a href="CRUDuser.php">👤Quản lý khách hàng </a></li>
                 <li><a href="CRUDgiamgia.php">👤 Quản lý mã giảm giá </a></li>
                 <li><a href="#">⚙️ Cài đặt</a></li>
@@ -121,11 +159,44 @@ $listproduct = getAllVariants($conn);
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Quản lý biến thể sản phẩm</h4>
 
-                    <a href="frmthem.php" class="btn btn-light fw-semibold">
-                        ➕ Thêm biến thể sản phẩm
-                    </a>
-                </div>
 
+                </div>
+                <h5>➕ Thêm biến thể sản phẩm</h5>
+
+                <form method="POST" class="row g-2 mb-4">
+
+                    <div class="col-md-2">
+                        <input type="number" name="san_pham_id"
+                            class="form-control"
+                            placeholder="ID SP" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="number" name="kich_thuoc_id"
+                            class="form-control"
+                            placeholder="ID Size" required>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="number" name="mau_sac_id"
+                            class="form-control"
+                            placeholder="ID Màu" required>
+                    </div>
+
+                    <div class="col-md-3">
+                        <input type="number" name="so_luong_ton"
+                            class="form-control"
+                            placeholder="Số lượng tồn" required>
+                    </div>
+
+                    <div class="col-md-3">
+                        <button name="add_variant"
+                            class="btn btn-success w-100">
+                            Thêm
+                        </button>
+                    </div>
+
+                </form>
                 <div class="card-body">
 
                     <div class="table-responsive">
@@ -139,7 +210,7 @@ $listproduct = getAllVariants($conn);
                                     <th>ID kích thước</th>
                                     <th>ID màu săc</th>
                                     <th>Số lượng tồn kho</th>
-                                    
+
                                     <th width="180">Hành động</th>
                                 </tr>
                             </thead>
@@ -153,9 +224,9 @@ $listproduct = getAllVariants($conn);
                                         <td><?= $bienthe['kich_thuoc_id'] ?></td>
                                         <td><?= $bienthe['mau_sac_id'] ?></td>
                                         <td><?= $bienthe['so_luong_ton'] ?></td>
-                                        
 
-                                        
+
+
 
                                         <td>
                                             <a href="Update.php?id=<?= $bienthe['id'] ?>" class="btn btn-warning btn-sm">
@@ -163,7 +234,7 @@ $listproduct = getAllVariants($conn);
                                             </a>
 
                                             <a onclick="return confirm('Xóa biến thể sản phẩm <?= $bienthe['id'] ?> ?')"
-                                                href="Delete.php?id=<?= $bienthe['id'] ?>"
+                                                href="?delete=<?= $bienthe['id'] ?>"
                                                 class="btn btn-danger btn-sm">
                                                 Xóa
                                             </a>
