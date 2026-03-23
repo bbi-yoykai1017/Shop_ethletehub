@@ -1,27 +1,119 @@
 <?php 
-    // class quan ly gio hang and luu gio hang trong session 
-    class Cart {
-        private $sessionKey = 'athleteHubCart';
+// khoi tao class gio hang
+class Cart {
+    private $sessionKey = 'athleteHubCart';
 
-        // contructor - khoi tao session gio hang
-        public function __construct() {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
-            // neu chua co gio hang -> tao moi
-            if (!isset($_SESSION[$this->sessionKey])) {
-                $_SESSION[$this->sessionKey] = [];
-            }
+    // Constructor - khoi tao session gio hang
+    public function __construct() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
-
-        // them san pham vao gio hang
-        public function addCart($productId, $productName, $price, $image, $quantity = 1, $size = '', $color = '', ) {
-            $carKey = $this->generaCarKey($productId,$size,$color);
-        }
-
-        // tao key duy nhat cho san pham 
-        public function generaCarKey($id,$size,$color) {
-            return 'product_' . $id . '_' .md5($size,$color);
+        // neu chua co gio hang thi tao moi
+        if (!isset($_SESSION[$this->sessionKey])) {
+            $_SESSION[$this->sessionKey] = [];
         }
     }
+
+    /**
+     * Thêm/Cập nhật sản phẩm vào giỏ hàng
+     */
+    public function addCart($productId, $productName, $price, $image, $quantity = 1, $size = '', $color = '') {
+        $cartKey = $this->generateCartKey($productId, $size, $color);
+
+        if (isset($_SESSION[$this->sessionKey][$cartKey])) {
+            // Tăng quantity nếu đã tồn tại
+            $_SESSION[$this->sessionKey][$cartKey]['quantity'] += $quantity;
+        } else {
+            // Tạo sản phẩm mới
+            $_SESSION[$this->sessionKey][$cartKey] = [
+                'product_id' => $productId,
+                'name' => $productName,
+                'price' => floatval($price),
+                'image' => $image,
+                'quantity' => (int)$quantity,
+                'size' => $size,
+                'color' => $color
+            ];
+        }
+        return true;
+    }
+
+    /**
+     * Tạo key unique cho sản phẩm (productId_size_color)
+     */
+    private function generateCartKey($id, $size, $color) {
+        return 'product_' . $id . '_' . md5($size . '_' . $color);
+    }
+
+    /**
+     * Lấy toàn bộ giỏ hàng
+     */
+    public function getCart() {
+        return $_SESSION[$this->sessionKey] ?? [];
+    }
+
+    /**
+     * Cập nhật số lượng sản phẩm
+     */
+    public function updateQuantity($cartKey, $quantity) {
+        if (isset($_SESSION[$this->sessionKey][$cartKey])) {
+            $quantity = (int)$quantity;
+            if ($quantity <= 0) {
+                $this->removeItem($cartKey);
+            } else {
+                $_SESSION[$this->sessionKey][$cartKey]['quantity'] = $quantity;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Xóa 1 sản phẩm khỏi giỏ hàng
+     */
+    public function removeItem($cartKey) {
+        if (isset($_SESSION[$this->sessionKey][$cartKey])) {
+            unset($_SESSION[$this->sessionKey][$cartKey]);
+        }
+        echo "Xóa thành công!";
+    }
+
+    /**
+     * Xóa toàn bộ giỏ hàng
+     */
+    public function clearCart() {
+        $_SESSION[$this->sessionKey] = [];
+    }
+
+    /**
+     * Tổng số lượng sản phẩm trong giỏ
+     */
+    public function totalItems() {
+        $total = 0;
+        foreach ($this->getCart() as $item) {
+            $total += $item['quantity'];
+        }
+        return $total;
+    }
+
+    /**
+     * Tổng tiền giỏ hàng
+     */
+    public function totalPrice() {
+        $total = 0;
+        foreach ($this->getCart() as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+        return number_format($total, 0, ',', '.');
+    }
+
+    /**
+     * Số lượng items (số dòng sản phẩm khác nhau)
+     */
+    public function countItems() {
+        return count($this->getCart());
+    }
+}
 ?>
+
