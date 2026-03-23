@@ -2,58 +2,64 @@
 session_start();
 require_once 'Database.php';
 require_once 'model/functions.php';
-require_once 'auth.php'; // File này sẽ kiểm tra xem người dùng đã đăng nhập chưa, nếu chưa sẽ chuyển hướng về login.php
+require_once 'auth.php'; 
 
-/*
-// e kiem tra phan quyen vai tro o day nha a
-if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
-    header("Location: index.php");
-    exit;
-}*/
-//code cua a cu viet binh thuong nha 
 $db = new Database();
 $conn = $db->connect();
-$listproduct = getAllOrders($conn);
-// ================= THÊM ĐƠN HÀNG =================
-if (isset($_POST['add_order'])) {
 
-    $sql = "INSERT INTO don_hang
-            (nguoi_dung_id, ma_don_hang, tong_tien,
-             tien_giam, thanh_tien, phuong_thuc_thanh_toan)
-            VALUES (?, ?, ?, ?, ?, ?)";
+$update_mode = false;
+$edit_order = [
+    'id' => '', 'nguoi_dung_id' => '', 'ma_don_hang' => '', 
+    'tong_tien' => '', 'tien_giam' => 0, 'thanh_tien' => '', 
+    'phuong_thuc_thanh_toan' => ''
+];
 
+// ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
+if (isset($_GET['edit'])) {
+    $id = $_GET['edit'];
+    $sql = "SELECT * FROM don_hang WHERE id = ?";
     $stmt = $conn->prepare($sql);
+    $stmt->execute([$id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result) {
+        $edit_order = $result;
+        $update_mode = true;
+    }
+}
 
-    $stmt->execute([
-        $_POST['nguoi_dung_id'],
-        $_POST['ma_don_hang'],
-        $_POST['tong_tien'],
-        $_POST['tien_giam'],
-        $_POST['thanh_tien'],
-        $_POST['phuong_thuc_thanh_toan']
-    ]);
+// ================= 2. XỬ LÝ THÊM HOẶC CẬP NHẬT =================
+if (isset($_POST['save_order'])) {
+    $user_id = $_POST['nguoi_dung_id'];
+    $ma_don = $_POST['ma_don_hang'];
+    $tong = $_POST['tong_tien'];
+    $giam = $_POST['tien_giam'];
+    $thanh_tien = $_POST['thanh_tien'];
+    $pttt = $_POST['phuong_thuc_thanh_toan'];
 
-    header("Location: " . $_SERVER['PHP_SELF']);
+    if (isset($_POST['id']) && !empty($_POST['id'])) {
+        // CẬP NHẬT
+        $id = $_POST['id'];
+        $sql = "UPDATE don_hang SET nguoi_dung_id=?, ma_don_hang=?, tong_tien=?, tien_giam=?, thanh_tien=?, phuong_thuc_thanh_toan=? WHERE id=?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$user_id, $ma_don, $tong, $giam, $thanh_tien, $pttt, $id]);
+    } else {
+        // THÊM MỚI
+        $sql = "INSERT INTO don_hang (nguoi_dung_id, ma_don_hang, tong_tien, tien_giam, thanh_tien, phuong_thuc_thanh_toan) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$user_id, $ma_don, $tong, $giam, $thanh_tien, $pttt]);
+    }
+    header("Location: CRUDdonhang.php");
     exit;
 }
 
-
-// ================= XÓA ĐƠN HÀNG =================
+// ================= 3. XỬ LÝ XÓA =================
 if (isset($_GET['delete'])) {
-
     $sql = "DELETE FROM don_hang WHERE id = ?";
-
     $stmt = $conn->prepare($sql);
     $stmt->execute([$_GET['delete']]);
-
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header("Location: CRUDdonhang.php");
     exit;
 }
-
-
-// LẤY LẠI DANH SÁCH SAU CRUD
-$listproduct = getAllOrders($conn);
-
 ?>
 <!DOCTYPE html>
 <html lang="vi">
