@@ -142,6 +142,7 @@ $listusers = getAllUsers($conn);
                 <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>
                 <li><a href="CRUDbienthesp.php">👤 Quản lý biến thể sản phẩm </a></li>
                 <li><a href="CRUDuser.php">👤Quản lý khách hàng </a></li>
+                <li><a href="CRUDdonhang.php">👤 Quản lý đơn hàng </a></li>
                 <li><a href="CRUDgiamgia.php">👤 Quản lý mã giảm giá </a></li>
                 <li><a href="#">⚙️ Cài đặt</a></li>
                 <li><a href="logout.php">🚪 Đăng xuất</a></li>
@@ -233,10 +234,10 @@ $listusers = getAllUsers($conn);
                                             </a>
 
                                             <a onclick="return confirm('Xóa user <?= $user['id'] ?> ?')"
-   href="?delete=<?= $user['id'] ?>"
-   class="btn btn-danger btn-sm">
-    Xóa
-</a>
+                                                href="?delete=<?= $user['id'] ?>"
+                                                class="btn btn-danger btn-sm">
+                                                Xóa
+                                            </a>
                                         </td>
                                     </tr>
                                 <?php } ?>
