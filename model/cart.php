@@ -20,8 +20,8 @@
         }
 
         // tao key duy nhat cho san pham 
-        public function generaCarKey($productId,$size,$color) {
-
+        public function generaCarKey($id,$size,$color) {
+            return 'product_' . $id . '_' .md5($size,$color);
         }
     }
 ?>
