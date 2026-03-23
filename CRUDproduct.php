@@ -2,20 +2,64 @@
 session_start();
 require_once 'Database.php';
 require_once 'model/functions.php';
-require_once 'auth.php'; // File này sẽ kiểm tra xem người dùng đã đăng nhập chưa, nếu chưa sẽ chuyển hướng về login.php
+require_once 'auth.php'; 
 
-/*
-// e kiem tra phan quyen vai tro o day nha a
-if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
-    header("Location: index.php");
-    exit;
-}*/
-//code cua a cu viet binh thuong nha 
 $db = new Database();
 $conn = $db->connect();
-$listproduct = getAllProducts($conn);
-// ===== THÊM USER =====
 
+$update_mode = false;
+$edit_product = [
+    'id' => '', 'ten' => '', 'mo_ta' => '', 
+    'gia' => '', 'gia_goc' => '', 'hinh_anh_chinh' => ''
+];
+
+// ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
+if (isset($_GET['edit'])) {
+    $id = $_GET['edit'];
+    $sql = "SELECT * FROM san_pham WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result) {
+        $edit_product = $result;
+        $update_mode = true;
+    }
+}
+
+// ================= 2. XỬ LÝ THÊM HOẶC CẬP NHẬT =================
+if (isset($_POST['save_product'])) {
+    $ten = $_POST['ten'];
+    $mo_ta = $_POST['mo_ta'];
+    $gia = $_POST['gia'];
+    $gia_goc = $_POST['gia_goc'];
+    $hinh_anh = $_POST['hinh_anh_chinh']; // Tạm thời lấy text đường dẫn
+
+    if (isset($_POST['id']) && !empty($_POST['id'])) {
+        // CẬP NHẬT
+        $id = $_POST['id'];
+        $sql = "UPDATE san_pham SET ten=?, mo_ta=?, gia=?, gia_goc=?, hinh_anh_chinh=? WHERE id=?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$ten, $mo_ta, $gia, $gia_goc, $hinh_anh, $id]);
+    } else {
+        // THÊM MỚI
+        $sql = "INSERT INTO san_pham (ten, mo_ta, gia, gia_goc, hinh_anh_chinh) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$ten, $mo_ta, $gia, $gia_goc, $hinh_anh]);
+    }
+    header("Location: CRUDproduct.php");
+    exit;
+}
+
+// ================= 3. XỬ LÝ XÓA =================
+if (isset($_GET['delete'])) {
+    $sql = "DELETE FROM san_pham WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$_GET['delete']]);
+    header("Location: CRUDproduct.php");
+    exit;
+}
+
+$listproduct = getAllProducts($conn);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
