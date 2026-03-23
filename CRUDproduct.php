@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
 //code cua a cu viet binh thuong nha 
 $db = new Database();
 $conn = $db->connect();
-$listusers = getAllUsers($conn);
+$listproduct = getAllProducts($conn);
 // ===== THÊM USER =====
 
 ?>
@@ -23,7 +23,7 @@ $listusers = getAllUsers($conn);
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản lý người dùng - EthleteHub</title>
+    <title>Quản lý sản phẩm - EthleteHub</title>
 
 
 
@@ -109,7 +109,7 @@ $listusers = getAllUsers($conn);
                 <li><a href="#">👤 Quản lý kho hàng </a></li>
                   <li><a href="#">👤 Quản lý biến thể sản phẩm </a></li>
                 <li><a href="#">👤 Quản lý thông số sản phẩm  </a></li>
-                <li><a href="#">👤Quản lý khách hàng </a></li>
+                <li><a href="CRUDuser.php">👤Quản lý khách hàng </a></li>
                 <li><a href="#">👤 Quản lý mã giảm giá </a></li>
                 <li><a href="#">👤 Quản lý danh giá sản phẩm từ khách hàng </a></li>
                 <li><a href="#">⚙️ Cài đặt</a></li>
@@ -123,10 +123,10 @@ $listusers = getAllUsers($conn);
             <div class="card shadow-lg border-0">
 
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Quản lý người dùng</h4>
+                    <h4 class="mb-0">Quản lý sản phẩm</h4>
 
                     <a href="frmthem.php" class="btn btn-light fw-semibold">
-                        ➕ Thêm người dùng
+                        ➕ Thêm sản phẩm
                     </a>
                 </div>
 
@@ -140,35 +140,35 @@ $listusers = getAllUsers($conn);
                                 <tr>
                                     <th>ID</th>
                                     <th>Tên</th>
-                                    <th>Email</th>
-                                    <th>SĐT</th>
-                                    <th>Vai trò</th>
+                                    <th>Mô tả</th>
+                                    <th>Giá</th>
+                                    <th>Hình ảnh</th>
                                     <th width="180">Hành động</th>
                                 </tr>
                             </thead>
 
                             <tbody>
 
-                                <?php foreach ($listusers as $user) { ?>
+                                <?php foreach ($listproduct as $product) { ?>
                                     <tr>
-                                        <td><?= $user['id'] ?></td>
-                                        <td><?= $user['ten'] ?></td>
-                                        <td><?= $user['email'] ?></td>
-                                        <td><?= $user['so_dien_thoai'] ?></td>
-
+                                        <td><?= $product['id'] ?></td>
+                                        <td><?= $product['ten'] ?></td>
+                                        <td><?= $product['mo_ta'] ?></td>
+                                        <td><?= $product['gia'] ?></td>
                                         <td>
-                                            <span class="badge bg-info text-dark">
-                                                <?= $user['vai_tro'] ?>
-                                            </span>
+                                            <img src="./public/<?php echo htmlspecialchars($product['hinh_anh_chinh']); ?>"
+                                                alt="<?= $product['ten'] ?>" width="80" height="80">
                                         </td>
 
+                                        
+
                                         <td>
-                                            <a href="Update.php?id=<?= $user['id'] ?>" class="btn btn-warning btn-sm">
+                                            <a href="Update.php?id=<?= $product['id'] ?>" class="btn btn-warning btn-sm">
                                                 Sửa
                                             </a>
 
-                                            <a onclick="return confirm('Xóa user <?= $user['id'] ?> ?')"
-                                                href="Delete.php?id=<?= $user['id'] ?>"
+                                            <a onclick="return confirm('Xóa sản phẩm <?= $product['id'] ?> ?')"
+                                                href="Delete.php?id=<?= $product['id'] ?>"
                                                 class="btn btn-danger btn-sm">
                                                 Xóa
                                             </a>

@@ -489,4 +489,11 @@ function loginUser($conn, $email, $mat_khau) {
         return ['success' => false, 'message' => 'Lỗi cơ sở dữ liệu!'];
     }
 }
+// lay danh sach san pham
+function getAllProducts($conn) {
+    $sql = "SELECT * FROM san_pham WHERE trang_thai = 1 ORDER BY id ASC";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
