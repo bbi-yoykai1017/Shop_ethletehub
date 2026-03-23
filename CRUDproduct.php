@@ -93,41 +93,7 @@ $listproduct = getAllProducts($conn);
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
-    <style>
-        .layout {
-            display: flex;
-            min-height: calc(100vh - 56px);
-        }
-
-        .sidebar {
-            width: 240px;
-            background: #111827;
-            color: #fff;
-            padding: 20px;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .sidebar a {
-            display: block;
-            padding: 10px;
-            color: #d1d5db;
-            text-decoration: none;
-        }
-
-        .sidebar a:hover {
-            background: #1f2937;
-            color: #fff;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 30px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/admin-layout.css">
 </head>
 
 <body style="background:#f4f6f9;">
@@ -153,8 +119,8 @@ $listproduct = getAllProducts($conn);
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <ul>
-                <li><a href="CRUDproduct.php"><i class="fas fa-box me-2"></i> Sản phẩm</a></li>
-                <li><a href="CRUDuser.php" class="active"><i class="fas fa-users me-2"></i> Khách hàng</a></li>
+                <li><a href="CRUDproduct.php" class="active"><i class="fas fa-box me-2"></i> Sản phẩm</a></li>
+                <li><a href="CRUDuser.php"><i class="fas fa-users me-2"></i> Khách hàng</a></li>
                 <li><a href="CRUDdonhang.php"><i class="fas fa-shopping-cart me-2"></i> Đơn hàng</a></li>
                 <li><a href="CRUDgiamgia.php"><i class="fas fa-tags me-2"></i> Mã giảm giá</a></li>
                 <li class="d-lg-none"><a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
