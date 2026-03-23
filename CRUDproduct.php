@@ -134,10 +134,13 @@ $listproduct = getAllProducts($conn);
                             <thead class="table-dark">
                                 <tr>
                                     <th>ID</th>
-                                    <th>Tên</th>
-                                    <th>Mô tả</th>
-                                    <th>Giá</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Mô tả</th>                               
+                                    <th>Giá bán</th>
+                                    <th>Giá gốc</th>
+                                    <th>Trung bình sao</th>
                                     <th>Hình ảnh</th>
+                                    <th>Số lượng đánh giá</th>
                                     <th width="180">Hành động</th>
                                 </tr>
                             </thead>
@@ -148,8 +151,11 @@ $listproduct = getAllProducts($conn);
                                     <tr>
                                         <td><?= $product['id'] ?></td>
                                         <td><?= $product['ten'] ?></td>
-                                        <td><?= $product['mo_ta'] ?></td>
+                                        <td><?= $product['mo_ta'] ?></td>                                  
                                         <td><?= $product['gia'] ?></td>
+                                        <td><?= $product['gia_goc'] ?></td>
+                                        <td><?= $product['trung_binh_sao'] ?></td>
+                                        <td><?= $product['so_luong_danh_gia'] ?></td>
                                         <td>
                                             <img src="./public/<?php echo htmlspecialchars($product['hinh_anh_chinh']); ?>"
                                                 alt="<?= $product['ten'] ?>" width="80" height="80">
