@@ -15,7 +15,8 @@ $edit_order = [
     'tong_tien' => '',
     'tien_giam' => 0,
     'thanh_tien' => '',
-    'phuong_thuc_thanh_toan' => ''
+    'phuong_thuc_thanh_toan' => '',
+    'trang_thai' => ''
 ];
 
 // ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
@@ -39,18 +40,20 @@ if (isset($_POST['save_order'])) {
     $giam = $_POST['tien_giam'];
     $thanh_tien = $_POST['thanh_tien'];
     $pttt = $_POST['phuong_thuc_thanh_toan'];
+    $trang_thai = $_POST['trang_thai'];
+
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
         // CẬP NHẬT
         $id = $_POST['id'];
-        $sql = "UPDATE don_hang SET nguoi_dung_id=?, ma_don_hang=?, tong_tien=?, tien_giam=?, thanh_tien=?, phuong_thuc_thanh_toan=? WHERE id=?";
+        $sql = "UPDATE don_hang SET nguoi_dung_id=?, ma_don_hang=?, tong_tien=?, tien_giam=?, thanh_tien=?, phuong_thuc_thanh_toan=?, trang_thai=? WHERE id=?";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$user_id, $ma_don, $tong, $giam, $thanh_tien, $pttt, $id]);
+        $stmt->execute([$user_id, $ma_don, $tong, $giam, $thanh_tien, $pttt, $trang_thai, $id]);
     } else {
         // THÊM MỚI
-        $sql = "INSERT INTO don_hang (nguoi_dung_id, ma_don_hang, tong_tien, tien_giam, thanh_tien, phuong_thuc_thanh_toan) VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO don_hang (nguoi_dung_id, ma_don_hang, tong_tien, tien_giam, thanh_tien, phuong_thuc_thanh_toan, trang_thai) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$user_id, $ma_don, $tong, $giam, $thanh_tien, $pttt]);
+        $stmt->execute([$user_id, $ma_don, $tong, $giam, $thanh_tien, $pttt, $trang_thai]);
     }
     header("Location: CRUDdonhang.php");
     exit;
@@ -189,6 +192,11 @@ $listorders = getAllOrders($conn);
                             <label class="form-label fw-bold">Tiền giảm</label>
                             <input type="number" name="tien_giam" class="form-control" value="<?= $edit_order['tien_giam'] ?>">
                         </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Thành tiền</label>
+                            <input type="number" name="thanh_tien" class="form-control" value="<?= $edit_order['thanh_tien'] ?>" required>
+                        </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Thanh toán</label>
                             <select name="phuong_thuc_thanh_toan" class="form-select">
@@ -199,9 +207,17 @@ $listorders = getAllOrders($conn);
 
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-bold">Thành tiền</label>
-                            <input type="number" name="thanh_tien" class="form-control" value="<?= $edit_order['thanh_tien'] ?>" required>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Trạng thái</label>
+                            <select name="trang_thai" class="form-select">
+                                <option value="cho_xu_ly" <?= $edit_order['trang_thai'] == 'cho_xu_ly' ? 'selected' : '' ?>>Chờ xử lý</option>
+                                <option value="dang_giao" <?= $edit_order['trang_thai'] == 'dang_giao' ? 'selected' : '' ?>>Đang giao</option>
+                                <option value="da_thanh_toan" <?= $edit_order['trang_thai'] == 'da_thanh_toan' ? 'selected' : '' ?>>Đã thanh toán</option>
+                                <option value="da_giao" <?= $edit_order['trang_thai'] == 'da_giao' ? 'selected' : '' ?>>Đã giao</option>
+                                <option value="hoan_thanh" <?= $edit_order['trang_thai'] == 'hoan_thanh' ? 'selected' : '' ?>>Đã hoàn thành</option>
+                                <option value="da_huy" <?= $edit_order['trang_thai'] == 'da_huy' ? 'selected' : '' ?>>Đã hủy</option>
+
+                            </select>
                         </div>
 
                         <div class="col-md-10 d-flex align-items-end justify-content-end">
@@ -215,9 +231,6 @@ $listorders = getAllOrders($conn);
                     </form>
                 </div>
             </div>
-
-
-
             <div class="table-responsive">
 
                 <table class="table table-hover align-middle text-center">
@@ -235,9 +248,7 @@ $listorders = getAllOrders($conn);
                             <th width="180">Hành động</th>
                         </tr>
                     </thead>
-
                     <tbody>
-
                         <?php foreach ($listorders as $donhang) { ?>
                             <tr>
                                 <td><?= $donhang['id'] ?></td>
@@ -247,20 +258,45 @@ $listorders = getAllOrders($conn);
                                 <td><?= $donhang['tien_giam'] ?></td>
                                 <td><?= $donhang['thanh_tien'] ?></td>
                                 <td><?= $donhang['phuong_thuc_thanh_toan'] ?></td>
+                                <td>
+                                    <?php
+                                    $status_label = '';
+                                    $status_class = '';
 
-                                <td><?= $donhang['trang_thai'] ?></td>
+                                    switch ($donhang['trang_thai']) {
+                                        case 'cho_xu_ly':
+                                            $status_label = 'Chờ xử lý';
+                                            $status_class = 'bg-secondary';
+                                            break;
+                                        case 'dang_giao':
+                                            $status_label = 'Đang giao';
+                                            $status_class = 'bg-info';
+                                            break;
+                                        case 'da_thanh_toan':
+                                            $status_label = 'Đã thanh toán';
+                                            $status_class = 'bg-primary';
+                                            break;
+                                        case 'da_hoan_thanh':
+                                            $status_label = 'Hoàn thành';
+                                            $status_class = 'bg-success';
+                                            break;
+                                        case 'da_huy':
+                                            $status_label = 'Đã hủy';
+                                            $status_class = 'bg-danger';
+                                            break;
+                                        default:
+                                            $status_label = $donhang['trang_thai'];
+                                            $status_class = 'bg-dark';
+                                    }
+                                    ?>
+                                    <span class="badge <?= $status_class ?>"><?= $status_label ?></span>
+                                </td>
 
 
                                 <td>
-                                    <a href="Update.php?id=<?= $donhang['id'] ?>" class="btn btn-warning btn-sm">
-                                        Sửa
-                                    </a>
-
-                                    <a onclick="return confirm('Xóa đơn hàng <?= $donhang['id'] ?> ?')"
-                                        href="?delete=<?= $donhang['id'] ?>"
-                                        class="btn btn-danger btn-sm">
-                                        Xóa
-                                    </a>
+                                    <a href="?edit=<?= $donhang['id'] ?>" class="btn btn-sm btn-outline-warning">Sửa</a>
+                                    <a href="?delete=<?= $donhang['id'] ?>" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Xóa đơn hàng này?')">Xóa</a>
                                 </td>
                             </tr>
                         <?php } ?>
