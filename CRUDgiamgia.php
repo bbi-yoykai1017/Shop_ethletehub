@@ -137,8 +137,14 @@ $list = getAllDiscounts($conn);
             <div class="card shadow-lg border-0">
 
                 <div class="card shadow border-0 mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><?= $update_mode ? "⚡ Cập nhật mã: " . $edit_data['ma_code'] : "➕ Thêm mã giảm giá mới" ?></h5>
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0">
+                            <?php if ($update_mode): ?>
+                                <i class="fas fa-bolt text-warning me-2"></i> Cập nhật mã giảm giá <span class="badge bg-light text-primary"></span>
+                            <?php else: ?>
+                                <i class="fas fa-plus-square text-info me-2"></i> Thêm mã giảm giá mới
+                            <?php endif; ?>
+                        </h5>
                     </div>
                     <div class="card-body">
                         <form method="POST" class="row g-3">
