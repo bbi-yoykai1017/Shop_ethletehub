@@ -2,17 +2,22 @@
 session_start();
 require_once 'Database.php';
 require_once 'model/functions.php';
-require_once 'auth.php'; 
+require_once 'auth.php';
 
 $db = new Database();
 $conn = $db->connect();
 
 $update_mode = false;
 $edit_data = [
-    'id' => '', 'ma_code' => '', 'mo_ta' => '', 
-    'phan_tram_giam' => 0, 'so_tien_giam' => 0, 
-    'don_hang_toi_thieu' => 0, 'giam_toi_da' => 0,
-    'gioi_han_su_dung' => 0, 'da_su_dung' => 0
+    'id' => '',
+    'ma_code' => '',
+    'mo_ta' => '',
+    'phan_tram_giam' => 0,
+    'so_tien_giam' => 0,
+    'don_hang_toi_thieu' => 0,
+    'giam_toi_da' => 0,
+    'gioi_han_su_dung' => 0,
+    'da_su_dung' => 0
 ];
 
 // ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
@@ -63,7 +68,7 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-$list = getAllDiscounts($conn); 
+$list = getAllDiscounts($conn);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -151,7 +156,7 @@ $list = getAllDiscounts($conn);
         <aside class="sidebar">
             <h4 class="text-center">ADMIN</h4>
             <ul>
-               <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>             
+                <li><a href="CRUDproduct.php">📋 Quản lý sản phẩm</a></li>
                 <li><a href="CRUDuser.php">👤Quản lý khách hàng </a></li>
                 <li><a href="CRUDdonhang.php">👤 Quản lý đơn hàng </a></li>
                 <li><a href="CRUDgiamgia.php">👤 Quản lý mã giảm giá </a></li>
@@ -165,73 +170,111 @@ $list = getAllDiscounts($conn);
 
             <div class="card shadow-lg border-0">
 
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Quản lý mã giảm giá</h4>
-
-                    <a href="frmthem.php" class="btn btn-light fw-semibold">
-                        ➕ Thêm mã giảm giá
-                    </a>
-                </div>
-
-                <div class="card-body">
-
-                    <div class="table-responsive">
-
-                        <table class="table table-hover align-middle text-center">
-
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Mã Code</th>
-                                    <th>Mô tả</th>
-                                     <th>Phần trăm giảm</th>
-                                    <th>Số tiền giảm</th>
-                                    <th>Đơn hàng tối thiểu</th>
-                                    <th>Giảm tối đa</th>
-                                    <th>Giới hạn sử dụng</th>
-                                    <th>Đã sử dụng</th>
-                                    <th width="180">Hành động</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                <?php foreach ($list as $giamgia) { ?>
-                                    <tr>
-                                        <td><?= $giamgia['id'] ?></td>
-                                        <td><?= $giamgia['ma_code'] ?></td>
-                                        <td><?= $giamgia['mo_ta'] ?></td>
-                                            <td><?= $giamgia['so_tien_giam'] ?></td>                                    
-                                        <td><?= $giamgia['phan_tram_giam'] ?></td>
-                                        <td><?= $giamgia['giam_toi_da'] ?></td>
-                                           <td><?= $giamgia['don_hang_toi_thieu'] ?></td>                                      
-                                        <td><?= $giamgia['gioi_han_su_dung'] ?></td>
-                                        <td><?= $giamgia['da_su_dung'] ?></td>
-                                        <td>
-                                            <a href="Update.php?id=<?= $giamgia['id'] ?>" class="btn btn-warning btn-sm">
-                                                Sửa
-                                            </a>
-
-                                            <a onclick="return confirm('Xóa sản phẩm <?= $giamgia['id'] ?> ?')"
-                                                href="Delete.php?id=<?= $giamgia['id'] ?>"
-                                                class="btn btn-danger btn-sm">
-                                                Xóa
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
-
-                            </tbody>
-
-                        </table>
-
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><?= $update_mode ? "⚡ Cập nhật mã: " . $edit_data['ma_code'] : "➕ Thêm mã giảm giá mới" ?></h5>
                     </div>
+                    <div class="card-body">
+                        <form method="POST" class="row g-3">
+                            <input type="hidden" name="id" value="<?= $edit_data['id'] ?>">
 
-                </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Mã Code</label>
+                                <input type="text" name="ma_code" class="form-control" value="<?= $edit_data['ma_code'] ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Mô tả</label>
+                                <input type="text" name="mo_ta" class="form-control" value="<?= $edit_data['mo_ta'] ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Giới hạn sử dụng</label>
+                                <input type="number" name="gioi_han_su_dung" class="form-control" value="<?= $edit_data['gioi_han_su_dung'] ?>">
+                            </div>
 
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Phần trăm giảm (%)</label>
+                                <input type="number" name="phan_tram_giam" class="form-control" value="<?= $edit_data['phan_tram_giam'] ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Giảm tối đa (đ)</label>
+                                <input type="number" name="giam_toi_da" class="form-control" value="<?= $edit_data['giam_toi_da'] ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Số tiền giảm cố định (đ)</label>
+                                <input type="number" name="so_tien_giam" class="form-control" value="<?= $edit_data['so_tien_giam'] ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Đơn tối thiểu (đ)</label>
+                                <input type="number" name="don_hang_toi_thieu" class="form-control" value="<?= $edit_data['don_hang_toi_thieu'] ?>">
+                            </div>
+
+                            <div class="col-12 text-end">
+                                <?php if ($update_mode): ?>
+                                    <button name="save_discount" class="btn btn-warning">Cập nhật</button>
+                                    <a href="CRUDgiamgia.php" class="btn btn-secondary">Hủy</a>
+                                <?php else: ?>
+                                    <button name="save_discount" class="btn btn-success">Thêm mới</button>
+                                <?php endif; ?>
+                            </div>
+                        </form>
+                    </div>
             </div>
 
+            <table class="table table-hover align-middle text-center">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Mã Code</th>
+                        <th>Mô tả</th>
+                        <th>Phần trăm giảm</th>
+                        <th>Số tiền giảm</th>
+                        <th>Đơn hàng tối thiểu</th>
+                        <th>Giảm tối đa</th>
+                        <th>Giới hạn sử dụng</th>
+                        <th>Đã sử dụng</th>
+                        <th width="180">Hành động</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <?php foreach ($list as $giamgia) { ?>
+                        <tr>
+                            <td><?= $giamgia['id'] ?></td>
+                            <td><?= $giamgia['ma_code'] ?></td>
+                            <td><?= $giamgia['mo_ta'] ?></td>
+                            <td><?= $giamgia['so_tien_giam'] ?></td>
+                            <td><?= $giamgia['phan_tram_giam'] ?></td>
+                            <td><?= $giamgia['giam_toi_da'] ?></td>
+                            <td><?= $giamgia['don_hang_toi_thieu'] ?></td>
+                            <td><?= $giamgia['gioi_han_su_dung'] ?></td>
+                            <td><?= $giamgia['da_su_dung'] ?></td>
+                            <td>
+                                <a href="Update.php?id=<?= $giamgia['id'] ?>" class="btn btn-warning btn-sm">
+                                    Sửa
+                                </a>
+
+                                <a onclick="return confirm('Xóa sản phẩm <?= $giamgia['id'] ?> ?')"
+                                    href="Delete.php?id=<?= $giamgia['id'] ?>"
+                                    class="btn btn-danger btn-sm">
+                                    Xóa
+                                </a>
+                            </td>
+                        </tr>
+                    <?php } ?>
+
+                </tbody>
+
+            </table>
+
         </div>
+
+    </div>
+
+    </div>
+
+    </div>
 
     </div>
 
