@@ -83,11 +83,39 @@ $listusers = getAllUsers($conn);
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
     <style>
-        .layout { display: flex; min-height: 100vh; }
-        .sidebar { width: 240px; background: #111827; color: #fff; padding: 20px; }
-        .sidebar a { display: block; padding: 10px; color: #d1d5db; text-decoration: none; }
-        .sidebar a:hover { background: #1f2937; color: #fff; }
-        .main-content { flex: 1; padding: 30px; background: #f4f6f9; }
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 56px);
+        }
+
+        .sidebar {
+            width: 240px;
+            background: #111827;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            color: #d1d5db;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: #1f2937;
+            color: #fff;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
     </style>
 </head>
 
