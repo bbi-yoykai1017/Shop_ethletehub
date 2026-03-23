@@ -199,7 +199,7 @@ $listusers = getAllUsers($conn);
     <div class="layout">
 
         <aside class="sidebar">
-            <h4 class="text-center mb-4 d-none d-lg-block">DASHBOARD</h4>
+            
             <ul>
                 <li><a href="CRUDproduct.php"><i class="fas fa-box me-2"></i> Sản phẩm</a></li>
                 <li><a href="CRUDuser.php" class="active"><i class="fas fa-users me-2"></i> Khách hàng</a></li>
