@@ -495,5 +495,12 @@ function getAllProducts($conn) {
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+} 
+// lay danh sach giam gia
+function getAllDiscounts($conn) {
+    $sql = "SELECT * FROM giam_gia WHERE trang_thai = 1 ORDER BY id ASC";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
