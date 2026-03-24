@@ -113,7 +113,7 @@ $displayProducts = array_slice($products, 0, 6);
                                     <?php if (isset($_SESSION['user_name'])): ?>
                                         <div class="user-logged-in d-flex align-items-center">
                                             <span class="welcome-text text-nowrap me-2" style="color: white;">
-                                                Xin chào, <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                                             <?php echo htmlspecialchars($_SESSION['user_name']); ?>
                                             </span>
 
                                             <a href="logout.php" class="btn btn-sm btn-outline-primary text-nowrap">
