@@ -72,7 +72,7 @@ $conn = $db->connect();
         </div>
     </div>
 
-    CART SECTION
+    <!-- CART SECTION -->
     <section class="cart-section">
         <div class="container-custom">
             <div class="row">
