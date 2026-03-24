@@ -337,12 +337,7 @@ function getProductsByCategory($conn, $categoryId) {
     }, $products);
 }
 
-function getAllUsers($conn) {
-    $sql = "SELECT id, ten, email, so_dien_thoai, vai_tro FROM nguoi_dung";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+
 
 function getUserById($conn, $id) {
     $sql = "SELECT id, ten, email, so_dien_thoai, dia_chi, anh_dai_dien, vai_tro, trang_thai, ngay_tao 
