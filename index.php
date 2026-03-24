@@ -45,7 +45,7 @@ $displayProducts = array_slice($products, 0, 6);
          NAVBAR MỚI
          ======================== -->
     <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container-fluid px-4">
+        <div class="container px-4">
             <div class="row">
                 <div class="col-12">
                     <!-- Logo & Brand -->
