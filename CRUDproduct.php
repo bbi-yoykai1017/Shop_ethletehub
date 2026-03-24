@@ -3,6 +3,7 @@ session_start();
 require_once 'Database.php';
 require_once 'model/CRUD.php';
 require_once 'auth.php';
+// Truy vấn lấy ID và Tên danh mục
 
 $db = new Database();
 $conn = $db->connect();
@@ -21,7 +22,12 @@ $edit_product = [
     'so_luong_danh_gia' => 0,
     'hinh_anh_chinh' => ''
 ];
-
+// Truy vấn lấy ID và Tên danh mục
+$sql_dm = "SELECT id, ten_danh_muc FROM danh_muc"; 
+/** @var PDOStatement $stmt_dm */
+$stmt_dm = $conn->prepare($sql_dm); 
+$stmt_dm->execute();
+$list_danhmuc = $stmt_dm->fetchAll(PDO::FETCH_ASSOC);
 // ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA (Sửa Link ở dưới thành ?edit=) =================
 if (isset($_GET['edit'])) {
     $id = $_GET['edit'];
@@ -162,12 +168,16 @@ $listproduct = getAllProducts($conn);
                     <form method="POST" class="row g-3" enctype="multipart/form-data">
                         <input type="hidden" name="id" value="<?= $edit_product['id'] ?>">
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Danh mục</label>
-                            <select name="danh_muc_id" class="form-control" required>
+                            <label class="form-label fw-bold">Danh mục sản phẩm</label>
+                            <select name="danh_muc_id" class="form-select" required>
                                 <option value="">-- Chọn danh mục --</option>
-                                <?php foreach ($danh_muc_list as $dm): ?>
-                                    <option value="<?= $dm['id'] ?>" <?= $edit_product['danh_muc_id'] == $dm['id'] ? 'selected' : '' ?>>
-                                        <?= $dm['ten'] ?>
+
+                                <?php foreach ($list_danhmuc as $dm): ?>
+                                    <option value="<?= $dm['id'] ?>"
+                                        <?= ($update_mode && $edit_product['danh_muc_id'] == $dm['id']) ? 'selected' : '' ?>>
+
+                                        <?= htmlspecialchars($dm['ten_danh_muc']) ?>
+
                                     </option>
                                 <?php endforeach; ?>
                             </select>
