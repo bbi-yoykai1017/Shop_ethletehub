@@ -1,7 +1,7 @@
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-require_once 'model/functions.php';
+require_once 'model/detail.php';
 require_once 'Database.php';
 
 $db = new Database();
