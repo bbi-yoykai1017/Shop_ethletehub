@@ -29,11 +29,11 @@ function loadCart() {
     cartItemsList.innerHTML = cart.map((item, index) => `
         <div class="cart-item">
             <div class="cart-item-image">
-                <img src="${item.image || 'https://via.placeholder.com/80?text=Product'}" alt="${item.name}">
+                <img src="${item.hinh_anh_chinh}" alt="${item.id}">
             </div>
             <div class="cart-item-info">
-                <h4>${item.name}</h4>
-                <p>${item.category || 'Sản phẩm'}</p>
+                <h4>${item.ten}</h4>
+                <p>${item. || 'Sản phẩm'}</p>
                 <div class="cart-item-price">${formatPrice(item.price)}</div>
             </div>
             <div class="cart-item-details">

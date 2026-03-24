@@ -1,3 +1,14 @@
+<?php
+require_once 'Database.php';
+require_once 'cart.php';
+
+$db= new Database();
+$conn = $db->connect();
+
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -30,13 +41,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">Trang chủ</a>
+                        <a class="nav-link" href="index.php">Trang chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="products.html">Sản phẩm</a>
+                        <a class="nav-link" href="products.php">Sản phẩm</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#categories">Danh mục</a>
+                        <a class="nav-link" href="index.php#categories">Danh mục</a>
                     </li>
                 </ul>
                 
