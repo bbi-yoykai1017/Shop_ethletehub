@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once 'Database.php';
-require_once 'model/functions.php';
+require_once 'model/CRUD.php';
 require_once 'auth.php';
 
 $db = new Database();

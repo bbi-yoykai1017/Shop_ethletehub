@@ -1,7 +1,8 @@
 <?php
+session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-require_once 'model/functions.php';
+require_once 'model/detail.php';
 require_once 'Database.php';
 
 $db = new Database();
@@ -159,8 +160,42 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                         <span class="cart-count">0</span>
                     </div>
 
-                    <div class="user-account">
-                        <i class="fas fa-user-circle"></i>
+                    <div class="user-account-wrapper d-flex align-items-center">
+                        <div class="user-action-dropdown dropdown">
+                            <a href="#" class="user-icon-link me-2 text-decoration-none dropdown-toggle"
+                                id="userMenu" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">
+                                <i class="fas fa-user-circle fa-lg"></i>
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                <?php if (isset($_SESSION['user_name'])): ?>
+                                    <li>
+                                        <h6 class="dropdown-header"> <?php echo htmlspecialchars($_SESSION['user_name']); ?></h6>
+                                    </li>
+                                    <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-edit me-2"></i> Hồ sơ của tôi</a></li>
+                                    <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i> Đơn hàng đã mua</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="logout.php">
+                                            <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                                        </a>
+                                    </li>
+                                <?php else: ?>
+                                    <li>
+                                        <a class="dropdown-item" href="login.php">
+                                            <i class="fas fa-sign-in-alt me-2"></i> Đăng nhập
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="register.php">
+                                            <i class="fas fa-user-plus me-2"></i> Đăng ký
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -450,7 +485,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                     <div class="rating-breakdown">
                                         <?php for ($i = 5; $i >= 1; $i--):
                                             $dist = $ratingSummary['rating_distribution'][$i] ?? ['count' => 0, 'percentage' => 0];
-                                            ?>
+                                        ?>
                                             <div class="rating-bar">
                                                 <span class="rating-label"><?php echo $i; ?> <i
                                                         class="fas fa-star"></i></span>

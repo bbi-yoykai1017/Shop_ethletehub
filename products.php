@@ -1,6 +1,9 @@
 <?php
+session_start();
 require_once "Database.php";
 require_once 'model/functions.php';
+require_once 'model/detail.php';
+
 $db = new Database();
 $conn = $db->connect();
 $items = getallproduct($conn);
@@ -25,8 +28,8 @@ $items = getallproduct($conn);
 
 <body>
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-custom"> 
-    <div class="container-custom">
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-custom">
             <a class="navbar-brand" href="index.php">
                 <i class="fas fa-dumbbell"></i>
                 AthleteHub
@@ -64,19 +67,46 @@ $items = getallproduct($conn);
                     <div class="cart-icon">
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count">0</span>
-                    </div>
+                    </div>                  
+                    <div class="user-account-wrapper d-flex align-items-center">
+                        <div class="user-action-dropdown dropdown">
+                            <a href="#" class="user-icon-link me-2 text-decoration-none dropdown-toggle"
+                                id="userMenu" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">
+                                <i class="fas fa-user-circle fa-lg"></i>
+                            </a>
 
-                    <div class="user-account">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
-                    <div class="user-login">
-                        <a href="login.php" class="btn btn-sm btn-primary-custom text-nowrap">
-                            <i class="fas fa-sign-in-alt"></i> Đăng nhập
-                        </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                <?php if (isset($_SESSION['user_name'])): ?>
+                                    <li>
+                                        <h6 class="dropdown-header"> <?php echo htmlspecialchars($_SESSION['user_name']); ?></h6>
+                                    </li>
+                                    <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-edit me-2"></i> Hồ sơ của tôi</a></li>
+                                    <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i> Đơn hàng đã mua</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="logout.php">
+                                            <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                                        </a>
+                                    </li>
+                                <?php else: ?>
+                                    <li>
+                                        <a class="dropdown-item" href="login.php">
+                                            <i class="fas fa-sign-in-alt me-2"></i> Đăng nhập
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="register.php">
+                                            <i class="fas fa-user-plus me-2"></i> Đăng ký
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     </nav>
 
     <!-- PAGE HEADER -->
