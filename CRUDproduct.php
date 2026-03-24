@@ -11,10 +11,12 @@ $update_mode = false;
 
 $edit_product = [
     'id' => '',
+    'danh_muc_id' => '',
     'ten' => '',
     'mo_ta' => '',
     'gia' => '',
     'gia_goc' => '',
+    'phan_tram_giam' => 0,
     'trung_binh_sao' => 0,
     'so_luong_danh_gia' => 0,
     'hinh_anh_chinh' => ''
@@ -35,23 +37,39 @@ if (isset($_GET['edit'])) {
 
 // ================= 2. XỬ LÝ THÊM HOẶC CẬP NHẬT =================
 if (isset($_POST['save_product'])) {
+    $danh_muc_id = $_POST['danh_muc_id'];
     $ten = $_POST['ten'];
     $mo_ta = $_POST['mo_ta'];
     $gia = $_POST['gia'];
     $gia_goc = $_POST['gia_goc'];
+    $phan_tram_giam = $_POST['phan_tram_giam'];
     $sao = $_POST['trung_binh_sao'];
     $danh_gia = $_POST['so_luong_danh_gia'];
-    $hinh_anh = $_POST['hinh_anh_chinh'];
+
+
+    // Xử lý Upload Ảnh
+    $hinh_anh = $_POST['hinh_anh_cu'] ?? ''; // Mặc định dùng ảnh cũ nếu có
+
+    if (isset($_FILES['hinh_anh_upload']) && $_FILES['hinh_anh_upload']['error'] == 0) {
+        $target_dir = "public/";
+        // Tạo tên file duy nhất để tránh trùng lặp: ví dụ 164812345_ten-anh.jpg
+        $file_name = basename($_FILES["hinh_anh_upload"]["name"]);
+        $target_file = $target_dir . $file_name;
+
+        if (move_uploaded_file($_FILES["hinh_anh_upload"]["tmp_name"], $target_file)) {
+            $hinh_anh = $file_name; // Gán tên file mới để lưu vào DB
+        }
+    }
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
         $id = $_POST['id'];
-        $sql = "UPDATE san_pham SET ten=?, mo_ta=?, gia=?, gia_goc=?, trung_binh_sao=?, so_luong_danh_gia=?, hinh_anh_chinh=? WHERE id=?";
+        $sql = "UPDATE san_pham SET danh_muc_id=?, ten=?, mo_ta=?, gia=?, gia_goc=?, phan_tram_giam=?, trung_binh_sao=?, so_luong_danh_gia=?, hinh_anh_chinh=? WHERE id=?";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$ten, $mo_ta, $gia, $gia_goc, $sao, $danh_gia, $hinh_anh, $id]);
+        $stmt->execute([$danh_muc_id, $ten, $mo_ta, $gia, $gia_goc, $phan_tram_giam, $sao, $danh_gia, $hinh_anh, $id]);
     } else {
-        $sql = "INSERT INTO san_pham (ten, mo_ta, gia, gia_goc, trung_binh_sao, so_luong_danh_gia, hinh_anh_chinh) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO san_pham (danh_muc_id, ten, mo_ta, gia, gia_goc, phan_tram_giam, trung_binh_sao, so_luong_danh_gia, hinh_anh_chinh) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$ten, $mo_ta, $gia, $gia_goc, $sao, $danh_gia, $hinh_anh]);
+        $stmt->execute([$danh_muc_id, $ten, $mo_ta, $gia, $gia_goc, $phan_tram_giam, $sao, $danh_gia, $hinh_anh]);
     }
     header("Location: CRUDproduct.php");
     exit;
@@ -141,8 +159,19 @@ $listproduct = getAllProducts($conn);
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST" class="row g-3">
+                    <form method="POST" class="row g-3" enctype="multipart/form-data">
                         <input type="hidden" name="id" value="<?= $edit_product['id'] ?>">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Danh mục</label>
+                            <select name="danh_muc_id" class="form-control" required>
+                                <option value="">-- Chọn danh mục --</option>
+                                <?php foreach ($danh_muc_list as $dm): ?>
+                                    <option value="<?= $dm['id'] ?>" <?= $edit_product['danh_muc_id'] == $dm['id'] ? 'selected' : '' ?>>
+                                        <?= $dm['ten'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Tên sản phẩm</label>
                             <input type="text" name="ten" class="form-control" value="<?= $edit_product['ten'] ?>" required>
@@ -160,6 +189,10 @@ $listproduct = getAllProducts($conn);
                             <input type="number" name="gia_goc" class="form-control" value="<?= $edit_product['gia_goc'] ?>">
                         </div>
                         <div class="col-md-2">
+                            <label class="form-label fw-bold">Phần trăm giảm</label>
+                            <input type="number" step="0.1" name="phan_tram_giam" class="form-control" value="<?= $edit_product['phan_tram_giam'] ?>">
+                        </div>
+                        <div class="col-md-2">
                             <label class="form-label fw-bold">Sao (1-5)</label>
                             <input type="number" step="0.1" name="trung_binh_sao" class="form-control" value="<?= $edit_product['trung_binh_sao'] ?>">
                         </div>
@@ -167,9 +200,13 @@ $listproduct = getAllProducts($conn);
                             <label class="form-label fw-bold">Lượt đánh giá</label>
                             <input type="number" name="so_luong_danh_gia" class="form-control" value="<?= $edit_product['so_luong_danh_gia'] ?>">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Tên file ảnh</label>
-                            <input type="text" name="hinh_anh_chinh" class="form-control" value="<?= $edit_product['hinh_anh_chinh'] ?>" placeholder="hinh1.jpg">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Hình ảnh sản phẩm</label>
+                            <input type="file" name="hinh_anh_upload" class="form-control" accept="image/*">
+                            <?php if ($update_mode && !empty($edit_product['hinh_anh_chinh'])): ?>
+                                <small class="text-muted">Ảnh hiện tại: <?= $edit_product['hinh_anh_chinh'] ?></small>
+                                <input type="hidden" name="hinh_anh_cu" value="<?= $edit_product['hinh_anh_chinh'] ?>">
+                            <?php endif; ?>
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
                             <?php if ($update_mode): ?>
@@ -189,10 +226,12 @@ $listproduct = getAllProducts($conn);
                     <thead class="table-dark">
                         <tr>
                             <th>ID</th>
+                            <th>Danh mục</th>
                             <th>Tên sản phẩm</th>
                             <th>Mô tả</th>
                             <th>Giá bán</th>
                             <th>Giá gốc</th>
+                            <th>Phần trăm giảm</th>
                             <th>Trung bình sao</th>
                             <th>Số lượng đánh giá</th>
                             <th>Hình ảnh</th>
@@ -205,19 +244,18 @@ $listproduct = getAllProducts($conn);
                         <?php foreach ($listproduct as $product) { ?>
                             <tr>
                                 <td><?= $product['id'] ?></td>
+                                <td><?= $product['danh_muc_id'] ?></td>
                                 <td><?= $product['ten'] ?></td>
                                 <td><?= $product['mo_ta'] ?></td>
                                 <td><?= $product['gia'] ?></td>
                                 <td><?= $product['gia_goc'] ?></td>
+                                <td><?= $product['phan_tram_giam'] ?></td>
                                 <td><?= $product['trung_binh_sao'] ?></td>
                                 <td><?= $product['so_luong_danh_gia'] ?></td>
                                 <td>
                                     <img src="./public/<?php echo htmlspecialchars($product['hinh_anh_chinh']); ?>"
                                         alt="<?= $product['ten'] ?>" width="80" height="80">
                                 </td>
-
-
-
                                 <td>
                                     <a href="?edit=<?= $product['id'] ?>" class="btn btn-sm btn-outline-warning">Sửa</a>
                                     <a href="?delete=<?= $product['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa sản phẩm này?')">Xóa</a>
