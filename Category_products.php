@@ -25,9 +25,9 @@ $categoryMap = [
 if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
     // Gọi hàm lấy sản phẩm theo danh mục
     $products = getProductsByCategory($conn, $id_danhmuc);
-    
+
     // Xử lý sản phẩm
-    $products = array_map(function($p) use ($categoryMap, $id_danhmuc) {
+    $products = array_map(function ($p) use ($categoryMap, $id_danhmuc) {
         // Giữ nguyên các trường từ DB
         $p['name'] = $p['ten'];
         $p['category'] = $categoryMap[$id_danhmuc]['key'];
@@ -35,16 +35,16 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
         $p['rating'] = floatval($p['trung_binh_sao']);
         $p['originalPrice'] = floatval($p['gia_goc']);
         $p['price'] = floatval($p['gia']);
-        
+
         // Tính discount
         $p['discount'] = 0;
         if ($p['originalPrice'] > $p['price'] && $p['originalPrice'] > 0) {
             $p['discount'] = round((($p['originalPrice'] - $p['price']) / $p['originalPrice']) * 100);
         }
-        
+
         return $p;
     }, $products);
-    
+
     $categoryName = $categoryMap[$id_danhmuc]['name'];
     $categoryKey = $categoryMap[$id_danhmuc]['key'];
 } else {
@@ -71,7 +71,7 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
-<link rel="stylesheet" href="css/products-page.css">
+    <link rel="stylesheet" href="css/products-page.css">
     <link rel="stylesheet" href="css/products.css">
     <link rel="stylesheet" href="css/product-detail.css">
 </head>
@@ -130,12 +130,45 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
                         <span class="cart-count">0</span>
                     </div>
 
-                    <div class="user-account">
-                        <i class="fas fa-user-circle"></i>
+                    <div class="user-account-wrapper d-flex align-items-center">
+                        <div class="user-action-dropdown dropdown">
+                            <a href="#" class="user-icon-link me-2 text-decoration-none dropdown-toggle"
+                                id="userMenu" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">
+                                <i class="fas fa-user-circle fa-lg"></i>
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                <?php if (isset($_SESSION['user_name'])): ?>
+                                    <li>
+                                        <h6 class="dropdown-header"> <?php echo htmlspecialchars($_SESSION['user_name']); ?></h6>
+                                    </li>
+                                    <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-edit me-2"></i> Hồ sơ của tôi</a></li>
+                                    <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i> Đơn hàng đã mua</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="logout.php">
+                                            <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                                        </a>
+                                    </li>
+                                <?php else: ?>
+                                    <li>
+                                        <a class="dropdown-item" href="login.php">
+                                            <i class="fas fa-sign-in-alt me-2"></i> Đăng nhập
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="register.php">
+                                            <i class="fas fa-user-plus me-2"></i> Đăng ký
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     </nav>
 
     <!-- PAGE HEADER -->
@@ -364,7 +397,7 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
                                         <span class="stock-status in-stock">Còn hàng</span>
 
                                         <div class="product-actions">
-<button class="product-btn btn-add-cart" onclick="addToCart(<?php echo $product['id']; ?>)">
+                                            <button class="product-btn btn-add-cart" onclick="addToCart(<?php echo $product['id']; ?>)">
                                                 <i class="fas fa-shopping-cart"></i> Thêm
                                             </button>
                                             <button class="btn-buy-now-detail" onclick="window.location.href='ThanhToan.php?id=<?php echo $product['id']; ?>'">
@@ -523,11 +556,10 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
     <script>
         window.allProducts = <?php echo json_encode($products, JSON_UNESCAPED_UNICODE); ?>;
     </script>
-    
+
     <!-- Custom JS -->
     <script src="js/script.js"></script>
     <script src="js/category-products.js"></script>
 </body>
 
 </html>
-
