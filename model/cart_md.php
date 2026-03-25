@@ -34,8 +34,8 @@ class Cart
 
         foreach ($_SESSION[$this->sessionKey] as $item) { // san pham ton tai tang so luong
             if ($item['id'] === $id) {
-                $item['quantity'] += (int) ($product['quantity'] ?? 1);
-                return $item;
+                $item['quantity'] += (int)($product['quantity'] ?? 1);
+                return;
             }
         }
 
@@ -49,6 +49,20 @@ class Cart
             'danh_muc' => htmlspecialchars(trim($product['danh_muc'] ?? 'Sản phẩm')),
             'quantity' => max(1, (int) ($product['quantity'] ?? 1)),
         ];
+    }
+
+    // cap nhat so luong
+    public function updateQuantity(int $productId, int $qty) {
+        if ($qty < 0) {
+            $this->removeItem($productId);
+            return;
+        }
+        foreach ($_SESSION[$this->sessionKey] as $item) {
+            if ($item['id'] === $productId) {
+                $item['quantity'] = $qty;
+                return;
+            }
+        }
     }
 
 }
