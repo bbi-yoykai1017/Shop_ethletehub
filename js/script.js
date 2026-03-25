@@ -34,8 +34,6 @@ document.addEventListener('click', function (e) {
         const card = btnAddCart.closest('.product-card');
         if (!card) return;
  
-        // Đọc thông tin sản phẩm từ data-* attributes của .product-card
-        // HTML cần có: data-id, data-ten, data-price, data-hinh-anh, data-danh-muc
         const product = {
             id:             parseInt(card.dataset.productId || card.dataset.id || 0),
             ten:            card.dataset.ten  || card.querySelector('.product-name')?.textContent?.trim() || 'Sản phẩm',
