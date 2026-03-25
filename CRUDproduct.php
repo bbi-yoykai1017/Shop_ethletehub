@@ -23,7 +23,7 @@ $edit_product = [
     'hinh_anh_chinh' => ''
 ];
 // Truy vấn lấy ID và Tên danh mục
-$sql_dm = "SELECT id, ten_danh_muc FROM danh_muc"; 
+$sql_dm = "SELECT id, ten_danh_muc FROM danh_muc ORDER BY ten_danh_muc ASC";
 /** @var PDOStatement $stmt_dm */
 $stmt_dm = $conn->prepare($sql_dm); 
 $stmt_dm->execute();
@@ -54,12 +54,12 @@ if (isset($_POST['save_product'])) {
 
 
     // Xử lý Upload Ảnh
-    $hinh_anh = $_POST['hinh_anh_cu'] ?? ''; // Mặc định dùng ảnh cũ nếu có
+    $hinh_anh = $_POST['hinh_anh_cu'] ?? ''; 
 
     if (isset($_FILES['hinh_anh_upload']) && $_FILES['hinh_anh_upload']['error'] == 0) {
         $target_dir = "public/";
         // Tạo tên file duy nhất để tránh trùng lặp: ví dụ 164812345_ten-anh.jpg
-        $file_name = basename($_FILES["hinh_anh_upload"]["name"]);
+        $file_name = time() . '_' . basename($_FILES["hinh_anh_upload"]["name"]);
         $target_file = $target_dir . $file_name;
 
         if (move_uploaded_file($_FILES["hinh_anh_upload"]["tmp_name"], $target_file)) {
@@ -171,11 +171,9 @@ $listproduct = getAllProducts($conn);
                             <label class="form-label fw-bold">Danh mục sản phẩm</label>
                             <select name="danh_muc_id" class="form-select" required>
                                 <option value="">-- Chọn danh mục --</option>
-
                                 <?php foreach ($list_danhmuc as $dm): ?>
                                     <option value="<?= $dm['id'] ?>"
                                         <?= ($update_mode && $edit_product['danh_muc_id'] == $dm['id']) ? 'selected' : '' ?>>
-
                                         <?= htmlspecialchars($dm['ten_danh_muc']) ?>
 
                                     </option>
