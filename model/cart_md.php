@@ -76,5 +76,10 @@ class Cart
         $this->clearDiscount();
     }
 
+    // logic tinh toan
+
+    public function getTotalQuantity() {
+        return array_sum(array_column($this->getItem(), 'quantity'));
+    }
 }
 ?>
