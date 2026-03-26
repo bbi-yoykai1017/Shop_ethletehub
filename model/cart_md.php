@@ -65,5 +65,16 @@ class Cart
         }
     }
 
+    public function removeItem( int $productId) {
+        $_SESSION[$this->sessionKey] = array_values( // reset lai key cua mang thanh 0,1,2...
+            array_filter($_SESSION[$this->sessionKey],fn($i) => $i['id'] !== $productId) // loc bo phan tu co id = idproduct 
+        );
+    }
+
+    public function clearCart() {
+        $_SESSION[$this->sessionKey] = [];
+        $this->clearDiscount();
+    }
+
 }
 ?>
