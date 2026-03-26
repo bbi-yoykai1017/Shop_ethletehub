@@ -19,7 +19,7 @@ class Cart
             $_SESSION[$this->sessionKey] = []; // neu chua co gio hang thi tao mang rong
     }
 
-    // _________________CRUD_______________
+    // _________________CRUD_________________
 
     public function getItem()
     { // lay danh sach san pham
@@ -45,7 +45,7 @@ class Cart
             'id' => $id,
             'ten' => htmlspecialchars(trim($product['ten'] ?? 'Sản phẩm')),
             'price' => max(0, (float) ($product['price'] ?? 0)),
-            'hinh_anh_chinh' => $product['hinh_anh_chinh'] ?? 'images/placeholder.jpg',
+            'hinh_anh_chinh' => $product['hinh_anh_chinh'] ?? 'public/placeholder.jpg',
             'danh_muc' => htmlspecialchars(trim($product['danh_muc'] ?? 'Sản phẩm')),
             'quantity' => max(1, (int) ($product['quantity'] ?? 1)),
         ];
