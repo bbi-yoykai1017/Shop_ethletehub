@@ -339,9 +339,9 @@ $displayProducts = array_slice($products, 0, 6);
                                 <?php if (!empty($product['image'])): ?>
                                     <img src="./public/<?php echo htmlspecialchars($product['image']); ?>"
                                         alt="<?php echo htmlspecialchars($product['name']); ?>"
-                                        onerror="this.src='images/placeholder.svg'; this.style.display='block';">
+                                        onerror="this.src='public/placeholder.svg'; this.style.display='block';">
                                 <?php else: ?>
-                                    <img src="images/placeholder.svg" alt="No image">
+                                    <img src="public/placeholder.svg" alt="No image">
                                 <?php endif; ?>
                             </a>
 
