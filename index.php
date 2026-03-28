@@ -378,7 +378,7 @@ $displayProducts = array_slice($products, 0, 6);
                             <span class="stock-status in-stock">Còn hàng</span>
 
                             <div class="product-actions">
-                                <button class="product-btn btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
+                                <button class="product-btn btn-add-cart" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                     <i class="fas fa-shopping-cart"></i> Thêm
                                 </button>
                                 <button class="btn-buy-now-detail" onclick="window.location.href='ThanhToan.php?id=<?php echo $product['id']; ?>'">
