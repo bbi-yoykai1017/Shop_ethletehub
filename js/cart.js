@@ -130,14 +130,14 @@ function loadCart() {
             const cart = data.cart;
             cartItemsList.innerHTML = cart.map((item, index) => {
                 // Fix image path - thêm public/ nếu cần
-                let imagePath = item.image || 'images/placeholder.svg';
+                let imagePath = item.image || 'public/placeholder.svg';
                 if (!imagePath.startsWith('./') && !imagePath.startsWith('/') && !imagePath.includes('data:')) {
                     imagePath = './public/' + imagePath;
                 }
                 return `
                 <div class="cart-item" id="item-${item.id}">
                     <div class="cart-item-image">
-                        <img src="${imagePath}" alt="${item.name}" onerror="this.src='images/placeholder.svg'">
+                        <img src="${imagePath}" alt="${item.name}" onerror="this.src='public/placeholder.svg'">
                     </div>
                     <div class="cart-item-info">
                         <h4>${item.name}</h4>

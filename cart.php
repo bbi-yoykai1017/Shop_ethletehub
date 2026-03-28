@@ -108,11 +108,10 @@ function formatPrice($price) {
                                 <div class="cart-item-image">
                                     <img src="<?= htmlspecialchars($item['image']) ?>"
                                          alt="<?= htmlspecialchars($item['name']) ?>"
-                                         onerror="this.src='images/placeholder.jpg'">
+                                         onerror="this.src='public/placeholder.svg'">
                                 </div>
                                 <div class="cart-item-info">
                                     <h4><?= htmlspecialchars($item['name']) ?></h4>
-                                    <p><?= htmlspecialchars($item['danh_muc'] ?? 'Danh mục') ?></p>
                                     <div class="cart-item-price"><?= formatPrice($item['price']) ?></div>
                                 </div>
                                 <div class="cart-item-details">

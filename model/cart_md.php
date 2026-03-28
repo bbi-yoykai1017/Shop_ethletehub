@@ -41,7 +41,7 @@ class Cart
             'id'             => $id,
             'ten'            => htmlspecialchars(trim($product['ten']    ?? 'Sản phẩm')),
             'price'          => max(0, (float)($product['price']         ?? 0)),
-            'hinh_anh_chinh' => $product['hinh_anh_chinh']               ?? 'images/placeholder.jpg',
+            'hinh_anh_chinh' => $product['hinh_anh_chinh']               ?? 'public/placeholder.svg',
             'danh_muc'       => htmlspecialchars(trim($product['danh_muc'] ?? 'Sản phẩm')),
             'quantity'       => max(1, (int)($product['quantity']         ?? 1)),
         ];
