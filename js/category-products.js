@@ -266,32 +266,48 @@ function getDiscountBadge(product) {
 }
 
 function addToCart(productId) {
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) return;
-
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-    const cartItem = {
-        id: product.id,
-        name: product.ten,
-        price: product.gia,
-        quantity: 1,
-        image: product.hinh_anh_chinh
-    };
-
-    cart.push(cartItem);
-    localStorage.setItem('cart', JSON.stringify(cart));
-
-    updateCartCount();
-    showNotification(`${product.ten} đã được thêm vào giỏ hàng!`, 'success');
+    if (typeof addToCart_API === 'function') {
+        // Gọi hàm từ cart.js nếu có
+        addToCart_API(productId, 1);
+    } else {
+        // Fallback: gọi API cart trực tiếp
+        fetch('api/cart.php?action=add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: 1
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+            } else {
+                showNotification(data.message || 'Lỗi khi thêm sản phẩm', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+            showNotification('Lỗi kết nối server', 'danger');
+        });
+    }
 }
 
 function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartCount = document.querySelector('.cart-count');
-    if (cartCount) {
-        cartCount.textContent = cart.length;
-    }
+    fetch('api/cart.php?action=get')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const cartCount = document.querySelector('.cart-count');
+                if (cartCount) {
+                    cartCount.textContent = data.cart_count || 0;
+                }
+            }
+        })
+        .catch(error => console.error('Lỗi cập nhật cart count:', error));
 }
 
 function showNotification(message, type = 'info') {
@@ -320,6 +336,9 @@ function showNotification(message, type = 'info') {
 // ===========================
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Clear old localStorage data
+    localStorage.removeItem('cart');
+    
     // Set current category
     const urlParams = new URLSearchParams(window.location.search);
     const danhMucId = urlParams.get('danh_muc_id');

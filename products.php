@@ -65,7 +65,7 @@ $items = getallproduct($conn);
                     </div>
 
                     <div class="cart-icon">
-                        <i class="fas fa-shopping-cart"></i>
+                        <i class="fas fa-shopping-cart" onclick="window.location.href='cart.php'"></i>
                         <span class="cart-count">0</span>
                     </div>                  
                     <div class="user-account-wrapper d-flex align-items-center">
@@ -309,6 +309,7 @@ $items = getallproduct($conn);
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="js/script.js"></script>
     <script>
         // Kiểm tra nếu chưa có thì mới gán, dùng 'var' hoặc gán thẳng vào 'window'
         window.allProducts = <?php echo json_encode($items); ?>;

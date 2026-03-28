@@ -248,53 +248,73 @@ function getDiscountBadge(product) {
 }
 
 function addToCart(productId) {
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) return;
-
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-    const cartItem = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        image: product.image
-    };
-
-    cart.push(cartItem);
-    localStorage.setItem('cart', JSON.stringify(cart));
-
-    updateCartCount();
-    showNotification(`${product.name} đã được thêm vào giỏ hàng!`, 'success');
+    if (typeof addToCart_API === 'function') {
+        // Gọi hàm từ cart.js nếu có
+        addToCart_API(productId, 1);
+    } else {
+        // Fallback: gọi API cart trực tiếp
+        fetch('api/cart.php?action=add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: 1
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+            } else {
+                showNotification(data.message || 'Lỗi khi thêm sản phẩm', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+            showNotification('Lỗi kết nối server', 'danger');
+        });
+    }
 }
 
 function buyNow(productId) {
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) return;
-    
-    // Add to cart first
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartItem = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        image: product.image
-    };
-    cart.push(cartItem);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartCount();
-    
-    // Redirect to payment page
-    window.location.href = 'ThanhToan.php?id=' + productId;
+    fetch('api/cart.php?action=add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = 'ThanhToan.php?id=' + productId;
+        } else {
+            showNotification(data.message || 'Lỗi khi thêm sản phẩm', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Lỗi:', error);
+        showNotification('Lỗi kết nối server', 'danger');
+    });
 }
 
 function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartCount = document.querySelector('.cart-count');
-    if (cartCount) {
-        cartCount.textContent = cart.length;
-    }
+    fetch('api/cart.php?action=get')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const cartCount = document.querySelector('.cart-count');
+                if (cartCount) {
+                    cartCount.textContent = data.cart_count || 0;
+                }
+            }
+        })
+        .catch(error => console.error('Lỗi cập nhật cart count:', error));
 }
 
 function showNotification(message, type = 'info') {
@@ -325,7 +345,14 @@ console.log(allProducts);
 // ===========================
 
 document.addEventListener('DOMContentLoaded', function () {
-    renderProducts();
+    // Clear old localStorage data (tránh confusion)
+    localStorage.removeItem('cart');
+    
+    // Cập nhật cart count từ session backend ngay khi page load
     updateCartCount();
+    
+    // Render sản phẩm
+    renderProducts();
+    
     console.log('✅ Trang danh sách sản phẩm đã được khởi tạo!');
 });

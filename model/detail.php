@@ -67,6 +67,11 @@ function getProductImages($conn, $productId) {
 }
 // Hàm hiển thị sao đánh giá
 function getStarRating($rating) {
+    // Đảm bảo $rating là số hợp lệ
+    $rating = (float)($rating ?? 0);
+    if ($rating < 0) $rating = 0;
+    if ($rating > 5) $rating = 5;
+    
     $html = '';
     for ($i = 1; $i <= 5; $i++) {
         if ($i <= floor($rating)) {
