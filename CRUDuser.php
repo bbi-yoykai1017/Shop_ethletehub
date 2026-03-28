@@ -131,15 +131,18 @@ $listusers = getAllUsers($conn);
 
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <label class="form-label small fw-bold">Tên khách hàng</label>
-                                <input type="text" name="ten" class="form-control" placeholder="Nhập tên..." value="<?= $edit_user['ten'] ?>" required>
+                                <input type="text" name="ten" class="form-control" placeholder="Nhập tên..." value="<?= $edit_user['ten'] ?>" minlength="2" maxlength="100" required>
+                                <div class="invalid-feedback">Tên khách hàng không được để trống và phải từ 2 đến 100 ký tự!</div>
                             </div>
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <label class="form-label small fw-bold">Email</label>
                                 <input type="email" name="email" class="form-control" placeholder="name@example.com" value="<?= $edit_user['email'] ?>" required>
+                                <div class="invalid-feedback">Email không hợp lệ!</div>
                             </div>
                             <div class="col-12 col-sm-6 col-lg-2">
                                 <label class="form-label small fw-bold">Số điện thoại</label>
-                                <input type="text" name="so_dien_thoai" class="form-control" placeholder="SĐT" value="<?= $edit_user['so_dien_thoai'] ?>" required>
+                                <input type="text" id="so_dien_thoai" name="so_dien_thoai" class="form-control" placeholder="SĐT" value="<?= $edit_user['so_dien_thoai'] ?>" minlength="10" maxlength="10" required>
+                                <div class="invalid-feedback">Số điện thoại không hợp lệ!</div>
                             </div>
                             <div class="col-12 col-sm-6 col-lg-2">
                                 <label class="form-label small fw-bold">Vai trò</label>
@@ -212,7 +215,96 @@ $listusers = getAllUsers($conn);
     </footer>
 
     <script src="bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tenInput = document.querySelector('input[name="ten"]');
+            const emailInput = document.querySelector('input[name="email"]');
+            const phoneInput = document.getElementById('so_dien_thoai');
+            const btnSave = document.querySelector('button[name="save_user"]');
 
+            function validateForm() {
+                //1 kiem tra ky tu ten khach hang
+                let isValid = true;
+
+                let tenRaw = tenInput.value;
+                let tenClean = tenRaw.trim().replace(/\s\s+/g, ' ');
+
+                // Regex này cho phép: Chữ cái (Unicode), khoảng trắng, và flag 'u' để xử lý tiếng Việt chuẩn
+                const vietnameseRegex = /^[\p{L}\s]+$/u;
+
+                const isDoubleSpace = /\s\s+/.test(tenRaw);
+                const isInvalidChar = !vietnameseRegex.test(tenClean);
+                const isTooShort = tenClean.length < 2;
+
+                const tenHasError = isDoubleSpace || isInvalidChar || isTooShort;
+
+                if (!tenHasError) {
+                    tenInput.classList.remove('is-invalid');
+                    tenInput.classList.add('is-valid');
+                } else {
+                    tenInput.classList.add('is-invalid');
+                    tenInput.classList.remove('is-valid');
+                    isValid = false;
+
+                    const feedback = tenInput.nextElementSibling;
+                    if (isDoubleSpace) {
+                        feedback.innerText = "Không được có 2 khoảng trắng liên tiếp!";
+                    } else if (isInvalidChar) {
+                        feedback.innerText = "Tên không được chứa số hoặc ký tự đặc biệt!";
+                    } else if (isTooShort) {
+                        feedback.innerText = "Tên phải từ 2 ký tự trở lên!";
+                    }
+                }
+
+                // --- 2. KIỂM TRA EMAIL (Tối ưu: cấm khoảng trắng hoàn toàn) ---
+                let emailRaw = emailInput.value;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const hasSpaceEmail = /\s/.test(emailRaw); // Email tuyệt đối không có khoảng trắng
+
+                if (emailRegex.test(emailRaw) && !hasSpaceEmail) {
+                    emailInput.classList.remove('is-invalid');
+                    emailInput.classList.add('is-valid');
+                } else {
+                    emailInput.classList.add('is-invalid');
+                    emailInput.classList.remove('is-valid');
+                    isValid = false;
+                    const feedbackEmail = emailInput.nextElementSibling;
+                    if (hasSpaceEmail) feedbackEmail.innerText = "Email không được chứa khoảng trắng!";
+                    else feedbackEmail.innerText = "Định dạng Email không hợp lệ (vd: abc@gmail.com)!";
+                }
+
+                // --- 3. KIỂM TRA SỐ ĐIỆN THOẠI (Tối ưu: 10 số, bắt đầu bằng 0, cấm khoảng trắng/chữ) ---
+                let phoneRaw = phoneInput.value;
+                const phoneRegex = /^0\d{9}$/;
+                const hasSpacePhone = /\s/.test(phoneRaw);
+                const hasCharPhone = /[a-zA-Z]/.test(phoneRaw);
+
+                if (phoneRegex.test(phoneRaw) && !hasSpacePhone) {
+                    phoneInput.classList.remove('is-invalid');
+                    phoneInput.classList.add('is-valid');
+                } else {
+                    phoneInput.classList.add('is-invalid');
+                    phoneInput.classList.remove('is-valid');
+                    isValid = false;
+                    const feedbackPhone = phoneInput.nextElementSibling;
+                    if (hasSpacePhone) feedbackPhone.innerText = "Số điện thoại không được chứa khoảng trắng!";
+                    else if (hasCharPhone) feedbackPhone.innerText = "Số điện thoại không được chứa chữ cái!";
+                    else feedbackPhone.innerText = "SĐT phải gồm 10 số và bắt đầu bằng số 0!";
+                }
+
+                // Kích hoạt/Vô hiệu hóa nút Lưu
+                btnSave.disabled = !isValid;
+            }
+
+            // Lắng nghe sự kiện 'input' để kiểm tra ngay lập tức khi gõ
+            [tenInput, emailInput, phoneInput].forEach(input => {
+                input.addEventListener('input', validateForm);
+            });
+
+            // Kiểm tra lần đầu khi load trang (hữu ích cho chế độ Edit)
+            validateForm();
+        });
+    </script>
 </body>
 
 </html>

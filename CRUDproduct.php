@@ -22,10 +22,10 @@ $edit_product = [
     'so_luong_danh_gia' => 0,
     'hinh_anh_chinh' => ''
 ];
-// Truy vấn lấy ID và Tên danh mục
-$sql_dm = "SELECT id, ten_danh_muc FROM danh_muc ORDER BY ten_danh_muc ASC";
+// Truy vấn lấy ID và Tên danh mục sap xep theoo id tang dan
+$sql_dm = "SELECT id, ten_danh_muc FROM danh_muc ORDER BY id ASC";
 /** @var PDOStatement $stmt_dm */
-$stmt_dm = $conn->prepare($sql_dm); 
+$stmt_dm = $conn->prepare($sql_dm);
 $stmt_dm->execute();
 $list_danhmuc = $stmt_dm->fetchAll(PDO::FETCH_ASSOC);
 // ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA (Sửa Link ở dưới thành ?edit=) =================
@@ -54,12 +54,11 @@ if (isset($_POST['save_product'])) {
 
 
     // Xử lý Upload Ảnh
-    $hinh_anh = $_POST['hinh_anh_cu'] ?? ''; 
+    $hinh_anh = $_POST['hinh_anh_cu'] ?? '';
 
     if (isset($_FILES['hinh_anh_upload']) && $_FILES['hinh_anh_upload']['error'] == 0) {
         $target_dir = "public/";
-        // Tạo tên file duy nhất để tránh trùng lặp: ví dụ 164812345_ten-anh.jpg
-        $file_name = time() . '_' . basename($_FILES["hinh_anh_upload"]["name"]);
+        $file_name = basename($_FILES["hinh_anh_upload"]["name"]);
         $target_file = $target_dir . $file_name;
 
         if (move_uploaded_file($_FILES["hinh_anh_upload"]["tmp_name"], $target_file)) {
@@ -189,24 +188,33 @@ $listproduct = getAllProducts($conn);
                             <input type="text" name="mo_ta" class="form-control" value="<?= $edit_product['mo_ta'] ?>">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">Giá bán</label>
-                            <input type="number" name="gia" class="form-control" value="<?= $edit_product['gia'] ?>" required>
-                        </div>
-                        <div class="col-md-2">
                             <label class="form-label fw-bold">Giá gốc</label>
-                            <input type="number" name="gia_goc" class="form-control" value="<?= $edit_product['gia_goc'] ?>">
+                            <input type="number" id="gia_goc" name="gia_goc" class="form-control" value="<?= $edit_product['gia_goc'] ?>" min="0">
                         </div>
+
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">Phần trăm giảm</label>
-                            <input type="number" step="0.1" name="phan_tram_giam" class="form-control" value="<?= $edit_product['phan_tram_giam'] ?>">
+                            <label class="form-label fw-bold">Giá bán</label>
+                            <input type="number" id="gia_ban" name="gia" class="form-control" value="<?= $edit_product['gia'] ?>" min="0" required>
+                            <div class="invalid-feedback">Giá bán không được cao hơn giá gốc!</div>
                         </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Phần trăm giảm (%)</label>
+                            <input type="number" id="phan_tram_giam" step="0.1" name="phan_tram_giam" class="form-control" value="<?= $edit_product['phan_tram_giam'] ?>" readonly>
+                            <small class="text-muted">Tự động tính toán</small>
+                        </div>
+
+
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Sao (1-5)</label>
-                            <input type="number" step="0.1" name="trung_binh_sao" class="form-control" value="<?= $edit_product['trung_binh_sao'] ?>">
+                            <input type="number" step="0.1" id="trung_binh_sao" name="trung_binh_sao" class="form-control" value="<?= $edit_product['trung_binh_sao'] ?>" required>
+                            <div class="invalid-feedback">Số sao phải từ 1 đến 5!</div>
                         </div>
+
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Lượt đánh giá</label>
-                            <input type="number" name="so_luong_danh_gia" class="form-control" value="<?= $edit_product['so_luong_danh_gia'] ?>">
+                            <input type="number" id="so_luong_danh_gia" name="so_luong_danh_gia" class="form-control" value="<?= $edit_product['so_luong_danh_gia'] ?>" required>
+                            <div class="invalid-feedback">Lượt đánh giá không được âm!</div>
                         </div>
                         <div class="col-md-8">
                             <label class="form-label fw-bold">Hình ảnh sản phẩm</label>
@@ -246,9 +254,7 @@ $listproduct = getAllProducts($conn);
                             <th width="180">Hành động</th>
                         </tr>
                     </thead>
-
                     <tbody>
-
                         <?php foreach ($listproduct as $product) { ?>
                             <tr>
                                 <td><?= $product['id'] ?></td>
@@ -292,6 +298,66 @@ $listproduct = getAllProducts($conn);
 
     <script src="bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const giaGocInput = document.getElementById('gia_goc');
+            const giaBanInput = document.getElementById('gia_ban');
+            const phanTramInput = document.getElementById('phan_tram_giam');
+            const saoInput = document.getElementById('trung_binh_sao');
+            const danhGiaInput = document.getElementById('so_luong_danh_gia');
+            const btnSave = document.querySelector('button[name="save_product"]');
+
+            function validateForm() {
+                let giaGoc = parseFloat(giaGocInput.value) || 0;
+                let giaBan = parseFloat(giaBanInput.value) || 0;
+                let sao = parseFloat(saoInput.value) || 0;
+                let danhGia = parseInt(danhGiaInput.value) || 0;
+                let isValid = true;
+
+                // Kiểm tra Giá bán
+                if (giaGoc > 0 && giaBan > giaGoc) {
+                    giaBanInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    giaBanInput.classList.remove('is-invalid');
+                        giaBanInput.classList.add('is-valid');
+                        giaGocInput.classList.add('is-valid');  
+                    // Tính % giảm giá nếu hợp lệ
+                    if (giaGoc > 0 && giaBan > 0) {
+                        phanTramInput.value = (((giaGoc - giaBan) / giaGoc) * 100).toFixed(1);
+                    } else {
+                        phanTramInput.value = 0;
+                    }
+                }
+
+                // Kiểm tra Sao
+                if (sao < 1 || sao > 5) {
+                    saoInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    saoInput.classList.remove('is-invalid');
+                    saoInput.classList.add('is-valid');
+                }
+
+                // Kiểm tra Lượt đánh giá
+                if (danhGia < 0) {
+                    danhGiaInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    danhGiaInput.classList.remove('is-invalid');
+                    danhGiaInput.classList.add('is-valid');
+                }
+
+                // Vô hiệu hóa nút Lưu nếu có bất kỳ lỗi nào
+                btnSave.disabled = !isValid;
+            }
+
+            // Lắng nghe sự kiện gõ phím
+            [giaGocInput, giaBanInput, saoInput, danhGiaInput].forEach(input => {
+                input.addEventListener('input', validateForm);
+            });
+        });
+    </script>
 </body>
 
 </html>
