@@ -52,7 +52,12 @@ document.addEventListener('click', function (e) {
 
         // Gọi addToCart() từ cart.js — CHỈ truyền id, không truyền giá
         if (typeof addToCart === 'function') {
-            addToCart(productId, qty);
+            addToCart(productId, qty).then(() => {
+                // Sau khi thêm vào giỏ thành công, navigate tới product-detail page
+                setTimeout(() => {
+                    window.location.href = `product-detail.php?id=${productId}`;
+                }, 500);
+            });
         }
     }
 

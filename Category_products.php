@@ -559,6 +559,7 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
     </script>
 
     <!-- Custom JS -->
+    <script src="js/cart.js"></script>
     <script src="js/script.js"></script>
     <script src="js/category-products.js"></script>
 </body>

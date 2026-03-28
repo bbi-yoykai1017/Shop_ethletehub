@@ -128,10 +128,16 @@ function loadCart() {
             if (!cartItemsList) return;
             
             const cart = data.cart;
-            cartItemsList.innerHTML = cart.map((item, index) => `
+            cartItemsList.innerHTML = cart.map((item, index) => {
+                // Fix image path - thêm public/ nếu cần
+                let imagePath = item.image || 'images/placeholder.svg';
+                if (!imagePath.startsWith('./') && !imagePath.startsWith('/') && !imagePath.includes('data:')) {
+                    imagePath = './public/' + imagePath;
+                }
+                return `
                 <div class="cart-item" id="item-${item.id}">
                     <div class="cart-item-image">
-                        <img src="public/${item.image || 'images/placeholder.jpg'}" alt="${item.name}">
+                        <img src="${imagePath}" alt="${item.name}" onerror="this.src='images/placeholder.svg'">
                     </div>
                     <div class="cart-item-info">
                         <h4>${item.name}</h4>
@@ -156,7 +162,8 @@ function loadCart() {
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
-            `).join('');
+                `;
+            }).join('');
             
             updateCartSummary();
             document.querySelector('.cart-summary').style.display = 'block';
@@ -208,13 +215,13 @@ function updateCartSummary() {
             // Tổng cộng
             const total = subtotal + shippingFee - discount;
             
-            // Cập nhật hiển thị
-            const totalItemsEl = document.getElementById('totalItems');
-            const subtotalEl = document.getElementById('subtotal');
-            const shippingEl = document.getElementById('shipping');
-            const totalEl = document.getElementById('total');
+            // Cập nhật hiển thị - SỬA LỖI ID
+            const totalItemsEl = document.getElementById('totalQuantity');
+            const subtotalEl = document.getElementById('subtotalDisplay');
+            const shippingEl = document.getElementById('shippingDisplay');
+            const totalEl = document.getElementById('totalDisplay');
             const discountItemEl = document.getElementById('discountItem');
-            const discountEl = document.getElementById('discount');
+            const discountEl = document.getElementById('discountDisplay');
             
             if (totalItemsEl) totalItemsEl.textContent = totalItems;
             if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal);
@@ -343,7 +350,56 @@ function showNotification(message, type = 'info') {
 }
 
 // ===========================
-// INITIALIZE
+// CHECKOUT FUNCTION
+// ===========================
+
+function goCheckout() {
+    fetch('api/cart.php?action=get')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.cart || data.cart.length === 0) {
+                showNotification('Giỏ hàng của bạn trống!', 'danger');
+                return;
+            }
+            
+            showNotification('Chuyển hướng tới trang thanh toán...', 'info');
+            setTimeout(() => {
+                window.location.href = 'ThanhToan.php';
+            }, 1000);
+        });
+}
+
+// ===========================
+// APPLY PROMO CODE
+// ===========================
+
+function applyPromo() {
+    const promoCode = document.getElementById('promoCode').value.toUpperCase().trim();
+    
+    if (!promoCode) {
+        showNotification('Vui lòng nhập mã giảm giá', 'warning');
+        return;
+    }
+    
+    // Định nghĩa các mã giảm giá hợp lệ
+    const promoCodes = {
+        'SAVE10': 50000,
+        'SAVE20': 100000,
+        'SHIP': 25000,
+        'WELCOME': 75000
+    };
+    
+    if (promoCodes[promoCode]) {
+        showNotification(`Mã giảm giá "${promoCode}" đã được áp dụng!`, 'success');
+        document.getElementById('promoCode').value = '';
+        // Lưu giảm giá và tính lại
+        updateCartSummary();
+    } else {
+        showNotification('Mã giảm giá không hợp lệ', 'danger');
+    }
+}
+
+// ===========================
 // ===========================
 
 document.addEventListener('DOMContentLoaded', function() {

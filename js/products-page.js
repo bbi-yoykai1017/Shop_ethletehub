@@ -58,7 +58,7 @@ function renderProducts() {
                 </div>
                 
                 <div class="product-actions-page">
-                    <button class="btn-page-add-cart" onclick="addToCart(${product.id})">
+                    <button class="btn-add-cart" data-product-id="${product.id}">
                         <i class="fas fa-shopping-cart"></i> Thêm
                     </button>
                     <button class="btn-page-buy-now" onclick="buyNow(${product.id})">

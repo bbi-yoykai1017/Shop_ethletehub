@@ -339,10 +339,9 @@ $displayProducts = array_slice($products, 0, 6);
                                 <?php if (!empty($product['image'])): ?>
                                     <img src="./public/<?php echo htmlspecialchars($product['image']); ?>"
                                         alt="<?php echo htmlspecialchars($product['name']); ?>"
-                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                    <i class="fas fa-shirt" style="display:none;"></i>
+                                        onerror="this.src='images/placeholder.svg'; this.style.display='block';">
                                 <?php else: ?>
-                                    <i class="fas fa-shirt"></i>
+                                    <img src="images/placeholder.svg" alt="No image">
                                 <?php endif; ?>
                             </a>
 
@@ -379,7 +378,7 @@ $displayProducts = array_slice($products, 0, 6);
                             <span class="stock-status in-stock">Còn hàng</span>
 
                             <div class="product-actions">
-                                <button class="product-btn btn-add-cart">
+                                <button class="product-btn btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
                                     <i class="fas fa-shopping-cart"></i> Thêm
                                 </button>
                                 <button class="btn-buy-now-detail" onclick="window.location.href='ThanhToan.php?id=<?php echo $product['id']; ?>'">
