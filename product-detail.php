@@ -156,7 +156,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                     </div>
 
                     <div class="cart-icon">
-                        <i class="fas fa-shopping-cart"></i>
+                        <i class="fas fa-shopping-cart" onclick="window.location.href='cart.php'"></i>
                         <span class="cart-count">0</span>
                     </div>
 
