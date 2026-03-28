@@ -4,15 +4,24 @@
  * Endpoint: /api/cart.php?action=add|remove|update|get
  */
 
+// Ngăn chặn output trước JSON
+ob_start();
+
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../Database.php';
-require_once __DIR__ . '/../model/functions.php';
+
+// Xóa bất kỳ output cũ nào
+ob_clean();
 
 try {
     $db = new Database();
     $conn = $db->connect();
+    
+    if (!$conn) {
+        throw new Exception('Không thể kết nối database');
+    }
     
     $action = $_GET['action'] ?? $_POST['action'] ?? '';
     $input = file_get_contents('php://input');
@@ -67,12 +76,13 @@ try {
             $qty = min($qty, $stock);
             
             // Kiểm tra sản phẩm đã có trong giỏ chưa
-            $itemExists = array_find(
-                $_SESSION['cart'],
-                function($item) use ($productId) {
-                    return $item['id'] === $productId;
+            $itemExists = false;
+            foreach ($_SESSION['cart'] as $item) {
+                if ($item['id'] === $productId) {
+                    $itemExists = true;
+                    break;
                 }
-            );
+            }
             
             // Nếu có rồi thì tăng qty, không thì thêm mới
             if ($itemExists) {

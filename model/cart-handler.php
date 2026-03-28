@@ -1,10 +1,4 @@
 <?php
-/**
- * cart-handler.php
- * Đặt tại: /cart-handler.php (thư mục gốc project)
- *
- * ✅ BẢO MẬT: Giá LUÔN lấy từ DB, không bao giờ tin client gửi lên.
- */
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/Database.php';

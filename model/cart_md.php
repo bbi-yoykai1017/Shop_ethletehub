@@ -1,8 +1,4 @@
 <?php
-/**
- * Cart.php
- * Đặt tại: /Cart.php (thư mục gốc project)
- */
 class Cart
 {
     private string $sessionKey  = 'athleteHubCart';

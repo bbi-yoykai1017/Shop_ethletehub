@@ -1,10 +1,6 @@
 <?php
 
 session_start();
-require_once __DIR__ . '/Database.php';
-
-$db   = new Database();
-$conn = $db->connect();
 
 // Lấy giỏ hàng từ session (API sử dụng session)
 $items = $_SESSION['cart'] ?? [];

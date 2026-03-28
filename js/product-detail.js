@@ -144,7 +144,12 @@ if (addToCartBtn) {
                 quantity: quantity
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 const size = sizeBtn ? (sizeBtn.dataset.sizeName || sizeBtn.textContent) : '';
@@ -167,7 +172,11 @@ if (addToCartBtn) {
             }
         })
         .catch(error => {
-            console.error('Lỗi:', error);
+            console.error('Chi tiết lỗi:', {
+                message: error.message,
+                stack: error.stack,
+                url: 'api/cart.php?action=add'
+            });
             showNotification('Lỗi kết nối server', 'danger');
         });
     });
@@ -454,7 +463,12 @@ function showNotification(message, type) {
 
 function updateCartCount() {
     fetch('api/cart.php?action=get')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 const cartCountElements = document.querySelectorAll('.cart-count');
@@ -463,7 +477,12 @@ function updateCartCount() {
                 });
             }
         })
-        .catch(error => console.error('Lỗi cập nhật cart count:', error));
+        .catch(error => {
+            console.error('Lỗi cập nhật cart count:', {
+                message: error.message,
+                url: 'api/cart.php?action=get'
+            });
+        });
 }
 
 // ===========================
