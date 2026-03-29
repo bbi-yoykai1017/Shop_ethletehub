@@ -62,59 +62,6 @@ $ratingSummary = $product['rating_summary'] ?? 0;
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/product-detail.css">
-    <style>
-        .product-tabs-section .nav-tabs {
-            border-bottom: 2px solid #eee;
-            margin-bottom: 20px;
-        }
-
-        .product-tabs-section .nav-link {
-            color: #555;
-            font-weight: 600;
-            border: none;
-            padding: 12px 20px;
-        }
-
-        .product-tabs-section .nav-link.active {
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--primary-color);
-            background: none;
-        }
-
-        .tab-content-body {
-            padding: 20px 0;
-            line-height: 1.8;
-            color: #444;
-        }
-
-        .review-item {
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-
-        .review-author {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .review-date {
-            font-size: 0.85em;
-            color: #888;
-        }
-
-        .review-stars {
-            color: #ffc107;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-    </style>
 </head>
 
 <body>

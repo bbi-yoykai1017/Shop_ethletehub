@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th3 07, 2026 lúc 08:34 AM
+-- Thời gian đã tạo: Th3 29, 2026 lúc 10:15 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.0.30
+-- Phiên bản PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,15 +20,12 @@ SET time_zone = "+00:00";
 --
 -- Cơ sở dữ liệu: `athletehub`
 --
-
-
 -- --------------------------------------------------------
 
 --
 -- Cấu trúc bảng cho bảng `bien_the_san_pham`
 --
 
-DROP TABLE IF EXISTS `bien_the_san_pham`;
 CREATE TABLE `bien_the_san_pham` (
   `id` int(11) NOT NULL COMMENT 'ID biến thể',
   `san_pham_id` int(11) NOT NULL COMMENT 'ID sản phẩm',
@@ -66,7 +63,147 @@ INSERT INTO `bien_the_san_pham` (`id`, `san_pham_id`, `kich_thuoc_id`, `mau_sac_
 (18, 11, 8, 1, 40, 'giay-chay-nam-36-den.jpg', 0.00, 1, '2026-01-11 08:00:00'),
 (19, 11, 9, 1, 45, 'giay-chay-nam-37-den.jpg', 0.00, 1, '2026-01-11 08:00:00'),
 (20, 11, 10, 1, 50, 'giay-chay-nam-38-den.jpg', 0.00, 1, '2026-01-11 08:00:00'),
-(21, 11, 11, 1, 48, 'giay-chay-nam-39-den.jpg', 0.00, 1, '2026-01-11 08:00:00');
+(21, 11, 11, 1, 48, 'giay-chay-nam-39-den.jpg', 0.00, 1, '2026-01-11 08:00:00'),
+(22, 5, 2, 1, 25, 'aochongnuocnam1-den-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(23, 5, 3, 1, 30, 'aochongnuocnam1-den-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(24, 5, 4, 1, 28, 'aochongnuocnam1-den-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(25, 5, 5, 1, 20, 'aochongnuocnam1-den-XL.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(26, 5, 3, 3, 22, 'aochongnuocnam1-xanh-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(27, 5, 4, 3, 25, 'aochongnuocnam1-xanh-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(28, 5, 3, 2, 18, 'aochongnuocnam1-trang-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(29, 5, 4, 2, 20, 'aochongnuocnam1-trang-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(30, 6, 2, 1, 20, 'aoamnu1-den-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(31, 6, 3, 1, 25, 'aoamnu1-den-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(32, 6, 4, 1, 22, 'aoamnu1-den-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(33, 6, 5, 1, 15, 'aoamnu1-den-XL.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(34, 6, 2, 10, 18, 'aoamnu1-hong-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(35, 6, 3, 10, 20, 'aoamnu1-hong-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(36, 6, 4, 10, 18, 'aoamnu1-hong-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(37, 6, 3, 7, 15, 'aoamnu1-vang-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(38, 6, 4, 7, 17, 'aoamnu1-vang-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(39, 7, 1, 1, 20, 'tanknam1-den-XS.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(40, 7, 2, 1, 25, 'tanknam1-den-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(41, 7, 3, 1, 30, 'tanknam1-den-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(42, 7, 4, 1, 28, 'tanknam1-den-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(43, 7, 5, 1, 22, 'tanknam1-den-XL.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(44, 7, 3, 3, 25, 'tanknam1-xanh-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(45, 7, 4, 3, 23, 'tanknam1-xanh-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(46, 7, 2, 5, 18, 'tanknam1-do-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(47, 7, 3, 5, 20, 'tanknam1-do-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(48, 7, 2, 2, 15, 'tanknam1-trang-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(49, 7, 3, 2, 18, 'tanknam1-trang-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(50, 8, 1, 1, 18, 'tanktop-nu-den-XS.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(51, 8, 2, 1, 22, 'tanktop-nu-den-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(52, 8, 3, 1, 28, 'tanktop-nu-den-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(53, 8, 4, 1, 25, 'tanktop-nu-den-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(54, 8, 5, 1, 18, 'tanktop-nu-den-XL.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(55, 8, 2, 10, 20, 'tanktop-nu-hong-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(56, 8, 3, 10, 24, 'tanktop-nu-hong-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(57, 8, 4, 10, 20, 'tanktop-nu-hong-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(58, 8, 3, 4, 18, 'tanktop-nu-xanh-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(59, 8, 4, 4, 15, 'tanktop-nu-xanh-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(60, 9, 2, 1, 20, 'quandainam1-den-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(61, 9, 3, 1, 25, 'quandainam1-den-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(62, 9, 4, 1, 22, 'quandainam1-den-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(63, 9, 5, 1, 18, 'quandainam1-den-XL.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(64, 9, 6, 1, 15, 'quandainam1-den-XXL.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(65, 9, 3, 3, 18, 'quandainam1-xanh-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(66, 9, 4, 3, 20, 'quandainam1-xanh-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(67, 9, 2, 12, 15, 'quandainam1-xam-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(68, 9, 3, 12, 18, 'quandainam1-xam-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(69, 9, 4, 12, 16, 'quandainam1-xam-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(70, 10, 1, 1, 18, 'quandainu-den-XS.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(71, 10, 2, 1, 22, 'quandainu-den-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(72, 10, 3, 1, 28, 'quandainu-den-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(73, 10, 4, 1, 25, 'quandainu-den-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(74, 10, 5, 1, 18, 'quandainu-den-XL.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(75, 10, 2, 12, 20, 'quandainu-xam-S.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(76, 10, 3, 12, 24, 'quandainu-xam-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(77, 10, 4, 12, 22, 'quandainu-xam-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(78, 10, 3, 8, 18, 'quandainu-xanh-M.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(79, 10, 4, 8, 15, 'quandainu-xanh-L.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(80, 12, 7, 1, 15, 'giaychaynu-35-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(81, 12, 8, 1, 20, 'giaychaynu-36-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(82, 12, 9, 1, 25, 'giaychaynu-37-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(83, 12, 10, 1, 28, 'giaychaynu-38-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(84, 12, 11, 1, 25, 'giaychaynu-39-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(85, 12, 12, 1, 20, 'giaychaynu-40-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(86, 12, 9, 10, 18, 'giaychaynu-37-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(87, 12, 10, 10, 22, 'giaychaynu-38-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(88, 12, 11, 10, 20, 'giaychaynu-39-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(89, 12, 9, 3, 15, 'giaychaynu-37-xanh.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(90, 12, 10, 3, 18, 'giaychaynu-38-xanh.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(91, 13, 8, 1, 15, 'giaygymnam1-36-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(92, 13, 9, 1, 20, 'giaygymnam1-37-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(93, 13, 10, 1, 25, 'giaygymnam1-38-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(94, 13, 11, 1, 28, 'giaygymnam1-39-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(95, 13, 12, 1, 25, 'giaygymnam1-40-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(96, 13, 13, 1, 22, 'giaygymnam1-41-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(97, 13, 14, 1, 18, 'giaygymnam1-42-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(98, 13, 10, 12, 20, 'giaygymnam1-38-xam.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(99, 13, 11, 12, 22, 'giaygymnam1-39-xam.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(100, 13, 12, 12, 18, 'giaygymnam1-40-xam.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(101, 14, 7, 10, 15, 'giaygymnu1-35-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(102, 14, 8, 10, 20, 'giaygymnu1-36-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(103, 14, 9, 10, 22, 'giaygymnu1-37-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(104, 14, 10, 10, 25, 'giaygymnu1-38-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(105, 14, 11, 10, 20, 'giaygymnu1-39-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(106, 14, 7, 1, 12, 'giaygymnu1-35-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(107, 14, 8, 1, 18, 'giaygymnu1-36-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(108, 14, 9, 1, 20, 'giaygymnu1-37-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(109, 14, 10, 1, 22, 'giaygymnu1-38-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(110, 15, 9, 1, 15, 'giaydabong1nam-37-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(111, 15, 10, 1, 20, 'giaydabong1nam-38-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(112, 15, 11, 1, 25, 'giaydabong1nam-39-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(113, 15, 12, 1, 22, 'giaydabong1nam-40-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(114, 15, 13, 1, 18, 'giaydabong1nam-41-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(115, 15, 14, 1, 15, 'giaydabong1nam-42-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(116, 15, 10, 5, 18, 'giaydabong1nam-38-do.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(117, 15, 11, 5, 20, 'giaydabong1nam-39-do.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(118, 15, 12, 5, 18, 'giaydabong1nam-40-do.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(119, 16, 9, 1, 20, 'giayhangngay1-37-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(120, 16, 10, 1, 25, 'giayhangngay1-38-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(121, 16, 11, 1, 28, 'giayhangngay1-39-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(122, 16, 12, 1, 25, 'giayhangngay1-40-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(123, 16, 13, 1, 22, 'giayhangngay1-41-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(124, 16, 14, 1, 18, 'giayhangngay1-42-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(125, 16, 10, 2, 22, 'giayhangngay1-38-trang.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(126, 16, 11, 2, 25, 'giayhangngay1-39-trang.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(127, 16, 12, 2, 22, 'giayhangngay1-40-trang.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(128, 17, 9, 11, 12, 'giayleonui1-37-nau.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(129, 17, 10, 11, 15, 'giayleonui1-38-nau.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(130, 17, 11, 11, 18, 'giayleonui1-39-nau.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(131, 17, 12, 11, 15, 'giayleonui1-40-nau.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(132, 17, 13, 11, 12, 'giayleonui1-41-nau.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(133, 17, 14, 11, 10, 'giayleonui1-42-nau.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(134, 17, 10, 1, 10, 'giayleonui1-38-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(135, 17, 11, 1, 12, 'giayleonui1-39-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(136, 17, 12, 1, 10, 'giayleonui1-40-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(137, 18, 8, 1, 15, 'giaycaulong1-36-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(138, 18, 9, 1, 20, 'giaycaulong1-37-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(139, 18, 10, 1, 22, 'giaycaulong1-38-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(140, 18, 11, 1, 20, 'giaycaulong1-39-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(141, 18, 12, 1, 18, 'giaycaulong1-40-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(142, 18, 9, 8, 15, 'giaycaulong1-37-xanh.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(143, 18, 10, 8, 18, 'giaycaulong1-38-xanh.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(144, 18, 11, 8, 15, 'giaycaulong1-39-xanh.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(145, 19, 9, 2, 15, 'giaytenis1-37-trang.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(146, 19, 10, 2, 18, 'giaytenis1-38-trang.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(147, 19, 11, 2, 20, 'giaytenis1-39-trang.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(148, 19, 12, 2, 18, 'giaytenis1-40-trang.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(149, 19, 13, 2, 15, 'giaytenis1-41-trang.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(150, 19, 10, 1, 12, 'giaytenis1-38-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(151, 19, 11, 1, 15, 'giaytenis1-39-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(152, 19, 12, 1, 12, 'giaytenis1-40-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(153, 20, 7, 10, 18, 'giaydibonu1-35-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(154, 20, 8, 10, 22, 'giaydibonu1-36-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(155, 20, 9, 10, 25, 'giaydibonu1-37-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(156, 20, 10, 10, 28, 'giaydibonu1-38-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(157, 20, 11, 10, 22, 'giaydibonu1-39-hong.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(158, 20, 8, 1, 15, 'giaydibonu1-36-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(159, 20, 9, 1, 18, 'giaydibonu1-37-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(160, 20, 10, 1, 20, 'giaydibonu1-38-den.jpg', 0.00, 1, '2026-03-07 16:04:59'),
+(161, 20, 11, 1, 18, 'giaydibonu1-39-den.jpg', 0.00, 1, '2026-03-07 16:04:59');
 
 -- --------------------------------------------------------
 
@@ -74,7 +211,6 @@ INSERT INTO `bien_the_san_pham` (`id`, `san_pham_id`, `kich_thuoc_id`, `mau_sac_
 -- Cấu trúc bảng cho bảng `cai_dat`
 --
 
-DROP TABLE IF EXISTS `cai_dat`;
 CREATE TABLE `cai_dat` (
   `id` int(11) NOT NULL,
   `khoa` varchar(100) NOT NULL,
@@ -120,7 +256,6 @@ INSERT INTO `cai_dat` (`id`, `khoa`, `gia_tri`, `loai_du_lieu`, `mo_ta`, `ngay_c
 -- Cấu trúc bảng cho bảng `chi_tiet_don_hang`
 --
 
-DROP TABLE IF EXISTS `chi_tiet_don_hang`;
 CREATE TABLE `chi_tiet_don_hang` (
   `id` int(11) NOT NULL COMMENT 'ID chi tiết',
   `don_hang_id` int(11) NOT NULL COMMENT 'ID đơn hàng',
@@ -153,7 +288,6 @@ INSERT INTO `chi_tiet_don_hang` (`id`, `don_hang_id`, `san_pham_id`, `bien_the_s
 -- Cấu trúc bảng cho bảng `chi_tiet_gio_hang`
 --
 
-DROP TABLE IF EXISTS `chi_tiet_gio_hang`;
 CREATE TABLE `chi_tiet_gio_hang` (
   `id` int(11) NOT NULL COMMENT 'ID chi tiết',
   `gio_hang_id` int(11) NOT NULL COMMENT 'ID giỏ hàng',
@@ -185,7 +319,6 @@ INSERT INTO `chi_tiet_gio_hang` (`id`, `gio_hang_id`, `san_pham_id`, `bien_the_s
 -- Cấu trúc bảng cho bảng `danh_gia`
 --
 
-DROP TABLE IF EXISTS `danh_gia`;
 CREATE TABLE `danh_gia` (
   `id` int(11) NOT NULL COMMENT 'ID đánh giá',
   `san_pham_id` int(11) NOT NULL COMMENT 'ID sản phẩm',
@@ -220,7 +353,6 @@ INSERT INTO `danh_gia` (`id`, `san_pham_id`, `nguoi_dung_id`, `so_sao`, `binh_lu
 -- Cấu trúc bảng cho bảng `danh_muc`
 --
 
-DROP TABLE IF EXISTS `danh_muc`;
 CREATE TABLE `danh_muc` (
   `id` int(11) NOT NULL COMMENT 'ID danh mục',
   `ten_danh_muc` varchar(100) NOT NULL COMMENT 'Tên danh mục',
@@ -248,7 +380,6 @@ INSERT INTO `danh_muc` (`id`, `ten_danh_muc`, `mo_ta`, `hinh_anh`, `thu_tu`, `tr
 -- Cấu trúc bảng cho bảng `don_hang`
 --
 
-DROP TABLE IF EXISTS `don_hang`;
 CREATE TABLE `don_hang` (
   `id` int(11) NOT NULL COMMENT 'ID đơn hàng',
   `nguoi_dung_id` int(11) NOT NULL COMMENT 'ID người dùng',
@@ -282,7 +413,6 @@ INSERT INTO `don_hang` (`id`, `nguoi_dung_id`, `ma_don_hang`, `tong_tien`, `tien
 -- Cấu trúc bảng cho bảng `gia_tri_thong_so`
 --
 
-DROP TABLE IF EXISTS `gia_tri_thong_so`;
 CREATE TABLE `gia_tri_thong_so` (
   `id` int(11) NOT NULL COMMENT 'ID giá trị thông số',
   `san_pham_id` int(11) NOT NULL COMMENT 'ID sản phẩm',
@@ -327,7 +457,6 @@ INSERT INTO `gia_tri_thong_so` (`id`, `san_pham_id`, `thong_so_id`, `gia_tri`) V
 -- Cấu trúc bảng cho bảng `gio_hang`
 --
 
-DROP TABLE IF EXISTS `gio_hang`;
 CREATE TABLE `gio_hang` (
   `id` int(11) NOT NULL COMMENT 'ID giỏ hàng',
   `nguoi_dung_id` int(11) DEFAULT NULL COMMENT 'ID người dùng (NULL = khách vãng lai)',
@@ -353,7 +482,6 @@ INSERT INTO `gio_hang` (`id`, `nguoi_dung_id`, `id_phien_lam_viec`, `ngay_tao`, 
 -- Cấu trúc bảng cho bảng `hinh_anh_san_pham`
 --
 
-DROP TABLE IF EXISTS `hinh_anh_san_pham`;
 CREATE TABLE `hinh_anh_san_pham` (
   `id` int(11) NOT NULL COMMENT 'ID hình ảnh',
   `san_pham_id` int(11) NOT NULL COMMENT 'ID sản phẩm',
@@ -389,7 +517,6 @@ INSERT INTO `hinh_anh_san_pham` (`id`, `san_pham_id`, `duong_dan`, `thu_tu`, `la
 -- Cấu trúc bảng cho bảng `kich_thuoc`
 --
 
-DROP TABLE IF EXISTS `kich_thuoc`;
 CREATE TABLE `kich_thuoc` (
   `id` int(11) NOT NULL COMMENT 'ID kích thước',
   `ten` varchar(20) NOT NULL COMMENT 'Tên kích thước (XS, S, M, L, XL, XXL, ...)',
@@ -423,7 +550,6 @@ INSERT INTO `kich_thuoc` (`id`, `ten`, `mo_ta`) VALUES
 -- Cấu trúc bảng cho bảng `mau_sac`
 --
 
-DROP TABLE IF EXISTS `mau_sac`;
 CREATE TABLE `mau_sac` (
   `id` int(11) NOT NULL COMMENT 'ID màu',
   `ten` varchar(50) NOT NULL COMMENT 'Tên màu (Đen, Trắng, Xanh, Đỏ, Vàng, ...)',
@@ -454,7 +580,6 @@ INSERT INTO `mau_sac` (`id`, `ten`, `ma_hex`) VALUES
 -- Cấu trúc bảng cho bảng `ma_giam_gia`
 --
 
-DROP TABLE IF EXISTS `ma_giam_gia`;
 CREATE TABLE `ma_giam_gia` (
   `id` int(11) NOT NULL COMMENT 'ID mã giảm',
   `ma_code` varchar(50) NOT NULL COMMENT 'Mã giảm giá',
@@ -488,7 +613,6 @@ INSERT INTO `ma_giam_gia` (`id`, `ma_code`, `mo_ta`, `phan_tram_giam`, `so_tien_
 -- Cấu trúc bảng cho bảng `nguoi_dung`
 --
 
-DROP TABLE IF EXISTS `nguoi_dung`;
 CREATE TABLE `nguoi_dung` (
   `id` int(11) NOT NULL COMMENT 'ID người dùng',
   `ten` varchar(100) NOT NULL COMMENT 'Họ tên',
@@ -509,7 +633,7 @@ CREATE TABLE `nguoi_dung` (
 --
 
 INSERT INTO `nguoi_dung` (`id`, `ten`, `email`, `mat_khau`, `so_dien_thoai`, `dia_chi`, `anh_dai_dien`, `vai_tro`, `trang_thai`, `ngay_tao`, `ngay_cap_nhat`, `lan_dang_nhap_cuoi`) VALUES
-(1, 'Admin AthleteHub', 'admin@email.com', 'admin123', '0912345678', '123 Đường Thể Thao, TP.HCM', 'admin-avatar.jpg', 'admin', 'hoat_dong', '2026-01-15 08:30:00', '2026-03-04 14:30:54', '2026-03-03 14:20:00'),
+(1, 'Admin AthleteHub', 'admin@email.com', '$2y$10$kzLAZfIXGu.Oz8Sd.dYvzujJhIJSkkTmxUV8W9t/XLa4BGOem3soC', '0912345678', '123 Đường Thể Thao, TP.HCM', 'admin-avatar.jpg', 'admin', 'hoat_dong', '2026-01-15 08:30:00', '2026-03-28 12:27:23', '2026-03-28 12:27:23'),
 (2, 'Nguyễn Văn A', 'khach1@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0987654321', '456 Đường Lê Lợi, Q1, TP.HCM', 'avatar-1.jpg', 'khach_hang', 'hoat_dong', '2026-01-20 10:15:00', '2026-03-04 14:30:54', '2026-03-03 09:45:00'),
 (3, 'Trần Thị B', 'khach2@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0912123456', '789 Đường Nguyễn Huệ, Q1, TP.HCM', 'avatar-2.jpg', 'khach_hang', 'hoat_dong', '2026-01-25 14:30:00', '2026-03-04 14:30:54', '2026-03-02 16:20:00'),
 (4, 'Lê Văn C', 'khach3@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0923456789', '321 Đường Trần Hưng Đạo, Q5, TP.HCM', 'avatar-3.jpg', 'khach_hang', 'hoat_dong', '2026-02-01 11:00:00', '2026-03-04 14:30:54', '2026-03-01 13:15:00'),
@@ -519,7 +643,11 @@ INSERT INTO `nguoi_dung` (`id`, `ten`, `email`, `mat_khau`, `so_dien_thoai`, `di
 (8, 'Bùi Văn G', 'khach7@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0967890123', '369 Đường Đinh Bộ Lĩnh, Q1, TP.HCM', 'avatar-7.jpg', 'khach_hang', 'hoat_dong', '2026-02-20 16:10:00', '2026-03-04 14:30:54', '2026-03-02 14:25:00'),
 (9, 'Đặng Thị H', 'khach8@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0978901234', '753 Đường Hai Bà Trưng, Q1, TP.HCM', 'avatar-8.jpg', 'khach_hang', 'hoat_dong', '2026-02-25 13:35:00', '2026-03-04 14:30:54', '2026-03-01 17:40:00'),
 (10, 'Trương Văn I', 'khach9@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0989012345', '159 Đường Pasteur, Q1, TP.HCM', 'avatar-9.jpg', 'khach_hang', 'hoat_dong', '2026-02-28 10:20:00', '2026-03-04 14:30:54', '2026-03-03 12:00:00'),
-(11, 'Phan Văn J', 'khach10@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0912345679', '852 Đường Ngô Tất Tố, Q1, TP.HCM', 'avatar-10.jpg', 'khach_hang', 'hoat_dong', '2026-03-01 07:50:00', '2026-03-04 14:30:54', '2026-03-03 15:30:00');
+(11, 'Phan Văn J', 'khach10@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0912345679', '852 Đường Ngô Tất Tố, Q1, TP.HCM', 'avatar-10.jpg', 'khach_hang', 'hoat_dong', '2026-03-01 07:50:00', '2026-03-04 14:30:54', '2026-03-03 15:30:00'),
+(12, 'nguyễn văn a', 'a@gmail.com', '$2y$10$pq0gtiU5VfzluOJC3aEdkOH4U6iy0qdRr3zF13yRhRaJd8o8TVGbi', '0901234567', '65a đường 102 lã xuân oai', 'hinh1.jpg', 'khach_hang', 'hoat_dong', '2026-03-18 14:07:03', '2026-03-28 11:02:17', '2026-03-28 11:02:17'),
+(38, 'khanh huyen', 'khanhhuyen@gmail.com', '$2y$10$nSK8agNkOcrWN4mQM0PcQehJ/JLBwk3pyeo7a.Ofd1.z5njCYapyS', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-21 16:21:43', '2026-03-21 16:21:43', NULL),
+(39, 'abc', 'abc@gmail.com', '$2y$10$3yxEcgOvMZL606V6su0Ccuq/w2189lH2UQCoZBoFFtOqZey7KYVFS', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-21 16:34:24', '2026-03-21 16:34:24', NULL),
+(40, 'duong', 'duong@gmail.com', '$2y$10$nvFan.kSaJ5nIw7GttOV6OjyL.5/h.ZaQzGeDuaPDXmSbPzdVG2Be', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-23 22:47:24', '2026-03-23 22:47:36', '2026-03-23 22:47:36');
 
 -- --------------------------------------------------------
 
@@ -527,7 +655,6 @@ INSERT INTO `nguoi_dung` (`id`, `ten`, `email`, `mat_khau`, `so_dien_thoai`, `di
 -- Cấu trúc bảng cho bảng `san_pham`
 --
 
-DROP TABLE IF EXISTS `san_pham`;
 CREATE TABLE `san_pham` (
   `id` int(11) NOT NULL COMMENT 'ID sản phẩm',
   `danh_muc_id` int(11) DEFAULT NULL COMMENT 'ID danh mục',
@@ -586,7 +713,6 @@ INSERT INTO `san_pham` (`id`, `danh_muc_id`, `ten`, `mo_ta`, `mo_ta_chi_tiet`, `
 -- Cấu trúc bảng cho bảng `su_dung_ma_giam_gia`
 --
 
-DROP TABLE IF EXISTS `su_dung_ma_giam_gia`;
 CREATE TABLE `su_dung_ma_giam_gia` (
   `id` int(11) NOT NULL COMMENT 'ID',
   `nguoi_dung_id` int(11) NOT NULL COMMENT 'ID người dùng',
@@ -610,7 +736,6 @@ INSERT INTO `su_dung_ma_giam_gia` (`id`, `nguoi_dung_id`, `ma_giam_gia_id`, `don
 -- Cấu trúc bảng cho bảng `thong_so`
 --
 
-DROP TABLE IF EXISTS `thong_so`;
 CREATE TABLE `thong_so` (
   `id` int(11) NOT NULL COMMENT 'ID thông số',
   `ten_thong_so` varchar(100) NOT NULL COMMENT 'Tên thông số (Chất liệu, Kích cỡ, Trọng lượng, ...)',
@@ -634,7 +759,6 @@ INSERT INTO `thong_so` (`id`, `ten_thong_so`, `mo_ta`) VALUES
 -- Cấu trúc bảng cho bảng `yeu_thich`
 --
 
-DROP TABLE IF EXISTS `yeu_thich`;
 CREATE TABLE `yeu_thich` (
   `id` int(11) NOT NULL COMMENT 'ID yêu thích',
   `nguoi_dung_id` int(11) NOT NULL COMMENT 'ID người dùng',
@@ -841,7 +965,7 @@ ALTER TABLE `yeu_thich`
 -- AUTO_INCREMENT cho bảng `bien_the_san_pham`
 --
 ALTER TABLE `bien_the_san_pham`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID biến thể', AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID biến thể', AUTO_INCREMENT=171;
 
 --
 -- AUTO_INCREMENT cho bảng `cai_dat`
@@ -919,7 +1043,7 @@ ALTER TABLE `ma_giam_gia`
 -- AUTO_INCREMENT cho bảng `nguoi_dung`
 --
 ALTER TABLE `nguoi_dung`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID người dùng', AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID người dùng', AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT cho bảng `san_pham`
