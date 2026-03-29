@@ -1,66 +1,49 @@
 <?php
-function getallproduct($conn)
-{
- $sql = "SELECT * FROM san_pham";
+
+// ========== HELPER FUNCTION ==========
+/**
+ * Convert category ID to category key (slug)
+ */
+function getCategoryKey($categoryId) {
+    $categoryMap = [
+        1 => 'quan-ao',
+        2 => 'giay',
+        3 => 'thiet-bi',
+        4 => 'phu-kien'
+    ];
+    return $categoryMap[$categoryId] ?? 'quan-ao';
+}
+
+// ========== PRODUCT FUNCTIONS ==========
+function getAllProducts($conn) {
+    $sql = "SELECT * FROM san_pham WHERE trang_thai = 1";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Map tên cột database sang tên cột JavaScript đang dùng
-    $mappedProducts = array_map(function($p) {
+    return array_map(function($p) {
         return [
-            'id' => $p['id'],
-            'name' => $p['ten'],
-            'description' => $p['mo_ta'],
-            'price' => $p['gia'],
-            'originalPrice' => $p['gia_goc'],
-            'rating' => $p['trung_binh_sao'],
-            'image' => $p['hinh_anh_chinh'],
-            'category' => getCategoryKey($p['danh_muc_id']),
-            'trung_binh_sao' => $p['trung_binh_sao'],
-            'so_luong_danh_gia' => $p['so_luong_danh_gia'],
-            'hinh_anh_chinh' => $p['hinh_anh_chinh'],
+            'id' => (int)$p['id'],
             'ten' => $p['ten'],
             'mo_ta' => $p['mo_ta'],
-            'gia' => $p['gia'],
-            'gia_goc' => $p['gia_goc']
+            'gia' => (float)$p['gia'],
+            'gia_goc' => (float)$p['gia_goc'],
+            'hinh_anh_chinh' => $p['hinh_anh_chinh'],
+            'danh_muc_id' => (int)$p['danh_muc_id'],
+            'trung_binh_sao' => (float)$p['trung_binh_sao'],
+            'so_luong_danh_gia' => (int)$p['so_luong_danh_gia'],
         ];
     }, $products);
+}
+
+function getProductsByCategory($conn, $categoryId) {
+    $sql = "SELECT * FROM san_pham WHERE danh_muc_id = :cat_id AND trang_thai = 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cat_id', $categoryId, PDO::PARAM_INT);
+    $stmt->execute();
     
-    return $mappedProducts;
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-
-
-// Hàm hiển thị danh mục (label tiếng Việt)
-function getCategoryLabel($category) {
-    $labels = [
-        'quan-ao' => 'Quần áo',
-        'giay' => 'Giày',
-        'thiet-bi' => 'Thiết bị',
-        'phu-kien' => 'Phụ kiện'
-    ];
-    return $labels[$category] ?? 'Quần áo';
-}
-
-// Hàm xử lý sản phẩm - thêm các trường tính toán
-function processProducts($products) {
-    return array_map(function($p) {
-        $p['categoryLabel'] = getCategoryLabel($p['category']);
-        $p['rating'] = floatval($p['rating']);
-        $p['originalPrice'] = floatval($p['originalPrice']);
-        $p['price'] = floatval($p['price']);
-        
-        // Tính discount
-        $p['discount'] = 0;
-        if ($p['originalPrice'] > $p['price'] && $p['originalPrice'] > 0) {
-            $p['discount'] = round((($p['originalPrice'] - $p['price']) / $p['originalPrice']) * 100);
-        }
-        
-        return $p;
-    }, $products);
-}
-
 
 function getVariantStock($conn, $productId, $sizeId, $colorId) {
     $sql = "SELECT so_luong_ton 
@@ -77,37 +60,9 @@ function getVariantStock($conn, $productId, $sizeId, $colorId) {
     $stmt->execute();
     
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $result ? (int) $result['so_luong_ton'] : 0;
+    return $result ? (int)$result['so_luong_ton'] : 0;
 }
 
-
-function getProductsByCategory($conn, $categoryId) {
-    $sql = "SELECT * FROM san_pham WHERE danh_muc_id = :cat_id AND trang_thai = 1";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':cat_id', $categoryId, PDO::PARAM_INT);
-    $stmt->execute();
-    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    return array_map(function($p) {
-        return [
-            'id' => $p['id'],
-            'name' => $p['ten'],
-            'description' => $p['mo_ta'],
-            'price' => $p['gia'],
-            'originalPrice' => $p['gia_goc'],
-            'rating' => $p['trung_binh_sao'],
-            'image' => $p['hinh_anh_chinh'],
-            'category' => getCategoryKey($p['danh_muc_id']),
-            'trung_binh_sao' => $p['trung_binh_sao'],
-            'so_luong_danh_gia' => $p['so_luong_danh_gia'],
-            'hinh_anh_chinh' => $p['hinh_anh_chinh'],
-            'ten' => $p['ten'],
-            'mo_ta' => $p['mo_ta'],
-            'gia' => $p['gia'],
-            'gia_goc' => $p['gia_goc']
-        ];
-    }, $products);
-}
 function getUserById($conn, $id) {
     $sql = "SELECT id, ten, email, so_dien_thoai, dia_chi, anh_dai_dien, vai_tro, trang_thai, ngay_tao 
             FROM nguoi_dung 
@@ -119,11 +74,8 @@ function getUserById($conn, $id) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-/**
- * ========================================
- * HÀM XỬ LÝ NGƯỜI DÙNG (ĐĂNG NHẬP / ĐĂNG KÝ)
- * ========================================
- */
+// ========== USER AUTHENTICATION ==========
+
 
 function registerUser($conn, $ten, $email, $mat_khau) {
     try {

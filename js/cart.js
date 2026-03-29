@@ -102,32 +102,71 @@ function removeFromCartAPI(productId) {
 // ===========================
 
 function loadCart() {
-    console.log("Đang gọi API lấy giỏ hàng...");
     fetch('api/cart.php?action=get')
         .then(response => response.json())
         .then(data => {
-            console.log("Dữ liệu thực tế từ API:", data); // Kiểm tra ở tab Console
-
-            // Kiểm tra hàng có tồn tại không (chấp nhận cả Array và Object)
-            const hasItems = data.cart && (Array.isArray(data.cart) ? data.cart.length > 0 : Object.keys(data.cart).length > 0);
-
-            if (!data.success || !hasItems) {
+            if (!data.success || !data.cart || data.cart.length === 0) {
                 const cartItemsList = document.getElementById('cartItemsList');
                 if (cartItemsList) {
                     cartItemsList.innerHTML = `
                         <div class="empty-cart text-center py-5">
                             <i class="fas fa-shopping-cart fa-4x mb-3 text-muted"></i>
                             <h3>Giỏ hàng của bạn trống</h3>
-                            <a href="products.php" class="btn btn-primary mt-2">Tiếp tục mua sắm</a>
-                        </div>`;
+                            <p class="text-muted">Hãy thêm sản phẩm vào giỏ để tiếp tục mua sắm.</p>
+                            <a href="products.php" class="btn btn-primary mt-2">
+                                <i class="fas fa-arrow-right me-1"></i>Tiếp tục mua sắm
+                            </a>
+                        </div>
+                    `;
                 }
                 const cartSummary = document.querySelector('.cart-summary');
                 if (cartSummary) cartSummary.style.display = 'none';
                 return;
             }
             
-            // Nếu có hàng, tiến hành render...
-            renderCartUI(data.cart); 
+            const cartItemsList = document.getElementById('cartItemsList');
+            if (!cartItemsList) return;
+            
+            const cart = data.cart;
+            cartItemsList.innerHTML = cart.map((item, index) => {
+                // Fix image path - thêm public/ nếu cần
+                let imagePath = item.image || 'public/placeholder.svg';
+                if (!imagePath.startsWith('./') && !imagePath.startsWith('/') && !imagePath.includes('data:')) {
+                    imagePath = './public/' + imagePath;
+                }
+                return `
+                <div class="cart-item" id="item-${item.id}">
+                    <div class="cart-item-image">
+                        <img src="${imagePath}" alt="${item.name}" onerror="this.src='public/placeholder.svg'">
+                    </div>
+                    <div class="cart-item-info">
+                        <h4>${item.name}</h4>
+                        <div class="cart-item-price">${formatPrice(item.price)}</div>
+                    </div>
+                    <div class="cart-item-details">
+                        <div class="quantity-control">
+                            <button class="qty-control-btn" onclick="changeQty(${item.id}, ${item.quantity - 1})">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" class="qty-control-input" value="${item.quantity}" min="1" max="100" 
+                                   onchange="changeQty(${item.id}, this.value)">
+                            <button class="qty-control-btn" onclick="changeQty(${item.id}, ${item.quantity + 1})">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="cart-item-subtotal">
+                        <strong>${formatPrice((item.price || 0) * (item.quantity || 1))}</strong>
+                    </div>
+                    <button class="btn-remove-item" onclick="removeFromCartAPI(${item.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                `;
+            }).join('');
+            
+            updateCartSummary();
+            document.querySelector('.cart-summary').style.display = 'block';
         })
         .catch(error => console.error('Lỗi tải giỏ hàng:', error));
 }
@@ -397,5 +436,5 @@ document.addEventListener('DOMContentLoaded', function() {
         document.head.appendChild(style);
     }
     
-    console.log('✅ Trang giỏ hàng đã được khởi tạo (Backend API)!');
+    console.log('✅ Trang giỏ hàng đã được khởi tạo!');
 });

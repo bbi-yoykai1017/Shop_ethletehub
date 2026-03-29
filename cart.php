@@ -133,9 +133,9 @@ function formatPrice($price) {
                                     <strong id="subtotal-<?= $item['id'] ?>">
                                         <?= formatPrice($item['price'] * $item['quantity']) ?>
                                     </strong>
-                                </div>  
+                                </div>
                                 <button class="btn-remove-item"
-                                        onclick="removeItem(<?= $item['id'] ?>, '<?= htmlspecialchars($item['name'], ENT_QUOTES) ?>')"
+                                        onclick="removeItem(<?= $item['id'] ?>, '<?= htmlspecialchars($item['ten'], ENT_QUOTES) ?>')"
                                         title="Xóa sản phẩm">
                                     <i class="fas fa-trash"></i>
                                 </button>

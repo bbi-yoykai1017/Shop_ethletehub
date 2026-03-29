@@ -6,7 +6,7 @@ require_once 'model/detail.php';
 
 $db = new Database();
 $conn = $db->connect();
-$items = getallproduct($conn);
+$items = getAllProducts($conn);
 ?>
 <!DOCTYPE html>
 <html lang="vi">

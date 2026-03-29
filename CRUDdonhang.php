@@ -21,14 +21,16 @@ $edit_order = [
 
 // ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
 if (isset($_GET['edit'])) {
-    $id = $_GET['edit'];
-    $sql = "SELECT * FROM don_hang WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([$id]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($result) {
-        $edit_order = $result;
-        $update_mode = true;
+    $id = (int)$_GET['edit'];
+    if ($id > 0) {
+        $sql = "SELECT * FROM don_hang WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result) {
+            $edit_order = $result;
+            $update_mode = true;
+        }
     }
 }
 
@@ -61,11 +63,14 @@ if (isset($_POST['save_order'])) {
 
 // ================= 3. XỬ LÝ XÓA =================
 if (isset($_GET['delete'])) {
-    $sql = "DELETE FROM don_hang WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([$_GET['delete']]);
-    header("Location: CRUDdonhang.php");
-    exit;
+    $id = (int)$_GET['delete'];
+    if ($id > 0) {
+        $sql = "DELETE FROM don_hang WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$id]);
+        header("Location: CRUDdonhang.php");
+        exit;
+    }
 }
 $listorders = getAllOrders($conn);
 ?>

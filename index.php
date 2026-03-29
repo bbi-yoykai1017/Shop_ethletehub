@@ -6,12 +6,9 @@ require_once 'Database.php';
 
 $db = new Database();
 $conn = $db->connect();
-$products = getallproduct($conn);
+$products = getAllProducts($conn);
 
-// Xử lý sản phẩm - thêm các trường tính toán
-$products = processProducts($products);
-
-// Giới hạn hiển thị 6 sản phẩm
+// Limit display to 6 products
 $displayProducts = array_slice($products, 0, 6);
 ?>
 

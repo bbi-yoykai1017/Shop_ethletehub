@@ -1,58 +1,20 @@
 <?php
 session_start();
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+require_once "Database.php";
+require_once 'model/functions.php';
 require_once 'model/detail.php';
-require_once 'Database.php';
 
 $db = new Database();
 $conn = $db->connect();
-
-// Lay id san pham tu URL
-$id = (int) isset($_GET['id']) ? (int) $_GET['id'] : 0;
-
-// Su dung ham lay chi tiet san pham
-$product = getProductDetail($conn, $id);
-
-// Neu khong tim thay san pham, chuyen huong ve trang chu
-if (!$product) {
-    header("Location: index.php");
-    exit();
-}
-
-// Lay danh gia
-$reviews = getReviewsByProductId($conn, $id);
-
-// Lay san pham lien quan
-$relatedProducts = getRelatedProducts($conn, $product['danh_muc_id'], $id, 4);
-
-// Xu ly hinh anh cho gallery
-$thumbnails = $product['images'] ?? []; // Nếu không có ảnh thì trả về mảng rỗng
-$mainImage = !empty($thumbnails) ? $thumbnails[0]['duong_dan'] : ($product['hinh_anh_chinh'] ?? '');
-
-// Xu ly size va mau
-$sizes = function_exists('getProductSizes') ? getProductSizes($conn, $id) : [];
-$colors = function_exists('getProductColors') ? getProductColors($conn, $id) : [];
-
-// Xu ly gia tri mac dinh (Chống lỗi văng trang)
-$gia = $product['gia'] ?? 0;
-$gia_goc = $product['gia_goc'] ?? 0;
-$discountPercent = $product['discount_percent'] ?? 0;
-$savings = $product['savings'] ?? 0;
-$danh_muc = $product['ten_danh_muc'] ?? 'Danh mục';
-$categoryKey = $product['category_key'] ?? '';
-
-// Rating summary
-$ratingSummary = $product['rating_summary'] ?? 0;
+$items = getAllProducts($conn);
 ?>
-
 <!DOCTYPE html>
 <html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết sản phẩm - AthleteHub</title>
+    <title>Danh sách sản phẩm - AthleteHub</title>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -61,65 +23,12 @@ $ratingSummary = $product['rating_summary'] ?? 0;
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
-    <link rel="stylesheet" href="css/product-detail.css">
-    <style>
-        .product-tabs-section .nav-tabs {
-            border-bottom: 2px solid #eee;
-            margin-bottom: 20px;
-        }
-
-        .product-tabs-section .nav-link {
-            color: #555;
-            font-weight: 600;
-            border: none;
-            padding: 12px 20px;
-        }
-
-        .product-tabs-section .nav-link.active {
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--primary-color);
-            background: none;
-        }
-
-        .tab-content-body {
-            padding: 20px 0;
-            line-height: 1.8;
-            color: #444;
-        }
-
-        .review-item {
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-
-        .review-author {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .review-date {
-            font-size: 0.85em;
-            color: #888;
-        }
-
-        .review-stars {
-            color: #ffc107;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/products-page.css">
 </head>
 
 <body>
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-custom">
             <a class="navbar-brand" href="index.php">
                 <i class="fas fa-dumbbell"></i>
@@ -142,7 +51,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                         <a class="nav-link" href="index.php#categories">Danh mục</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#about">Về chúng tôi</a>
+                        <a class="nav-link" href="index.php#about">Về chúng tôi</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#contact">Liên hệ</a>
@@ -155,11 +64,10 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                         <span class="notification-badge">2</span>
                     </div>
 
-                     <div class="cart-icon" onclick="window.location.href='cart.php'">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count"></span>
-                    </div>
-
+                    <div class="cart-icon">
+                        <i class="fas fa-shopping-cart" onclick="window.location.href='cart.php'"></i>
+                        <span class="cart-count">0</span>
+                    </div>                  
                     <div class="user-account-wrapper d-flex align-items-center">
                         <div class="user-action-dropdown dropdown">
                             <a href="#" class="user-icon-link me-2 text-decoration-none dropdown-toggle"
@@ -199,425 +107,146 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                     </div>
                 </div>
             </div>
-        </div>
     </nav>
 
-    <!-- BREADCRUMB -->
-    <div class="breadcrumb-section">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
         <div class="container-custom">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.php">Trang chủ</a></li>
-                    <li class="breadcrumb-item"><a href="products.php">Sản phẩm</a></li>
-                    <li class="breadcrumb-item"><a
-                            href="products.php?category=<?php echo $categoryKey; ?>"><?php echo htmlspecialchars($danh_muc); ?></a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                        <?php echo htmlspecialchars($product['ten']); ?>
-                    </li>
-                </ol>
-            </nav>
+            <h1>Danh sách sản phẩm</h1>
+            <p>Khám phá bộ sưu tập đồ thể thao chuyên nghiệp của chúng tôi</p>
         </div>
     </div>
 
-    <!-- PRODUCT DETAIL SECTION -->
-    <section class="product-detail-section">
+    <!-- PRODUCTS PAGE -->
+    <section class="products-page">
         <div class="container-custom">
             <div class="row">
-                <!-- Product Images -->
-                <div class="col-lg-6">
-                    <div class="product-gallery">
-                        <div class="main-image">
-                            <img id="mainImage" src="public/<?php echo htmlspecialchars($mainImage); ?>"
-                                alt="<?php echo htmlspecialchars($product['ten']); ?>">
-                            <?php if ($discountPercent > 0): ?>
-                                <span class="product-badge-detail sale">-<?php echo $discountPercent; ?>%</span>
-                            <?php endif; ?>
+                <!-- Sidebar Filter -->
+                <div class="col-lg-3">
+                    <div class="sidebar-filters">
+                        <!-- Search Filter -->
+                        <div class="filter-group">
+                            <h4 class="filter-title">
+                                <i class="fas fa-search"></i>
+                                Tìm kiếm
+                            </h4>
+                            <div class="search-box">
+                                <input type="text" id="searchInput" class="form-control" placeholder="Tìm sản phẩm...">
+                                <i class="fas fa-search"></i>
+                            </div>
                         </div>
-                        <div class="thumbnail-images">
-                            <?php if (!empty($thumbnails)): ?>
-                                <?php foreach ($thumbnails as $index => $img): ?>
-                                    <div class="thumbnail-item <?php echo $index === 0 ? 'active' : ''; ?>"
-                                        onclick="changeImage(this)"
-                                        data-src="public/<?php echo htmlspecialchars($img['duong_dan']); ?>">
-                                        <img src="public/<?php echo htmlspecialchars($img['duong_dan']); ?>"
-                                            alt="View <?php echo $index + 1; ?>">
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <div class="thumbnail-item active" onclick="changeImage(this)">
-                                    <img src="public/<?php echo htmlspecialchars($product['hinh_anh_chinh']); ?>"
-                                        alt="View 1">
+
+                        <!-- Category Filter -->
+                        <div class="filter-group">
+                            <h4 class="filter-title">
+                                <i class="fas fa-tag"></i>
+                                Danh mục
+                            </h4>
+                            <div class="filter-options">
+                                <label class="filter-label">
+                                    <input type="checkbox" class="category-filter" value="all" checked>
+                                    <span>Tất cả</span>
+                                </label>
+                                <label class="filter-label">
+                                    <input type="checkbox" class="category-filter" value="quan-ao">
+                                    <span>Quần áo</span>
+                                </label>
+                                <label class="filter-label">
+                                    <input type="checkbox" class="category-filter" value="giay">
+                                    <span>Giày </span>
+                                </label>
+                                <label class="filter-label">
+                                    <input type="checkbox" class="category-filter" value="thiet-bi">
+                                    <span>Thiết bị</span>
+                                </label>
+                                <label class="filter-label">
+                                    <input type="checkbox" class="category-filter" value="phu-kien">
+                                    <span>Phụ kiện </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Price Filter -->
+                        <div class="filter-group">
+                            <h4 class="filter-title">
+                                <i class="fas fa-dollar-sign"></i>
+                                Giá
+                            </h4>
+                            <div class="price-range">
+                                <input type="range" id="priceRange" min="0" max="2000000" value="2000000" class="form-range">
+                                <div class="price-display">
+                                    <span>Từ: <strong>0₫</strong></span>
+                                    <span>Đến: <strong id="maxPrice">2.000.000₫</strong></span>
                                 </div>
-                            <?php endif; ?>
+                            </div>
                         </div>
+                        <!-- Clear Filters -->
+                        <button class="btn-clear-filters" id="clearFilters">
+                            <i class="fas fa-times"></i>
+                            Xóa tất cả bộ lọc
+                        </button>
                     </div>
                 </div>
 
-                <!-- Product Info -->
-                <div class="col-lg-6">
-                    <div class="product-detail-info">
-                        <!-- Category & Rating -->
-                        <div class="detail-header">
-                            <span class="product-category"><?php echo htmlspecialchars($danh_muc); ?></span>
-                            <div class="rating-group">
-                                <div class="stars">
-                                    <?php echo getStarRating($ratingSummary['average_rating']); ?>
-                                </div>
-                                <span class="rating-count">(<?php echo $ratingSummary['total_reviews']; ?> đánh
-                                    giá)</span>
-                            </div>
+                <!-- Products Grid -->
+                <div class="col-lg-9">
+                    <!-- Toolbar -->
+                    <div class="products-toolbar">
+                        <div class="toolbar-left">
+                            <span class="products-count">
+                                Hiển thị <strong id="showingCount">12</strong> sản phẩm
+                            </span>
                         </div>
-
-                        <!-- Title & Price -->
-                        <h1 class="detail-title"><?php echo htmlspecialchars($product['ten']); ?></h1>
-                        <p class="detail-description"><?php echo htmlspecialchars($product['mo_ta']); ?></p>
-
-                        <!-- Price Section -->
-                        <div class="detail-price-section">
-                            <div class="price-group">
-                                <span class="price-current"><?php echo $product['gia_formatted']; ?></span>
-                                <span class="price-original"><?php echo $product['gia_goc_formatted']; ?></span>
-                                <?php if ($discountPercent > 0): ?>
-                                    <span class="price-discount">-<?php echo $discountPercent; ?>%</span>
-                                <?php endif; ?>
-                            </div>
-                            <div class="price-info">
-                                <p>Tiết kiệm: <strong><?php echo $product['savings_formatted']; ?></strong></p>
-                            </div>
+                        <div class="toolbar-right">
+                            <label>Sắp xếp theo:</label>
+                            <select id="sortBy" class="form-select sort-select">
+                                <option value="popular">Phổ biến nhất</option>
+                                <option value="newest">Mới nhất</option>
+                                <option value="price-low">Giá: thấp đến cao</option>
+                                <option value="price-high">Giá: cao đến thấp</option>
+                                <option value="rating">Đánh giá cao nhất</option>
+                                <option value="bestseller">Bán chạy nhất</option>
+                            </select>
                         </div>
+                    </div>
 
-                        <!-- Stock Status -->
-                        <div class="stock-section">
-                            <?php if ($product['total_stock'] > 0): ?>
-                                <span class="stock-status-badge in-stock">
-                                    <i class="fas fa-check-circle"></i> Còn hàng (<?php echo $product['total_stock']; ?> sản
-                                    phẩm)
-                                </span>
-                                <?php if ($product['total_stock'] < 20): ?>
-                                    <span class="stock-warning">Chỉ còn <?php echo $product['total_stock']; ?> sản phẩm với giá
-                                        này!</span>
-                                <?php endif; ?>
-                            <?php else: ?>
-                                <span class="stock-status-badge out-of-stock">
-                                    <i class="fas fa-times-circle"></i> Hết hàng
-                                </span>
-                            <?php endif; ?>
-                        </div>
+                    <!-- Products Grid -->
+                    <div class="products-grid-page" id="productsGrid">
+                        <!-- Products will be inserted here by JavaScript -->
+                    </div>
 
-                        <!-- Product Options -->
-                        <div class="product-options">
-                            <?php if (!empty($sizes) || !empty($colors)): ?>
-                                <!-- Size -->
-                                <?php if (!empty($sizes)): ?>
-                                    <div class="option-group">
-                                        <label class="option-label">Size:</label>
-                                        <div class="size-options" id="sizeOptions">
-                                            <?php foreach ($sizes as $size): ?>
-                                                <button type="button" class="size-btn" data-size-id="<?php echo $size['id']; ?>"
-                                                    data-size-name="<?php echo htmlspecialchars($size['ten']); ?>">
-                                                    <?php echo htmlspecialchars($size['ten']); ?>
-                                                </button>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-
-                                <!-- Color -->
-                                <?php if (!empty($colors)): ?>
-                                    <div class="option-group">
-                                        <label class="option-label">Màu sắc:</label>
-                                        <div class="color-options" id="colorOptions">
-                                            <?php foreach ($colors as $color): ?>
-                                                <button type="button" class="color-btn" data-color-id="<?php echo $color['id']; ?>"
-                                                    data-color-name="<?php echo htmlspecialchars($color['ten']); ?>"
-                                                    style="background-color: <?php echo htmlspecialchars($color['ma_hex']); ?>;"
-                                                    title="<?php echo htmlspecialchars($color['ten']); ?>">
-                                                </button>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-                            <?php endif; ?>
-
-                            <!-- Quantity -->
-                            <div class="option-group">
-                                <label class="option-label">Số lượng:</label>
-                                <div class="quantity-selector">
-                                    <button class="qty-btn" onclick="decreaseQty()">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number" id="quantity" class="qty-input" value="1" min="1"
-                                        max="<?php echo $product['total_stock']; ?>">
-                                    <button class="qty-btn" onclick="increaseQty()">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="detail-actions">
-                            <button class="btn-add-to-cart-detail" data-product-id="<?php echo $product['id']; ?>">
-                                <i class="fas fa-shopping-cart"></i>
-                                Thêm vào giỏ hàng
-                            </button>
-                            <button class="btn-buy-now-detail">
-                                <i class="fas fa-bolt"></i>
-                                Mua ngay
-                            </button>
-                            <button class="btn-wishlist-detail" id="wishlistBtn"
-                                data-product-id="<?php echo $product['id']; ?>">
-                                <i class="far fa-heart"></i>
-                                <span>Yêu thích</span>
-                            </button>
-                        </div>
-
-                        <!-- Shipping Info -->
-                        <div class="shipping-info">
-                            <div class="shipping-item">
-                                <i class="fas fa-truck"></i>
-                                <div>
-                                    <h4>Giao hàng miễn phí</h4>
-                                    <p>Đơn hàng trên 500.000₫</p>
-                                </div>
-                            </div>
-                            <div class="shipping-item">
-                                <i class="fas fa-undo"></i>
-                                <div>
-                                    <h4>Trả hàng 30 ngày</h4>
-                                    <p>Không yêu cầu câu hỏi</p>
-                                </div>
-                            </div>
-                            <div class="shipping-item">
-                                <i class="fas fa-shield-alt"></i>
-                                <div>
-                                    <h4>Bảo mật thanh toán</h4>
-                                    <p>Bảo vệ mọi giao dịch</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Share -->
-                        <div class="detail-share">
-                            <span>Chia sẻ:</span>
-                            <a href="#" class="share-btn"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="share-btn"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="share-btn"><i class="fab fa-pinterest"></i></a>
-                            <a href="#" class="share-btn"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
+                    <!-- Pagination -->
+                    <div class="pagination-section">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination">
+                                <li class="page-item"><a class="page-link" href="#">
+                                        <i class="fas fa-chevron-left"></i> Trước
+                                    </a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item"><a class="page-link" href="#">4</a></li>
+                                <li class="page-item"><a class="page-link" href="#">
+                                        Tiếp <i class="fas fa-chevron-right"></i>
+                                    </a></li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Product Details Tabs -->
-            <div class="product-tabs-section">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="description-tab" data-bs-toggle="tab"
-                            data-bs-target="#description" type="button">
-                            Mô tả sản phẩm
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="specifications-tab" data-bs-toggle="tab"
-                            data-bs-target="#specifications" type="button">
-                            Thông số kỹ thuật
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews"
-                            type="button">
-                            Đánh giá (<?php echo $ratingSummary['total_reviews']; ?>)
-                        </button>
-                    </li>
-                </ul>
-
-                <div class="tab-content">
-                    <!-- Description Tab -->
-                    <div class="tab-pane fade show active" id="description" role="tabpanel">
-                        <div class="tab-content-body">
-                            <h3>Mô tả sản phẩm</h3>
-                            <?php if (!empty($product['mo_ta_chi_tiet'])): ?>
-                                <p><?php echo nl2br(htmlspecialchars($product['mo_ta_chi_tiet'])); ?></p>
-                            <?php elseif (!empty($product['mo_ta'])): ?>
-                                <p><?php echo nl2br(htmlspecialchars($product['mo_ta'])); ?></p>
-                            <?php else: ?>
-                                <p>Chưa có mô tả chi tiết cho sản phẩm này.</p>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-
-                    <!-- Specifications Tab -->
-                    <div class="tab-pane fade" id="specifications" role="tabpanel">
-                        <div class="tab-content-body">
-                            <h3>Thông số kỹ thuật</h3>
-                            <?php if (!empty($product['specifications'])): ?>
-                                <table class="specs-table">
-                                    <?php foreach ($product['specifications'] as $spec): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($spec['ten_thong_so']); ?></td>
-                                            <td><?php echo htmlspecialchars($spec['gia_tri']); ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </table>
-                            <?php else: ?>
-                                <p>Chưa có thông số kỹ thuật cho sản phẩm này.</p>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-
-                    <!-- Reviews Tab -->
-                    <div class="tab-pane fade" id="reviews" role="tabpanel">
-                        <div class="tab-content-body">
-                            <div class="reviews-container">
-                                <div class="reviews-summary">
-                                    <div class="rating-box">
-                                        <div class="rating-number">
-                                            <?php echo number_format($ratingSummary['average_rating'], 1); ?>
-                                        </div>
-                                        <div class="rating-stars">
-                                            <?php echo getStarRating($ratingSummary['average_rating']); ?>
-                                        </div>
-                                        <p>Dựa trên <?php echo $ratingSummary['total_reviews']; ?> đánh giá</p>
-                                    </div>
-
-                                    <div class="rating-breakdown">
-                                        <?php for ($i = 5; $i >= 1; $i--):
-                                            $dist = $ratingSummary['rating_distribution'][$i] ?? ['count' => 0, 'percentage' => 0];
-                                        ?>
-                                            <div class="rating-bar">
-                                                <span class="rating-label"><?php echo $i; ?> <i
-                                                        class="fas fa-star"></i></span>
-                                                <div class="bar">
-                                                    <div class="fill" style="width: <?php echo $dist['percentage']; ?>%;">
-                                                    </div>
-                                                </div>
-                                                <span class="rating-count"><?php echo $dist['count']; ?></span>
-                                            </div>
-                                        <?php endfor; ?>
-                                    </div>
-                                </div>
-
-                                <div class="write-review">
-                                    <h4>Viết đánh giá của bạn</h4>
-                                    <form class="review-form">
-                                        <div class="form-group">
-                                            <label>Đánh giá:</label>
-                                            <div class="rating-input">
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Tiêu đề:</label>
-                                            <input type="text" class="form-control"
-                                                placeholder="Viết tiêu đề đánh giá...">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Nội dung:</label>
-                                            <textarea class="form-control" rows="4"
-                                                placeholder="Chia sẻ kinh nghiệm của bạn..."></textarea>
-                                        </div>
-                                        <button type="submit" class="btn-submit-review">Gửi đánh giá</button>
-                                    </form>
-                                </div>
-
-                                <div class="reviews-list">
-                                    <h4>Đánh giá từ khách hàng</h4>
-                                    <?php if (!empty($reviews)): ?>
-                                        <?php foreach ($reviews as $review): ?>
-                                            <div class="review-item">
-                                                <div class="review-header">
-                                                    <div class="reviewer-info">
-                                                        <img src="<?php echo !empty($review['anh_dai_dien']) ? 'public/' . htmlspecialchars($review['anh_dai_dien']) : 'https://via.placeholder.com/40?text=Avatar'; ?>"
-                                                            alt="Avatar" class="reviewer-avatar">
-                                                        <div>
-                                                            <h5><?php echo htmlspecialchars($review['ten_nguoi_dung']); ?></h5>
-                                                            <p class="review-date"><?php echo $review['so_sao']; ?> sao -
-                                                                <?php echo date('d/m/Y', strtotime($review['ngay_danh_gia'])); ?>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <span class="verified-badge">
-                                                        <i class="fas fa-check-circle"></i> Đã xác minh
-                                                    </span>
-                                                </div>
-                                                <p class="review-content">
-                                                    <?php echo nl2br(htmlspecialchars($review['binh_luan'])); ?>
-                                                </p>
-                                                <div class="review-actions">
-                                                    <button class="helpful-btn">
-                                                        <i class="fas fa-thumbs-up"></i> Hữu ích
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <p>Chưa có đánh giá nào cho sản phẩm này.</p>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Related Products -->
-            <div class="related-products-section">
-                <h2 class="section-title">
-                    <span>Sản phẩm liên quan</span>
-                </h2>
-
-                <div class="row">
-                    <?php if (!empty($relatedProducts)): ?>
-                        <?php foreach ($relatedProducts as $related): ?>
-                            <div class="col-lg-3 col-md-6 col-sm-6">
-                                <div class="product-card-small">
-                                    <div class="product-image-small">
-                                        <?php if (!empty($related['hinh_anh_chinh'])): ?>
-                                            <img src="public/<?php echo htmlspecialchars($related['hinh_anh_chinh']); ?>"
-                                                alt="<?php echo htmlspecialchars($related['ten']); ?>">
-                                        <?php else: ?>
-                                            <i class="fas fa-shirt"></i>
-                                        <?php endif; ?>
-                                        <?php if ($related['discount_percent'] > 0): ?>
-                                            <span class="product-badge">-<?php echo $related['discount_percent']; ?>%</span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="product-info-small">
-                                        <h4><?php echo htmlspecialchars($related['ten']); ?></h4>
-                                        <div class="price-small">
-                                            <span class="price"><?php echo $related['gia_formatted']; ?></span>
-                                            <?php if ($related['discount_percent'] > 0): ?>
-                                                <span class="price-old"><?php echo $related['gia_goc_formatted']; ?></span>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="rating-small">
-                                            <?php echo $related['star_rating']; ?>
-                                            <span>(<?php echo $related['so_luong_danh_gia']; ?>)</span>
-                                        </div>
-                                        <button class="btn-add-to-cart-detail" data-product-id="<?php echo $product['id']; ?>">
-                                            <i class="fas fa-shopping-cart"></i>
-                                            Thêm vào giỏ hàng
-                                        </button>
-                                        <button class="btn-buy-now-detail">
-                                            <i class="fas fa-bolt"></i>
-                                            Mua ngay
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="col-12">
-                            <p class="text-center">Không có sản phẩm liên quan.</p>
-                        </div>
-                    <?php endif; ?>
-                </div>
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container-custom">
+            <div class="cta-content">
+                <h2>Không tìm thấy sản phẩm bạn muốn?</h2>
+                <p>Liên hệ với chúng tôi và chúng tôi sẽ giúp bạn tìm thấy sản phẩm phù hợp nhất</p>
+                <button class="btn-contact-cta">
+                    <i class="fas fa-envelope"></i>
+                    Liên hệ ngay
+                </button>
             </div>
         </div>
     </section>
@@ -630,8 +259,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-section">
                             <h4 class="footer-title">AthleteHub</h4>
-                            <p style="color: #c0c0c0;">Chúng tôi cung cấp sản phẩm thể thao chất lượng cao với giá cạnh
-                                tranh tốt nhất.</p>
+                            <p style="color: #c0c0c0;">Chúng tôi cung cấp sản phẩm thể thao chất lượng cao.</p>
                             <div class="footer-socials">
                                 <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
                                 <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
@@ -643,10 +271,10 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                         <div class="footer-section">
                             <h4 class="footer-title">Liên kết nhanh</h4>
                             <ul class="footer-links">
-                                <li><a href="#">Trang chủ</a></li>
-                                <li><a href="#">Sản phẩm</a></li>
-                                <li><a href="#">Danh mục</a></li>
-                                <li><a href="#">Về chúng tôi</a></li>
+                                <li><a href="index.php"><i class="fas fa-angle-right"></i>Trang chủ</a></li>
+                                <li><a href="products.php"><i class="fas fa-angle-right"></i>Sản phẩm</a></li>
+                                <li><a href="#categories"><i class="fas fa-angle-right"></i>Danh mục</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Về chúng tôi</a></li>
                             </ul>
                         </div>
                     </div>
@@ -654,10 +282,9 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                         <div class="footer-section">
                             <h4 class="footer-title">Hỗ trợ</h4>
                             <ul class="footer-links">
-                                <li><a href="#">Liên hệ chúng tôi</a></li>
-                                <li><a href="#">Chính sách giao hàng</a></li>
-                                <li><a href="#">Chính sách hoàn trả</a></li>
+                                <li><a href="#">Liên hệ</a></li>
                                 <li><a href="#">FAQ</a></li>
+                                <li><a href="#">Chính sách</a></li>
                             </ul>
                         </div>
                     </div>
@@ -667,10 +294,6 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                             <div class="contact-item">
                                 <i class="fas fa-phone"></i>
                                 <p>+84 (0) 123 456 789</p>
-                            </div>
-                            <div class="contact-item">
-                                <i class="fas fa-envelope"></i>
-                                <p>support@athletehub.vn</p>
                             </div>
                         </div>
                     </div>
@@ -686,8 +309,13 @@ $ratingSummary = $product['rating_summary'] ?? 0;
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="js/cart.js"></script>
     <script src="js/script.js"></script>
-    <script src="js/product-detail.js"></script>
+    <script>
+        window.allProducts = <?php echo json_encode($items); ?>;
+    </script>
+    <script src="js/products-page.js"></script>
+
 </body>
 
 </html>
