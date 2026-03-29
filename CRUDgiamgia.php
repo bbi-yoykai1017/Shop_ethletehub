@@ -22,16 +22,14 @@ $edit_data = [
 
 // ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
 if (isset($_GET['edit'])) {
-    $id = (int)$_GET['edit'];
-    if ($id > 0) {
-        $sql = "SELECT * FROM ma_giam_gia WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($result) {
-            $edit_data = $result;
-            $update_mode = true;
-        }
+    $id = $_GET['edit'];
+    $sql = "SELECT * FROM ma_giam_gia WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result) {
+        $edit_data = $result;
+        $update_mode = true;
     }
 }
 
@@ -66,14 +64,11 @@ if (isset($_POST['save_discount'])) {
 
 // ================= 3. XỬ LÝ XÓA =================
 if (isset($_GET['delete'])) {
-    $id = (int)$_GET['delete'];
-    if ($id > 0) {
-        $sql = "DELETE FROM ma_giam_gia WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
-        header("Location: CRUDgiamgia.php");
-        exit;
-    }
+    $sql = "DELETE FROM ma_giam_gia WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$_GET['delete']]);
+    header("Location: CRUDgiamgia.php");
+    exit;
 }
 
 $list = getAllDiscounts($conn);

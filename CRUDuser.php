@@ -10,18 +10,16 @@ $conn = $db->connect();
 $update_mode = false;
 $edit_user = ['id' => '', 'ten' => '', 'email' => '', 'so_dien_thoai' => ''];
 
-// ================= 1. XỬ Lý LẤY Dữ LIỆU ĐỂ SỬA =================
+// ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
 if (isset($_GET['edit'])) {
-    $id = (int)$_GET['edit'];
-    if ($id > 0) {
-        $sql = "SELECT * FROM nguoi_dung WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($result) {
-            $edit_user = $result;
-            $update_mode = true;
-        }
+    $id = $_GET['edit'];
+    $sql = "SELECT * FROM nguoi_dung WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result) {
+        $edit_user = $result;
+        $update_mode = true; // Bật chế độ cập nhật
     }
 }
 
@@ -50,14 +48,11 @@ if (isset($_POST['save_user'])) {
 
 // ================= 3. XỬ LÝ XÓA =================
 if (isset($_GET['delete'])) {
-    $id = (int)$_GET['delete'];
-    if ($id > 0) {
-        $sql = "DELETE FROM nguoi_dung WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
-        header("Location: CRUDuser.php");
-        exit;
-    }
+    $sql = "DELETE FROM nguoi_dung WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$_GET['delete']]);
+    header("Location: CRUDuser.php");
+    exit;
 }
 
 $listusers = getAllUsers($conn);

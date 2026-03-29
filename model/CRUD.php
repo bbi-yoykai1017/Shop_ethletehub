@@ -1,6 +1,11 @@
 <?php 
-require_once __DIR__ . '/functions.php';
-
+// lay danh sach san pham
+function getAllProducts($conn) {
+    $sql = "SELECT * FROM san_pham ";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+} 
 // lay danh sach giam gia
 function getAllDiscounts($conn) {
     $sql = "SELECT * FROM ma_giam_gia ";

@@ -1,6 +1,7 @@
 <?php
 
 session_start();
+require_once 'model/functions.php';
 
 // Lấy giỏ hàng từ session (API sử dụng session)
 $items = $_SESSION['cart'] ?? [];
@@ -14,11 +15,6 @@ $summary = [
 ];
 $summary['shippingFee'] = $summary['subtotal'] >= 500000 ? 0 : 25000;
 $summary['total'] = $summary['subtotal'] + $summary['shippingFee'] - $summary['discount'];
-
-// Helper function để format giá
-function formatPrice($price) {
-    return number_format($price, 0, ',', '.') . '₫';
-}
 ?>
 <!DOCTYPE html>
 <html lang="vi">

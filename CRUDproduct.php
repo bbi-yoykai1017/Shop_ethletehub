@@ -28,82 +28,65 @@ $sql_dm = "SELECT id, ten_danh_muc FROM danh_muc ORDER BY id ASC";
 $stmt_dm = $conn->prepare($sql_dm);
 $stmt_dm->execute();
 $list_danhmuc = $stmt_dm->fetchAll(PDO::FETCH_ASSOC);
-// ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
+// ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA (Sửa Link ở dưới thành ?edit=) =================
 if (isset($_GET['edit'])) {
-    $id = (int)$_GET['edit'];
-    if ($id > 0) {
-        $sql = "SELECT * FROM san_pham WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($result) {
-            $edit_product = $result;
-            $update_mode = true;
-        }
+    $id = $_GET['edit'];
+    $sql = "SELECT * FROM san_pham WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result) {
+        $edit_product = $result;
+        $update_mode = true;
     }
 }
 
 // ================= 2. XỬ LÝ THÊM HOẶC CẬP NHẬT =================
 if (isset($_POST['save_product'])) {
-    $danh_muc_id = (int)($_POST['danh_muc_id'] ?? 0);
-    $ten = trim($_POST['ten'] ?? '');
-    $mo_ta = trim($_POST['mo_ta'] ?? '');
-    $gia = (float)($_POST['gia'] ?? 0);
-    $gia_goc = (float)($_POST['gia_goc'] ?? 0);
-    $phan_tram_giam = (int)($_POST['phan_tram_giam'] ?? 0);
-    $trung_binh_sao = (float)($_POST['trung_binh_sao'] ?? 0);
-    $so_luong_danh_gia = (int)($_POST['so_luong_danh_gia'] ?? 0);
+    $danh_muc_id = $_POST['danh_muc_id'];
+    $ten = $_POST['ten'];
+    $mo_ta = $_POST['mo_ta'];
+    $gia = $_POST['gia'];
+    $gia_goc = $_POST['gia_goc'];
+    $phan_tram_giam = $_POST['phan_tram_giam'];
+    $sao = $_POST['trung_binh_sao'];
+    $danh_gia = $_POST['so_luong_danh_gia'];
 
-    // Validate required fields
-    if (empty($ten) || $danh_muc_id <= 0 || $gia < 0) {
-        die('Invalid input data');
-    }
 
-    // Handle Image Upload with validation
+    // Xử lý Upload Ảnh
     $hinh_anh = $_POST['hinh_anh_cu'] ?? '';
+
     if (isset($_FILES['hinh_anh_upload']) && $_FILES['hinh_anh_upload']['error'] == 0) {
-        $allowed_types = ['image/jpeg', 'image/png', 'image/webp'];
-        $max_size = 5 * 1024 * 1024;
-        
-        if (in_array($_FILES['hinh_anh_upload']['type'], $allowed_types) &&
-            $_FILES['hinh_anh_upload']['size'] <= $max_size) {
-            
-            if (!is_dir('public')) mkdir('public', 0755, true);
-            
-            $ext = pathinfo($_FILES['hinh_anh_upload']['name'], PATHINFO_EXTENSION);
-            $file_name = 'product_' . time() . '.' . strtolower($ext);
-            $target_file = 'public/' . $file_name;
-            
-            if (move_uploaded_file($_FILES['hinh_anh_upload']['tmp_name'], $target_file)) {
-                $hinh_anh = $file_name;
-            }
+        $target_dir = "public/";
+        $file_name = basename($_FILES["hinh_anh_upload"]["name"]);
+        $target_file = $target_dir . $file_name;
+
+        if (move_uploaded_file($_FILES["hinh_anh_upload"]["tmp_name"], $target_file)) {
+            $hinh_anh = $file_name; // Gán tên file mới để lưu vào DB
         }
     }
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
-        $id = (int)$_POST['id'];
+        $id = $_POST['id'];
         $sql = "UPDATE san_pham SET danh_muc_id=?, ten=?, mo_ta=?, gia=?, gia_goc=?, phan_tram_giam=?, trung_binh_sao=?, so_luong_danh_gia=?, hinh_anh_chinh=? WHERE id=?";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$danh_muc_id, $ten, $mo_ta, $gia, $gia_goc, $phan_tram_giam, $trung_binh_sao, $so_luong_danh_gia, $hinh_anh, $id]);
+        $stmt->execute([$danh_muc_id, $ten, $mo_ta, $gia, $gia_goc, $phan_tram_giam, $sao, $danh_gia, $hinh_anh, $id]);
     } else {
         $sql = "INSERT INTO san_pham (danh_muc_id, ten, mo_ta, gia, gia_goc, phan_tram_giam, trung_binh_sao, so_luong_danh_gia, hinh_anh_chinh) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$danh_muc_id, $ten, $mo_ta, $gia, $gia_goc, $phan_tram_giam, $trung_binh_sao, $so_luong_danh_gia, $hinh_anh]);
+        $stmt->execute([$danh_muc_id, $ten, $mo_ta, $gia, $gia_goc, $phan_tram_giam, $sao, $danh_gia, $hinh_anh]);
     }
     header("Location: CRUDproduct.php");
     exit;
 }
 
-// ================= 3. XỬ LÝ XÓA =================
+// ================= 3. XỬ LÝ XÓA (Sửa Link ở dưới thành ?delete=) =================
 if (isset($_GET['delete'])) {
-    $id = (int)$_GET['delete'];
-    if ($id > 0) {
-        $sql = "DELETE FROM san_pham WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
-        header("Location: CRUDproduct.php");
-        exit;
-    }
+    $sql = "DELETE FROM san_pham WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$_GET['delete']]);
+    header("Location: CRUDproduct.php");
+    exit;
 }
 
 $listproduct = getAllProducts($conn);

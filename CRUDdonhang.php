@@ -21,16 +21,14 @@ $edit_order = [
 
 // ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
 if (isset($_GET['edit'])) {
-    $id = (int)$_GET['edit'];
-    if ($id > 0) {
-        $sql = "SELECT * FROM don_hang WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($result) {
-            $edit_order = $result;
-            $update_mode = true;
-        }
+    $id = $_GET['edit'];
+    $sql = "SELECT * FROM don_hang WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result) {
+        $edit_order = $result;
+        $update_mode = true;
     }
 }
 
@@ -63,14 +61,11 @@ if (isset($_POST['save_order'])) {
 
 // ================= 3. XỬ LÝ XÓA =================
 if (isset($_GET['delete'])) {
-    $id = (int)$_GET['delete'];
-    if ($id > 0) {
-        $sql = "DELETE FROM don_hang WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
-        header("Location: CRUDdonhang.php");
-        exit;
-    }
+    $sql = "DELETE FROM don_hang WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$_GET['delete']]);
+    header("Location: CRUDdonhang.php");
+    exit;
 }
 $listorders = getAllOrders($conn);
 ?>
@@ -129,7 +124,8 @@ $listorders = getAllOrders($conn);
                 <li><a href="CRUDuser.php"><i class="fas fa-users me-2"></i> Khách hàng</a></li>
                 <li><a href="CRUDdonhang.php" class="active"><i class="fas fa-shopping-cart me-2"></i> Đơn hàng</a></li>
                 <li><a href="CRUDgiamgia.php"><i class="fas fa-tags me-2"></i> Mã giảm giá</a></li>
-                <li class="d-lg-none"><a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
+                <li class="d-lg-none"><a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i>
+                        Đăng xuất</a></li>
             </ul>
         </aside>
 
@@ -140,7 +136,8 @@ $listorders = getAllOrders($conn);
                 <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0">
                         <?php if ($update_mode): ?>
-                            <i class="fas fa-file-invoice me-2"></i> Chỉnh sửa đơn hàng <span class="badge bg-light text-primary"></span>
+                            <i class="fas fa-file-invoice me-2"></i> Chỉnh sửa đơn hàng <span
+                                class="badge bg-light text-primary"></span>
                         <?php else: ?>
                             <i class="fas fa-cart-plus me-2"></i> Thêm đơn hàng mới
                         <?php endif; ?>
@@ -152,24 +149,29 @@ $listorders = getAllOrders($conn);
 
                         <div class="col-md-2">
                             <label class="form-label fw-bold">ID Người dùng</label>
-                            <input type="number" name="nguoi_dung_id" class="form-control" value="<?= $edit_order['nguoi_dung_id'] ?>" required>
+                            <input type="number" name="nguoi_dung_id" class="form-control"
+                                value="<?= $edit_order['nguoi_dung_id'] ?>" required>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Mã đơn hàng</label>
-                            <input type="text" name="ma_don_hang" class="form-control" value="<?= $edit_order['ma_don_hang'] ?>" required>
+                            <input type="text" name="ma_don_hang" class="form-control"
+                                value="<?= $edit_order['ma_don_hang'] ?>" required>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Tổng tiền</label>
-                            <input type="number" name="tong_tien" class="form-control" value="<?= $edit_order['tong_tien'] ?>" required>
+                            <input type="number" name="tong_tien" class="form-control"
+                                value="<?= $edit_order['tong_tien'] ?>" required>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Tiền giảm</label>
-                            <input type="number" name="tien_giam" class="form-control" value="<?= $edit_order['tien_giam'] ?>">
+                            <input type="number" name="tien_giam" class="form-control"
+                                value="<?= $edit_order['tien_giam'] ?>">
                         </div>
 
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Thành tiền</label>
-                            <input type="number" name="thanh_tien" class="form-control" value="<?= $edit_order['thanh_tien'] ?>" required>
+                            <input type="number" name="thanh_tien" class="form-control"
+                                value="<?= $edit_order['thanh_tien'] ?>" required>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Thanh toán</label>
@@ -187,9 +189,11 @@ $listorders = getAllOrders($conn);
                                 <option value="cho_xu_ly" <?= $edit_order['trang_thai'] == 'cho_xu_ly' ? 'selected' : '' ?>>Chờ xử lý</option>
                                 <option value="dang_giao" <?= $edit_order['trang_thai'] == 'dang_giao' ? 'selected' : '' ?>>Đang giao</option>
                                 <option value="da_thanh_toan" <?= $edit_order['trang_thai'] == 'da_thanh_toan' ? 'selected' : '' ?>>Đã thanh toán</option>
-                                <option value="da_giao" <?= $edit_order['trang_thai'] == 'da_giao' ? 'selected' : '' ?>>Đã giao</option>
+                                <option value="da_giao" <?= $edit_order['trang_thai'] == 'da_giao' ? 'selected' : '' ?>>Đã
+                                    giao</option>
                                 <option value="hoan_thanh" <?= $edit_order['trang_thai'] == 'hoan_thanh' ? 'selected' : '' ?>>Đã hoàn thành</option>
-                                <option value="da_huy" <?= $edit_order['trang_thai'] == 'da_huy' ? 'selected' : '' ?>>Đã hủy</option>
+                                <option value="da_huy" <?= $edit_order['trang_thai'] == 'da_huy' ? 'selected' : '' ?>>Đã
+                                    hủy</option>
 
                             </select>
                         </div>

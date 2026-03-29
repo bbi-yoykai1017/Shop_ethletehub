@@ -74,7 +74,7 @@ function renderProducts() {
                 <span class="stock-status in-stock">Còn hàng</span>
 
                 <div class="product-actions">
-                    <button class="product-btn btn-add-cart" onclick="window.location.href='product-detail.php?id=${product.id}'">
+                    <button class="product-btn btn-add-cart" onclick="addToCart(${product.id})">
                         <i class="fas fa-shopping-cart"></i> Thêm
                     </button>
                     <button class="btn-buy-now-detail" onclick="window.location.href='ThanhToan.php?id=${product.id}'">
