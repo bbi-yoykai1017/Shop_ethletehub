@@ -1,7 +1,6 @@
 <?php
 
 session_start();
-require_once 'model/functions.php';
 
 // Lấy giỏ hàng từ session (API sử dụng session)
 $items = $_SESSION['cart'] ?? [];
@@ -15,6 +14,11 @@ $summary = [
 ];
 $summary['shippingFee'] = $summary['subtotal'] >= 500000 ? 0 : 25000;
 $summary['total'] = $summary['subtotal'] + $summary['shippingFee'] - $summary['discount'];
+
+// Helper function để format giá
+function formatPrice($price) {
+    return number_format($price, 0, ',', '.') . '₫';
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -102,36 +106,36 @@ $summary['total'] = $summary['subtotal'] + $summary['shippingFee'] - $summary['d
                             <?php foreach ($items as $item): ?>
                             <div class="cart-item" id="item-<?= $item['id'] ?>">
                                 <div class="cart-item-image">
-                                    <img src="<?= htmlspecialchars($item['image']) ?>"
-                                         alt="<?= htmlspecialchars($item['name']) ?>"
+                                    <img src="<?= htmlspecialchars($item['image'] ?? $item['hinh_anh_chinh'] ?? 'public/placeholder.svg') ?>"
+                                         alt="<?= htmlspecialchars($item['name'] ?? $item['ten'] ?? 'Sản phẩm') ?>"
                                          onerror="this.src='public/placeholder.svg'">
                                 </div>
                                 <div class="cart-item-info">
-                                    <h4><?= htmlspecialchars($item['name']) ?></h4>
-                                    <div class="cart-item-price"><?= formatPrice($item['price']) ?></div>
+                                    <h4><?= htmlspecialchars($item['name'] ?? $item['ten'] ?? 'Sản phẩm') ?></h4>
+                                    <div class="cart-item-price"><?= formatPrice($item['price'] ?? $item['gia'] ?? 0) ?></div>
                                 </div>
                                 <div class="cart-item-details">
                                     <div class="quantity-control">
                                         <button class="qty-control-btn"
-                                                onclick="changeQty(<?= $item['id'] ?>, <?= $item['quantity'] - 1 ?>)">
+                                                onclick="changeQty(<?= $item['id'] ?>, <?= ($item['quantity'] ?? 1) - 1 ?>)">
                                             <i class="fas fa-minus"></i>
                                         </button>
                                         <input type="number" class="qty-control-input"
-                                               value="<?= $item['quantity'] ?>" min="1" max="100"
+                                               value="<?= $item['quantity'] ?? 1 ?>" min="1" max="100"
                                                onchange="changeQty(<?= $item['id'] ?>, this.value)">
                                         <button class="qty-control-btn"
-                                                onclick="changeQty(<?= $item['id'] ?>, <?= $item['quantity'] + 1 ?>)">
+                                                onclick="changeQty(<?= $item['id'] ?>, <?= ($item['quantity'] ?? 1) + 1 ?>)">
                                             <i class="fas fa-plus"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="cart-item-subtotal">
                                     <strong id="subtotal-<?= $item['id'] ?>">
-                                        <?= formatPrice($item['price'] * $item['quantity']) ?>
+                                        <?= formatPrice(($item['price'] ?? $item['gia'] ?? 0) * ($item['quantity'] ?? 1)) ?>
                                     </strong>
                                 </div>
                                 <button class="btn-remove-item"
-                                        onclick="removeItem(<?= $item['id'] ?>, '<?= htmlspecialchars($item['ten'], ENT_QUOTES) ?>')"
+                                        onclick="removeItem(<?= $item['id'] ?>, '<?= htmlspecialchars($item['name'] ?? $item['ten'] ?? 'Sản phẩm', ENT_QUOTES) ?>')"
                                         title="Xóa sản phẩm">
                                     <i class="fas fa-trash"></i>
                                 </button>

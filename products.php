@@ -64,10 +64,10 @@ $items = getallproduct($conn);
                         <span class="notification-badge">2</span>
                     </div>
 
-                    <div class="cart-icon" onclick="window.location.href='cart.php'">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count"></span>
-                    </div>                
+                    <div class="cart-icon">
+                        <i class="fas fa-shopping-cart" onclick="window.location.href='cart.php'"></i>
+                        <span class="cart-count">0</span>
+                    </div>                  
                     <div class="user-account-wrapper d-flex align-items-center">
                         <div class="user-action-dropdown dropdown">
                             <a href="#" class="user-icon-link me-2 text-decoration-none dropdown-toggle"
