@@ -8,7 +8,7 @@ $db = new Database();
 $conn = $db->connect();
 
 $update_mode = false;
-$edit_user = ['id' => '', 'ten' => '', 'email' => '', 'so_dien_thoai' => ''];
+$edit_user = ['id' => '', 'ten' => '', 'email' => '', 'so_dien_thoai' => '' , 'vai_tro' => '']; 
 
 // ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
 if (isset($_GET['edit'])) {
@@ -28,7 +28,7 @@ if (isset($_POST['save_user'])) {
     $ten = $_POST['ten'];
     $email = $_POST['email'];
     $sdt = $_POST['so_dien_thoai'];
-    $vai_tro = 'khach_hang'; // Luôn cố định là user
+    $vai_tro = $_POST['vai_tro']; // Lấy vai trò từ form
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
         // CẬP NHẬT
@@ -146,8 +146,9 @@ $listusers = getAllUsers($conn);
                             </div>
                             <div class="col-12 col-sm-6 col-lg-2">
                                 <label class="form-label small fw-bold">Vai trò</label>
-                                <select class="form-select" disabled>
-                                    <option>Khách Hàng</option>
+                                <select class="form-select" name="vai_tro" required>
+                                     <option value="khach_hang" <?= ($update_mode && $edit_user['vai_tro'] === 'khach_hang') ? 'selected' : '' ?>>Khách Hàng</option>
+                                    <option value="admin" <?= ($update_mode && $edit_user['vai_tro'] === 'admin') ? 'selected' : '' ?>>Admin</option>
                                 </select>
                             </div>
                             <div class="col-12 col-lg-2 d-flex align-items-end">
