@@ -52,9 +52,7 @@ document.addEventListener('click', function (e) {
 
         // Gọi addToCart() từ cart.js — CHỈ truyền id, không truyền giá
         if (typeof addToCart === 'function') {
-            const result = addToCart(productId, qty);
-            const promise = result && typeof result.then === 'function' ? result : Promise.resolve();
-            promise.then(() => {
+            addToCart(productId, qty).then(() => {
                 // Sau khi thêm vào giỏ thành công, navigate tới product-detail page
                 setTimeout(() => {
                     window.location.href = `product-detail.php?id=${productId}`;
@@ -98,9 +96,7 @@ document.addEventListener('click', function (e) {
         const qty = parseInt(document.getElementById('quantity')?.value || 1);
         // Thêm vào giỏ rồi chuyển thẳng sang checkout
         if (typeof addToCart === 'function') {
-            const result = addToCart(productId, qty);
-            const promise = result && typeof result.then === 'function' ? result : Promise.resolve();
-            promise.then(() => {
+            addToCart(productId, qty).then(() => {
                 setTimeout(() => window.location.href = 'checkout.php', 600);
             });
         }

@@ -42,7 +42,7 @@
 /* Cart Item */
 .cart-item {
     display: grid;
-    grid-template-columns: 80px 1fr 100px 100px 50px;
+    grid-template-columns: 80px 1fr 100px 100px 70px;
     gap: var(--spacing-lg);
     padding: var(--spacing-lg);
     align-items: center;
@@ -146,6 +146,57 @@
 .btn-remove-item:hover {
     color: #c73d5f;
     transform: scale(1.2);
+}
+
+/* Edit Button */
+.btn-edit-item {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-size: 1.2rem;
+    margin-right: 8px;
+}
+
+.btn-edit-item:hover {
+    color: var(--accent-dark);
+    transform: scale(1.2);
+}
+
+/* Cart Item Variants (Size and Color) */
+.cart-item-variants {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.variant-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--light);
+    color: var(--dark);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    border: 1px solid var(--gray-light);
+}
+
+.color-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+/* Cart Item Actions */
+.cart-item-actions {
+    display: flex;
+    gap: 8px;
 }
 
 /* Empty Cart */
@@ -438,8 +489,13 @@
 
     .cart-item-price,
     .quantity-control,
+    .cart-item-actions,
     .btn-remove-item {
         grid-column: 1 / -1;
+    }
+
+    .cart-item-actions {
+        justify-content: flex-start;
     }
 
     .cart-header h1 {

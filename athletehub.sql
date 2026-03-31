@@ -21,6 +21,8 @@ SET time_zone = "+00:00";
 -- Cơ sở dữ liệu: `athletehub`
 --
 -- --------------------------------------------------------
+create database if not exists `athletehub` default character set utf8mb4 collate utf8mb4_unicode_ci;
+use `athletehub`;
 
 --
 -- Cấu trúc bảng cho bảng `bien_the_san_pham`

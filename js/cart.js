@@ -43,7 +43,7 @@ function addToCart(productId, qty = 1) {
 // ===========================
 
 function updateCartQuantity(productId, qty) {
-    return fetch('api/cart.php?action=update', {
+    fetch('api/cart.php?action=update', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

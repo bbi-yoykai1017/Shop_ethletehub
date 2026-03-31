@@ -254,7 +254,7 @@ function formatPrice($price) {
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-<script src="js/cart.js"></script>
 <script src="js/script.js"></script>
+<script src="js/cart.js"></script>
 </body>
 </html>

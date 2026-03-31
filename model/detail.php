@@ -40,16 +40,6 @@ function getProductDetail($conn, $id) {
     $product['variants'] = getProductVariants($conn, $id);
     $product['specifications'] = getProductSpecifications($conn, $id);
     $product['rating_summary'] = getProductRatingSummary($conn, $id);
-    // XỬ LÝ RATING SUMMARY
-    $product['rating_summary'] = getProductRatingSummary($conn, $id);
-    
-    // Nếu hàm getProductRatingSummary trả về null, 
-    // hãy đảm bảo nó có cấu trúc mặc định để không lỗi View
-    if (!$product['rating_summary']) {
-        $product['rating_summary'] = [
-            'rating_distribution' => []
-        ];
-    }
     
     return $product;
 }
@@ -111,44 +101,22 @@ function getProductVariants($conn, $productId) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 function getProductRatingSummary($conn, $productId) {
-    // THAY 'binh_luan' THÀNH TÊN BẢNG ĐÚNG TRONG DB CỦA BẠN (Ví dụ: danh_gia)
     $sql = "SELECT 
                 COUNT(*) as total_reviews,
-                IFNULL(AVG(so_sao), 0) as average_rating,
-                SUM(CASE WHEN so_sao = 5 THEN 1 ELSE 0 END) as five,
-                SUM(CASE WHEN so_sao = 4 THEN 1 ELSE 0 END) as four,
-                SUM(CASE WHEN so_sao = 3 THEN 1 ELSE 0 END) as three,
-                SUM(CASE WHEN so_sao = 2 THEN 1 ELSE 0 END) as two,
-                SUM(CASE WHEN so_sao = 1 THEN 1 ELSE 0 END) as one
-            FROM danh_gia 
+                AVG(so_sao) as average_rating,
+                SUM(CASE WHEN so_sao = 5 THEN 1 ELSE 0 END) as five_star,
+                SUM(CASE WHEN so_sao = 4 THEN 1 ELSE 0 END) as four_star,
+                SUM(CASE WHEN so_sao = 3 THEN 1 ELSE 0 END) as three_star,
+                SUM(CASE WHEN so_sao = 2 THEN 1 ELSE 0 END) as two_star,
+                SUM(CASE WHEN so_sao = 1 THEN 1 ELSE 0 END) as one_star
+            FROM danh_gia
             WHERE san_pham_id = :id AND trang_thai = 1";
     
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
-    $stmt->execute(); // Dòng 129 sẽ không còn lỗi nếu tên bảng đúng
-    $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$data || $data['total_reviews'] == 0) {
-        return [
-            'average_rating' => 0,
-            'total_reviews' => 0,
-            'rating_distribution' => array_fill(1, 5, ['count' => 0, 'percentage' => 0])
-        ];
-    }
-
-    $total = $data['total_reviews'];
-
-    return [
-        'average_rating' => round($data['average_rating'], 1),
-        'total_reviews' => $total,
-        'rating_distribution' => [
-            5 => ['count' => (int)$data['five'], 'percentage' => round(($data['five'] / $total) * 100)],
-            4 => ['count' => (int)$data['four'], 'percentage' => round(($data['four'] / $total) * 100)],
-            3 => ['count' => (int)$data['three'], 'percentage' => round(($data['three'] / $total) * 100)],
-            2 => ['count' => (int)$data['two'], 'percentage' => round(($data['two'] / $total) * 100)],
-            1 => ['count' => (int)$data['one'], 'percentage' => round(($data['one'] / $total) * 100)],
-        ]
-    ];
+    $stmt->execute();
+    
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 function getTotalStock($conn, $productId) {
     $sql = "SELECT COALESCE(SUM(so_luong_ton), 0) as total 
