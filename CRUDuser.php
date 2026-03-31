@@ -8,7 +8,7 @@ $db = new Database();
 $conn = $db->connect();
 
 $update_mode = false;
-$edit_user = ['id' => '', 'ten' => '', 'email' => '', 'so_dien_thoai' => '' , 'vai_tro' => '']; 
+$edit_user = ['id' => '', 'ten' => '', 'email' => '', 'so_dien_thoai' => '', 'vai_tro' => '', 'trang_thai' => 'hoat_dong'];
 
 // ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA =================
 if (isset($_GET['edit'])) {
@@ -29,29 +29,39 @@ if (isset($_POST['save_user'])) {
     $email = $_POST['email'];
     $sdt = $_POST['so_dien_thoai'];
     $vai_tro = $_POST['vai_tro']; // Lấy vai trò từ form
+    $trang_thai = $_POST['trang_thai']; // Lấy trạng thái từ form
+
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
         // CẬP NHẬT
         $id = $_POST['id'];
-        $sql = "UPDATE nguoi_dung SET ten=?, email=?, so_dien_thoai=?, vai_tro=? WHERE id=?";
+        $sql = "UPDATE nguoi_dung SET ten=?, email=?, so_dien_thoai=?, vai_tro=?, trang_thai=? WHERE id=?";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$ten, $email, $sdt, $vai_tro, $id]);
+        $stmt->execute([$ten, $email, $sdt, $vai_tro, $trang_thai, $id]);
     } else {
         // THÊM MỚI
-        $sql = "INSERT INTO nguoi_dung (ten, email, so_dien_thoai, vai_tro) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO nguoi_dung (ten, email, so_dien_thoai, vai_tro, trang_thai) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$ten, $email, $sdt, $vai_tro]);
+        $stmt->execute([$ten, $email, $sdt, $vai_tro, $trang_thai]);
     }
     header("Location: CRUDuser.php");
     exit;
 }
 
-// ================= 3. XỬ LÝ XÓA =================
+// ================= 3. XỬ LÝ "XÓA" (CHUYỂN TRẠNG THÁI) =================
 if (isset($_GET['delete'])) {
-    $sql = "DELETE FROM nguoi_dung WHERE id = ?";
+    $id = $_GET['delete'];
+
+    // Thay vì DELETE, chúng ta UPDATE trạng thái
+    $sql = "UPDATE nguoi_dung SET trang_thai = 'bi_khoa' WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->execute([$_GET['delete']]);
-    header("Location: CRUDuser.php");
+
+    if ($stmt->execute([$id])) {
+        // Thông báo thành công (có thể dùng session để hiện alert)
+        header("Location: CRUDuser.php?msg=locked");
+    } else {
+        header("Location: CRUDuser.php?msg=error");
+    }
     exit;
 }
 
@@ -147,24 +157,28 @@ $listusers = getAllUsers($conn);
                             <div class="col-12 col-sm-6 col-lg-2">
                                 <label class="form-label small fw-bold">Vai trò</label>
                                 <select class="form-select" name="vai_tro" required>
-                                     <option value="khach_hang" <?= ($update_mode && $edit_user['vai_tro'] === 'khach_hang') ? 'selected' : '' ?>>Khách Hàng</option>
+                                    <option value="khach_hang" <?= ($update_mode && $edit_user['vai_tro'] === 'khach_hang') ? 'selected' : '' ?>>Khách Hàng</option>
                                     <option value="admin" <?= ($update_mode && $edit_user['vai_tro'] === 'admin') ? 'selected' : '' ?>>Admin</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-2">
+                                <label class="form-label small fw-bold">Trạng thái</label>
+                                <select class="form-select" name="trang_thai" required>
+                                    <option value="hoat_dong" <?= ($update_mode && $edit_user['trang_thai'] === 'hoat_dong') ? 'selected' : '' ?>>Hoạt động</option>
+                                    <option value="bi_khoa" <?= ($update_mode && $edit_user['trang_thai'] === 'bi_khoa') ? 'selected' : '' ?>>Bị khóa</option>
                                 </select>
                             </div>
                             <div class="col-12 col-lg-2 d-flex align-items-end">
                                 <?php if ($update_mode): ?>
                                     <div class="w-100">
-                                        <button name="save_user" class="btn btn-warning w-100 mb-1">Cập nhật</button>
+                                        <button type="submit" name="save_user" class="btn btn-warning w-100 mb-1">Cập nhật</button>
                                         <a href="CRUDuser.php" class="btn btn-light btn-sm w-100 border">Hủy</a>
                                     </div>
                                 <?php else: ?>
-                                    <button name="save_user" class="btn btn-success w-100"><i class="fas fa-plus me-1"></i> Thêm mới</button>
+                                    <button type="submit" name="save_user" class="btn btn-success w-100"><i class="fas fa-plus me-1"></i> Thêm mới</button>
                                 <?php endif; ?>
                             </div>
                         </form>
-
-                        <hr>
-
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
                                 <thead class="table-light">
@@ -173,6 +187,7 @@ $listusers = getAllUsers($conn);
                                         <th>Thông tin khách hàng</th>
                                         <th class="text-center d-none d-md-table-cell">SĐT</th>
                                         <th class="text-center">Vai trò</th>
+                                        <th class="text-center">Trạng thái</th>
                                         <th class="text-end">Hành động</th>
                                     </tr>
                                 </thead>
@@ -188,14 +203,21 @@ $listusers = getAllUsers($conn);
                                             <td class="text-center">
                                                 <span class="badge rounded-pill bg-light text-dark border"><?= $user['vai_tro'] ?></span>
                                             </td>
+                                            <td class="text-center">
+                                                <?php if ($user['trang_thai'] === 'hoat_dong'): ?>
+                                                    <span class="badge bg-success">Hoạt động</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-danger">Bị khóa</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td class="text-end">
                                                 <div class="btn-group">
                                                     <a href="?edit=<?= $user['id'] ?>" class="btn btn-sm btn-outline-warning" title="Sửa">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <a href="?delete=<?= $user['id'] ?>" class="btn btn-sm btn-outline-danger"
-                                                        onclick="return confirm('Xóa người dùng này?')" title="Xóa">
-                                                        <i class="fas fa-trash"></i>
+                                                        onclick="return confirm('Bạn có chắc chắn muốn KHÓA người dùng này không?')" title="Khóa tài khoản">
+                                                        <i class="fas fa-user-slash"></i>
                                                     </a>
                                                 </div>
                                             </td>

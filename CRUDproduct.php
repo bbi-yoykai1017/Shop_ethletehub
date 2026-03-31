@@ -198,7 +198,7 @@ $listproduct = getAllProducts($conn);
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Phần trăm giảm (%)</label>
                             <input type="number" id="phan_tram_giam" step="1" name="phan_tram_giam" class="form-control" value="<?= $edit_product['phan_tram_giam'] ?>" required>
-                            <small class="text-muted">Phần trăm giảm lớn hơn  khác số âm </small>
+                            <small class="text-muted">Phần trăm giảm phải nằm trong khoảng 0-100</small>
                         </div>
 
 

@@ -28,7 +28,7 @@ function getAllOrders($conn) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 function getAllUsers($conn) {
-    $sql = "SELECT id, ten, email, so_dien_thoai, vai_tro FROM nguoi_dung";
+    $sql = "SELECT id, ten, email, so_dien_thoai, vai_tro, trang_thai FROM nguoi_dung ";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);

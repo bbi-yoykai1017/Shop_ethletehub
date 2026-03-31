@@ -380,7 +380,7 @@ $displayProducts = array_slice($products, 0, 6);
                                 <button class="product-btn btn-add-cart" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                     <i class="fas fa-shopping-cart"></i> Thêm
                                 </button>
-                                <button class="btn-buy-now-detail" onclick="window.location.href='ThanhToan.php?id=<?php echo $product['id']; ?>'">
+                                <button class="btn-buy-now-detail " onclick="window.location.href='ThanhToan.php?id=<?php echo $product['id']; ?>'">
                                     <i class="fas fa-bolt"></i>
                                     Mua Ngay
                                 </button>

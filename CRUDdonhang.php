@@ -61,10 +61,24 @@ if (isset($_POST['save_order'])) {
 
 // ================= 3. XỬ LÝ XÓA =================
 if (isset($_GET['delete'])) {
-    $sql = "DELETE FROM don_hang WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([$_GET['delete']]);
-    header("Location: CRUDdonhang.php");
+    $id = $_GET['delete'];
+    
+    // 1. Kiểm tra xem đơn hàng này có chi tiết sản phẩm không
+    $check_sql = "SELECT COUNT(*) FROM chi_tiet_don_hang WHERE don_hang_id = ?";
+    $check_stmt = $conn->prepare($check_sql);
+    $check_stmt->execute([$id]);
+    $count = $check_stmt->fetchColumn();
+
+    if ($count > 0) {
+        // Nếu có dữ liệu liên quan, không cho xóa
+        header("Location: CRUDdonhang.php?error=cannot_delete");
+    } else {
+        // Nếu trống trải, tiến hành xóa
+        $sql = "DELETE FROM don_hang WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$id]);
+        header("Location: CRUDdonhang.php?success=deleted");
+    }
     exit;
 }
 $listorders = getAllOrders($conn);
@@ -159,19 +173,20 @@ $listorders = getAllOrders($conn);
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Tổng tiền</label>
-                            <input type="number" name="tong_tien" class="form-control"
-                                value="<?= $edit_order['tong_tien'] ?>" required>
+                            <input type="number" id="tong_tien" name="tong_tien" class="form-control"
+                                value="<?= $edit_order['tong_tien'] ?>" required min="1">
+                                <div class="invalid-feedback">Tổng tiền phải lớn hơn 0!</div>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Tiền giảm</label>
-                            <input type="number" name="tien_giam" class="form-control"
-                                value="<?= $edit_order['tien_giam'] ?>">
+                            <input type="number" id="tien_giam" name="tien_giam" class="form-control"
+                                value="<?= $edit_order['tien_giam'] ?>" min="0">
+                            <div class="invalid-feedback">Tiền giảm không được lớn hơn tổng tiền!</div>
                         </div>
-
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Thành tiền</label>
-                            <input type="number" name="thanh_tien" class="form-control"
-                                value="<?= $edit_order['thanh_tien'] ?>" required>
+                            <input type="number" id="thanh_tien" name="thanh_tien" class="form-control"
+                                value="<?= $edit_order['thanh_tien'] ?>" required readonly style="background-color: #e9ecef;">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Thanh toán</label>
@@ -299,7 +314,60 @@ $listorders = getAllOrders($conn);
     </footer>
 
     <script src="bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const tongTienInput = document.getElementById('tong_tien');
+            const tienGiamInput = document.getElementById('tien_giam');
+            const thanhTienInput = document.getElementById('thanh_tien');
+            const btnSave = document.querySelector('button[name="save_order"]');
 
+            function calculateAndValidate() {
+                let tongTien = parseFloat(tongTienInput.value) || 0;
+                let tienGiam = parseFloat(tienGiamInput.value) || 0;
+
+                // 1. Tự động tính Thành tiền
+                let thanhTien = tongTien - tienGiam;
+
+                // Hiển thị kết quả (không cho phép âm)
+                thanhTienInput.value = thanhTien > 0 ? thanhTien : 0;
+
+                // 2. Kiểm tra logic ràng buộc
+                let isValid = true;
+
+                if (tienGiam > tongTien) {
+                    tienGiamInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    tienGiamInput.classList.remove('is-invalid');
+                }
+
+                if (tongTien <= 0) {
+                    tongTienInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    tongTienInput.classList.remove('is-invalid');
+                }
+
+                // Khóa/Mở nút lưu
+                if (btnSave) btnSave.disabled = !isValid;
+
+                return isValid;
+            }
+
+            // Lắng nghe sự kiện gõ phím trên cả 2 ô
+            tongTienInput.addEventListener('input', calculateAndValidate);
+            tienGiamInput.addEventListener('input', calculateAndValidate);
+
+            // CHẶN TUYỆT ĐỐI nếu cố tình nhấn Enter để submit khi dữ liệu sai
+            form.addEventListener('submit', function(e) {
+                if (!calculateAndValidate()) {
+                    e.preventDefault();
+                    alert('Lỗi: Tiền giảm không thể lớn hơn tổng tiền!');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
