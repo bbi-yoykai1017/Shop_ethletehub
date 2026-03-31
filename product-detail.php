@@ -43,7 +43,8 @@ $danh_muc = $product['ten_danh_muc'] ?? 'Danh mục';
 $categoryKey = $product['category_key'] ?? '';
 
 // Rating summary
-$ratingSummary = $product['rating_summary'] ?? 0;
+$ratingSummary = $product['rating_summary'];
+
 ?>
 
 <!DOCTYPE html>
@@ -62,6 +63,22 @@ $ratingSummary = $product['rating_summary'] ?? 0;
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/product-detail.css">
+    <style>
+        .bar {
+            width: 200px;
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .fill {
+            height: 100%;
+            background: #ffc107;
+            /* Màu vàng sao */
+            border-radius: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -102,7 +119,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                         <span class="notification-badge">2</span>
                     </div>
 
-                     <div class="cart-icon" onclick="window.location.href='cart.php'">
+                    <div class="cart-icon" onclick="window.location.href='cart.php'">
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count"></span>
                     </div>
@@ -421,7 +438,7 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                 <div class="reviews-summary">
                                     <div class="rating-box">
                                         <div class="rating-number">
-                                            <?php echo number_format($ratingSummary['average_rating'], 1); ?>
+                                            <?php echo number_format($ratingSummary['average_rating'] ?? 0, 1); ?>
                                         </div>
                                         <div class="rating-stars">
                                             <?php echo getStarRating($ratingSummary['average_rating']); ?>
@@ -434,11 +451,9 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                             $dist = $ratingSummary['rating_distribution'][$i] ?? ['count' => 0, 'percentage' => 0];
                                         ?>
                                             <div class="rating-bar">
-                                                <span class="rating-label"><?php echo $i; ?> <i
-                                                        class="fas fa-star"></i></span>
+                                                <span class="rating-label"><?php echo $i; ?> <i class="fas fa-star"></i></span>
                                                 <div class="bar">
-                                                    <div class="fill" style="width: <?php echo $dist['percentage']; ?>%;">
-                                                    </div>
+                                                    <div class="fill" style="width: <?php echo $dist['percentage']; ?>%;"></div>
                                                 </div>
                                                 <span class="rating-count"><?php echo $dist['count']; ?></span>
                                             </div>
@@ -462,12 +477,12 @@ $ratingSummary = $product['rating_summary'] ?? 0;
                                         <div class="form-group">
                                             <label>Tiêu đề:</label>
                                             <input type="text" class="form-control"
-                                                placeholder="Viết tiêu đề đánh giá...">
+                                                placeholder="Viết tiêu đề đánh giá..." required>
                                         </div>
                                         <div class="form-group">
                                             <label>Nội dung:</label>
                                             <textarea class="form-control" rows="4"
-                                                placeholder="Chia sẻ kinh nghiệm của bạn..."></textarea>
+                                                placeholder="Chia sẻ kinh nghiệm của bạn..." required></textarea>
                                         </div>
                                         <button type="submit" class="btn-submit-review">Gửi đánh giá</button>
                                     </form>
