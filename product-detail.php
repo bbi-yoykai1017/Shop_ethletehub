@@ -575,14 +575,14 @@ $ratingSummary = $product['rating_summary'];
                                             <?php echo $related['star_rating']; ?>
                                             <span>(<?php echo $related['so_luong_danh_gia']; ?>)</span>
                                         </div>
-                                        <button class="btn-add-to-cart-detail" data-product-id="<?php echo $product['id']; ?>">
+                                        <a href="product-detail.php?id=<?php echo $related['id']; ?>" class="btn-add-to-cart-detail" role="button">
                                             <i class="fas fa-shopping-cart"></i>
-                                            Thêm vào giỏ hàng
-                                        </button>
-                                        <button class="btn-buy-now-detail">
+                                            Xem chi tiết
+                                        </a>
+                                        <a href="product-detail.php?id=<?php echo $related['id']; ?>" class="btn-buy-now-detail" role="button">
                                             <i class="fas fa-bolt"></i>
                                             Mua ngay
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
