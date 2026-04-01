@@ -398,7 +398,7 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
                                         <span class="stock-status in-stock">Còn hàng</span>
 
                                         <div class="product-actions">
-                                            <button class="product-btn btn-add-cart" onclick="addToCart(<?php echo $product['id']; ?>)">
+                                            <button class="product-btn btn-add-cart-index" onclick=" window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                                 <i class="fas fa-shopping-cart"></i> Thêm
                                             </button>
                                             <button class="btn-buy-now-detail" onclick="window.location.href='ThanhToan.php?id=<?php echo $product['id']; ?>'">
