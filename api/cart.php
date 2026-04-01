@@ -38,6 +38,10 @@ try {
         case 'add':
             $productId = (int) ($data['product_id'] ?? 0);
             $qty = (int) ($data['quantity'] ?? 1);
+            $sizeId = $data['size_id'] ?? null;
+            $colorId = $data['color_id'] ?? null;
+            $sizeName = $data['size_name'] ?? null;
+            $colorName = $data['color_name'] ?? null;
             $qty = max(1, $qty);
 
             if ($productId <= 0) {
@@ -75,10 +79,20 @@ try {
 
             $qty = min($qty, $stock);
 
-            // Kiểm tra sản phẩm đã có trong giỏ chưa
+            // Helper: Tạo khóa duy nhất cho item dựa trên product + size + color
+            function generateCartKey($productId, $sizeId, $colorId) {
+                $size = $sizeId ?? 'NULL';
+                $color = $colorId ?? 'NULL';
+                return $productId . '_' . $size . '_' . $color;
+            }
+
+            $cartKey = generateCartKey($productId, $sizeId, $colorId);
+
+            // Kiểm tra sản phẩm với cùng size/color đã có trong giỏ
             $itemExists = false;
             foreach ($_SESSION['cart'] as $item) {
-                if ($item['id'] === $productId) {
+                $existingKey = generateCartKey($item['id'], $item['size_id'] ?? null, $item['color_id'] ?? null);
+                if ($existingKey === $cartKey) {
                     $itemExists = true;
                     break;
                 }
@@ -87,7 +101,8 @@ try {
             // Nếu có rồi thì tăng qty, không thì thêm mới
             if ($itemExists) {
                 foreach ($_SESSION['cart'] as &$item) {
-                    if ($item['id'] === $productId) {
+                    $existingKey = generateCartKey($item['id'], $item['size_id'] ?? null, $item['color_id'] ?? null);
+                    if ($existingKey === $cartKey) {
                         $oldQty = $item['quantity'];
                         $item['quantity'] += $qty;
                         // Không được vượt quá tồn kho
@@ -106,9 +121,16 @@ try {
                 $_SESSION['cart'][] = [
                     'id' => $product['id'],
                     'name' => $product['ten'],
+                    'ten' => $product['ten'],
                     'price' => (float) $product['gia'],
+                    'gia' => (float) $product['gia'],
                     'image' => $product['hinh_anh_chinh'],
-                    'quantity' => $qty
+                    'hinh_anh_chinh' => $product['hinh_anh_chinh'],
+                    'quantity' => $qty,
+                    'size_id' => $sizeId,
+                    'size' => $sizeName,
+                    'color_id' => $colorId,
+                    'color' => $colorName
                 ];
 
                 echo json_encode([
@@ -124,6 +146,8 @@ try {
         case 'update':
             $productId = (int) ($data['product_id'] ?? 0);
             $qty = (int) ($data['quantity'] ?? 1);
+            $sizeId = $data['size_id'] ?? null;
+            $colorId = $data['color_id'] ?? null;
 
             if ($productId <= 0 || $qty < 0) {
                 http_response_code(400);
@@ -131,10 +155,20 @@ try {
                 exit;
             }
 
+            // Helper để tạo cartKey
+            function generateCartKeyForUpdate($productId, $sizeId, $colorId) {
+                $size = $sizeId ?? 'NULL';
+                $color = $colorId ?? 'NULL';
+                return $productId . '_' . $size . '_' . $color;
+            }
+
+            $targetKey = generateCartKeyForUpdate($productId, $sizeId, $colorId);
+
             if ($qty === 0) {
                 // Xóa sản phẩm nếu qty = 0
-                $_SESSION['cart'] = array_filter($_SESSION['cart'], function ($item) use ($productId) {
-                    return $item['id'] !== $productId;
+                $_SESSION['cart'] = array_filter($_SESSION['cart'], function ($item) use ($targetKey) {
+                    $existingKey = generateCartKeyForUpdate($item['id'], $item['size_id'] ?? null, $item['color_id'] ?? null);
+                    return $existingKey !== $targetKey;
                 });
                 $_SESSION['cart'] = array_values($_SESSION['cart']);
 
@@ -148,7 +182,8 @@ try {
 
             // Cập nhật số lượng
             foreach ($_SESSION['cart'] as &$item) {
-                if ($item['id'] === $productId) {
+                $existingKey = generateCartKeyForUpdate($item['id'], $item['size_id'] ?? null, $item['color_id'] ?? null);
+                if ($existingKey === $targetKey) {
                     $item['quantity'] = $qty;
                     echo json_encode([
                         'success' => true,
@@ -166,6 +201,8 @@ try {
         // ========== XÓA KHỎI GIỎ ==========
         case 'remove':
             $productId = (int) ($data['product_id'] ?? 0);
+            $sizeId = $data['size_id'] ?? null;
+            $colorId = $data['color_id'] ?? null;
 
             if ($productId <= 0) {
                 http_response_code(400);
@@ -173,16 +210,27 @@ try {
                 exit;
             }
 
+            // Helper để tạo cartKey
+            function generateCartKeyForRemove($productId, $sizeId, $colorId) {
+                $size = $sizeId ?? 'NULL';
+                $color = $colorId ?? 'NULL';
+                return $productId . '_' . $size . '_' . $color;
+            }
+
+            $targetKey = generateCartKeyForRemove($productId, $sizeId, $colorId);
             $productName = '';
+
             foreach ($_SESSION['cart'] as $item) {
-                if ($item['id'] === $productId) {
-                    $productName = $item['name'];
+                $existingKey = generateCartKeyForRemove($item['id'], $item['size_id'] ?? null, $item['color_id'] ?? null);
+                if ($existingKey === $targetKey) {
+                    $productName = $item['name'] ?? $item['ten'] ?? 'Sản phẩm';
                     break;
                 }
             }
 
-            $_SESSION['cart'] = array_filter($_SESSION['cart'], function ($item) use ($productId) {
-                return $item['id'] !== $productId;
+            $_SESSION['cart'] = array_filter($_SESSION['cart'], function ($item) use ($targetKey) {
+                $existingKey = generateCartKeyForRemove($item['id'], $item['size_id'] ?? null, $item['color_id'] ?? null);
+                return $existingKey !== $targetKey;
             });
             $_SESSION['cart'] = array_values($_SESSION['cart']);
 
@@ -191,7 +239,7 @@ try {
                 'message' => '"' . $productName . '" đã được xóa khỏi giỏ hàng',
                 'cart_count' => countCart()
             ]);
-            break;
+            exit;
 
         // ========== LẤY THÔNG TIN GIỎ ==========
         case 'get':

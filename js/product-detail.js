@@ -133,6 +133,14 @@ if (addToCartBtn) {
             return;
         }
         
+        // Chuẩn bị dữ liệu: lấy size_id, color_id từ data attributes
+        const sizeId = sizeBtn ? sizeBtn.dataset.sizeId : null;
+        const colorId = colorBtn ? colorBtn.dataset.colorId : null;
+        const sizeName = sizeBtn ? sizeBtn.dataset.sizeName : null;
+        const colorName = colorBtn ? colorBtn.dataset.colorName : null;
+        
+
+        
         // Gọi API để thêm vào giỏ
         fetch('api/cart.php?action=add', {
             method: 'POST',
@@ -141,7 +149,11 @@ if (addToCartBtn) {
             },
             body: JSON.stringify({
                 product_id: productId,
-                quantity: quantity
+                quantity: quantity,
+                size_id: sizeId,
+                color_id: colorId,
+                size_name: sizeName,
+                color_name: colorName
             })
         })
         .then(response => {

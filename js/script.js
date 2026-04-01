@@ -29,9 +29,9 @@ if (backToTopBtn) {
 // ══════════════════════════════════════════
 document.addEventListener('click', function (e) {
 
-    // 1. NÚT "Thêm vào giỏ" (class btn-add-cart hoặc btn-add-to-cart-detail)
-    const btnAdd = e.target.closest('.btn-add-cart, .btn-add-to-cart-detail');
-    if (btnAdd) {
+    // 1. NÚT "Thêm vào giỏ" (class btn-add-cart ONLY - product-detail.php có handler riêng)
+    const btnAdd = e.target.closest('.btn-add-cart');
+    if (btnAdd && !btnAdd.closest('.btn-add-to-cart-detail')) {
         e.preventDefault();
 
         // Lấy product id — ưu tiên data-product-id trên nút, sau đó trên card

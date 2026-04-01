@@ -94,6 +94,20 @@
     font-weight: var(--font-weight-black);
 }
 
+.cart-item-details {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-item-subtotal {
+    text-align: right;
+    font-size: 1.1rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--primary);
+    min-width: 100px;
+}
+
 /* Quantity Control */
 .quantity-control {
     display: flex;
@@ -470,6 +484,95 @@
 
 .btn-add-related:hover {
     background: var(--primary-dark);
+}
+
+/* Edit Cart Item Modal */
+.cart-edit-item {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.edit-item-image {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-item-info {
+    flex: 1;
+}
+
+.edit-item-info h6 {
+    font-size: 1.1rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--dark);
+    margin-bottom: var(--spacing-sm);
+}
+
+.edit-item-info p {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: var(--spacing-sm);
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.input-group button {
+    padding: 6px 12px;
+    border: 1px solid var(--gray-light);
+    background: white;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.input-group button:first-child {
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    border-right: none;
+}
+
+.input-group button:last-child {
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    border-left: none;
+}
+
+.input-group button:hover {
+    background: var(--light);
+    color: var(--primary);
+}
+
+.input-group input {
+    border: 1px solid var(--gray-light);
+    border-left: none;
+    border-right: none;
+}
+
+.modal-content {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--gray-light);
+    background: var(--light);
+}
+
+.modal-header .modal-title {
+    font-weight: var(--font-weight-bold);
+    color: var(--dark);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--gray-light);
+    background: var(--light);
 }
 
 /* Responsive */

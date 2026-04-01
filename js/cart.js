@@ -42,7 +42,11 @@ function addToCart(productId, qty = 1) {
 // UPDATE CART QUANTITY
 // ===========================
 
-function updateCartQuantity(productId, qty) {
+function updateCartQuantity(productId, qty, sizeId = null, colorId = null) {
+    // Chuyển empty string thành null
+    sizeId = sizeId === '' ? null : sizeId;
+    colorId = colorId === '' ? null : colorId;
+    
     fetch('api/cart.php?action=update', {
         method: 'POST',
         headers: {
@@ -50,7 +54,9 @@ function updateCartQuantity(productId, qty) {
         },
         body: JSON.stringify({
             product_id: productId,
-            quantity: qty
+            quantity: qty,
+            size_id: sizeId,
+            color_id: colorId
         })
     })
     .then(response => response.json())
@@ -63,19 +69,21 @@ function updateCartQuantity(productId, qty) {
     .catch(error => console.error('Lỗi:', error));
 }
 
-// ===========================
-// REMOVE FROM CART
-// ===========================
-
-function removeFromCartAPI(productId) {
+function removeFromCartAPI(productId, sizeId = null, colorId = null) {
     return new Promise((resolve) => {
+        // Chuyển empty string thành null
+        sizeId = sizeId === '' ? null : sizeId;
+        colorId = colorId === '' ? null : colorId;
+        
         fetch('api/cart.php?action=remove', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                product_id: productId
+                product_id: productId,
+                size_id: sizeId,
+                color_id: colorId
             })
         })
         .then(response => response.json())
@@ -128,7 +136,9 @@ function loadCart() {
             if (!cartItemsList) return;
             
             const cart = data.cart;
+            
             cartItemsList.innerHTML = cart.map((item, index) => {
+                
                 let imagePath = item.image || 'public/placeholder.svg';
                 if (!imagePath.startsWith('./') && !imagePath.startsWith('/') && !imagePath.startsWith('http') && !imagePath.includes('data:')) {
                     imagePath = 'public/' + imagePath;
@@ -148,7 +158,7 @@ function loadCart() {
                 }
                 
                 return `
-                <div class="cart-item" id="item-${item.id}">
+                <div class="cart-item" id="item-${item.id}" data-size-id="${item.size_id || ''}" data-color-id="${item.color_id || ''}">
                     <div class="cart-item-image">
                         <img src="${imagePath}" alt="${item.name}" onerror="this.src='public/placeholder.svg'">
                     </div>
@@ -159,12 +169,12 @@ function loadCart() {
                     </div>
                     <div class="cart-item-details">
                         <div class="quantity-control">
-                            <button class="qty-control-btn" onclick="changeQty(${item.id}, ${item.quantity - 1})">
+                            <button class="qty-control-btn" onclick="changeQty(${item.id}, ${item.quantity - 1}, '${item.size_id || ''}', '${item.color_id || ''}')">
                                 <i class="fas fa-minus"></i>
                             </button>
                             <input type="number" class="qty-control-input" value="${item.quantity}" min="1" max="100" 
-                                   onchange="changeQty(${item.id}, this.value)">
-                            <button class="qty-control-btn" onclick="changeQty(${item.id}, ${item.quantity + 1})">
+                                   onchange="changeQty(${item.id}, this.value, '${item.size_id || ''}', '${item.color_id || ''}')">
+                            <button class="qty-control-btn" onclick="changeQty(${item.id}, ${item.quantity + 1}, '${item.size_id || ''}', '${item.color_id || ''}')">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
@@ -173,10 +183,10 @@ function loadCart() {
                         <strong>${formatPrice((item.price || 0) * (item.quantity || 1))}</strong>
                     </div>
                     <div class="cart-item-actions">
-                        <button class="btn-edit-item" onclick="editCartItem(${item.id}, '${item.size || ''}', '${item.color || ''}')" title="Chỉnh sửa sản phẩm">
+                        <button class="btn-edit-item" data-product-id="${item.id}" data-size-name="${(item.size || '').replace(/'/g, '&#39;')}" data-color-name="${(item.color || '').replace(/'/g, '&#39;')}" data-size-id="${item.size_id || ''}" data-color-id="${item.color_id || ''}" title="Chỉnh sửa sản phẩm">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-remove-item" onclick="removeFromCartAPI(${item.id})" title="Xóa sản phẩm">
+                        <button class="btn-remove-item" data-product-id="${item.id}" data-size-id="${item.size_id || ''}" data-color-id="${item.color_id || ''}" title="Xóa sản phẩm">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -194,19 +204,19 @@ function loadCart() {
 // CHANGE QUANTITY
 // ===========================
 
-function changeQty(productId, newQty) {
+function changeQty(productId, newQty, sizeId = null, colorId = null) {
     newQty = parseInt(newQty);
     if (newQty < 0) newQty = 0;
     if (newQty > 100) newQty = 100;
     
     if (newQty === 0) {
         if (confirm('Xóa sản phẩm này khỏi giỏ hàng?')) {
-            removeFromCartAPI(productId);
+            removeFromCartAPI(productId, sizeId, colorId);
         }
         return;
     }
     
-    updateCartQuantity(productId, newQty);
+    updateCartQuantity(productId, newQty, sizeId, colorId);
 }
 
 // ===========================
@@ -419,11 +429,292 @@ function applyPromo() {
 }
 
 // ===========================
+// BUTTON HANDLERS (wrapper functions)
+// ===========================
+
+function editCartItemBtn(btn) {
+    const productId = parseInt(btn.dataset.productId);
+    const sizeName = btn.dataset.sizeName || '';
+    const colorName = btn.dataset.colorName || '';
+    const sizeId = btn.dataset.sizeId || null;
+    const colorId = btn.dataset.colorId || null;
+    
+    editCartItem(productId, sizeName, colorName, sizeId, colorId);
+}
+
+function removeFromCartBtn(btn) {
+    const productId = parseInt(btn.dataset.productId);
+    const sizeId = btn.dataset.sizeId || null;
+    const colorId = btn.dataset.colorId || null;
+    
+    removeFromCartAPI(productId, sizeId, colorId);
+}
+
+// ===========================
+// EDIT CART ITEM
+// ===========================
+
+function editCartItem(productId, size, color, sizeId = null, colorId = null) {
+    // Fetch thông tin sản phẩm từ session và variants từ database
+    Promise.all([
+        fetch('api/cart.php?action=get').then(r => r.json()),
+        fetch(`api/product-variants.php?product_id=${productId}`).then(r => r.json())
+    ])
+    .then(([cartData, variantsData]) => {
+        if (!cartData.cart || !variantsData.success) {
+            showNotification('Lỗi tải dữ liệu sản phẩm', 'danger');
+            return;
+        }
+        
+        // Tìm item trong giỏ hàng - match với size/color
+        const item = cartData.cart.find(i => 
+            i.id == productId && 
+            (i.size_id == sizeId || (i.size_id === null && sizeId === null)) &&
+            (i.color_id == colorId || (i.color_id === null && colorId === null))
+        );
+        if (!item) {
+            showNotification('Không tìm thấy sản phẩm trong giỏ hàng', 'danger');
+            return;
+        }
+        
+        const sizes = variantsData.sizes || [];
+        const colors = variantsData.colors || [];
+        
+        // Render size buttons
+        let sizesHTML = '';
+        if (sizes.length > 0) {
+            sizesHTML = '<div class="form-group mt-3"><label class="form-label">Kích thước:</label><div id="editSizeOptions" class="d-flex flex-wrap gap-2">';
+            sizes.forEach(s => {
+                const isActive = sizeId == s.id ? 'active' : '';
+                sizesHTML += `<button type="button" class="btn btn-outline-primary size-btn-edit ${isActive}" data-size-id="${s.id}" data-size-name="${s.ten}">${s.ten}</button>`;
+            });
+            sizesHTML += '</div></div>';
+        }
+        
+        // Render color buttons
+        let colorsHTML = '';
+        if (colors.length > 0) {
+            colorsHTML = '<div class="form-group mt-3"><label class="form-label">Màu sắc:</label><div id="editColorOptions" class="d-flex flex-wrap gap-2">';
+            colors.forEach(c => {
+                const isActive = colorId == c.id ? 'active' : '';
+                const colorHex = c.ma_hex || '#999999';
+                colorsHTML += `<button type="button" class="btn btn-outline-secondary color-btn-edit ${isActive}" data-color-id="${c.id}" data-color-name="${c.ten}" style="position: relative;">
+                    <span style="display: inline-block; width: 16px; height: 16px; background: ${colorHex}; border: 2px solid #ccc; border-radius: 4px; margin-right: 5px;"></span>${c.ten}
+                </button>`;
+            });
+            colorsHTML += '</div></div>';
+        }
+        
+        // Tạo modal để chỉnh sửa
+        const modalHTML = `
+            <div class="modal fade" id="editCartModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Chỉnh sửa sản phẩm</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-4 text-center">
+                                    <img src="${item.image.includes('public/') ? item.image : 'public/' + item.image}" 
+                                         alt="${item.name}" style="max-width: 100%; border-radius: 8px;">
+                                </div>
+                                <div class="col-md-8">
+                                    <h6>${item.name}</h6>
+                                    <p class="text-muted">Giá: ${formatPrice(item.price)}</p>
+                                    
+                                    ${sizesHTML}
+                                    ${colorsHTML}
+                                    
+                                    <div class="form-group mt-3">
+                                        <label for="editQuantity" class="form-label">Số lượng:</label>
+                                        <div class="input-group" style="max-width: 150px;">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="decreaseQtyEdit()">-</button>
+                                            <input type="number" id="editQuantity" class="form-control text-center" 
+                                                   value="${item.quantity}" min="1" max="100">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="increaseQtyEdit()">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-primary" onclick="saveEditCartItem(${productId})">Lưu thay đổi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Xóa modal cũ nếu có
+        const oldModal = document.getElementById('editCartModal');
+        if (oldModal) {
+            oldModal.remove();
+        }
+        
+        // Thêm modal vào body
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Setup size button event listeners
+        document.querySelectorAll('.size-btn-edit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.size-btn-edit').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                window.editItemNewSizeId = this.dataset.sizeId;
+                window.editItemNewSizeName = this.dataset.sizeName;
+            });
+        });
+        
+        // Setup color button event listeners
+        document.querySelectorAll('.color-btn-edit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.color-btn-edit').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                window.editItemNewColorId = this.dataset.colorId;
+                window.editItemNewColorName = this.dataset.colorName;
+            });
+        });
+        
+        // Store original values
+        window.editItemProductId = productId;
+        window.editItemOldSizeId = sizeId;
+        window.editItemOldColorId = colorId;
+        window.editItemNewSizeId = sizeId;
+        window.editItemNewColorId = colorId;
+        window.editItemNewSizeName = size;
+        window.editItemNewColorName = color;
+        
+        // Hiển thị modal
+        const modal = new bootstrap.Modal(document.getElementById('editCartModal'));
+        modal.show();
+        
+        // Xóa modal khi đóng
+        document.getElementById('editCartModal').addEventListener('hidden.bs.modal', function() {
+            this.remove();
+        });
+    })
+    .catch(error => {
+        console.error('Lỗi tải thông tin sản phẩm:', error);
+        showNotification('Lỗi tải dữ liệu', 'danger');
+    });
+}
+
+function increaseQtyEdit() {
+    const input = document.getElementById('editQuantity');
+    let value = parseInt(input.value) || 1;
+    if (value < 100) {
+        input.value = value + 1;
+    }
+}
+
+function decreaseQtyEdit() {
+    const input = document.getElementById('editQuantity');
+    let value = parseInt(input.value) || 1;
+    if (value > 1) {
+        input.value = value - 1;
+    }
+}
+
+function saveEditCartItem(productId) {
+    const newQty = parseInt(document.getElementById('editQuantity').value);
+    
+    if (isNaN(newQty) || newQty < 1) {
+        showNotification('Số lượng không hợp lệ', 'danger');
+        return;
+    }
+    
+    const oldSizeId = window.editItemOldSizeId;
+    const oldColorId = window.editItemOldColorId;
+    const newSizeId = window.editItemNewSizeId;
+    const newColorId = window.editItemNewColorId;
+    const newSizeName = window.editItemNewSizeName;
+    const newColorName = window.editItemNewColorName;
+    
+    // Check if size or color changed
+    const sizeChanged = oldSizeId != newSizeId;
+    const colorChanged = oldColorId != newColorId;
+    
+    if (sizeChanged || colorChanged) {
+        // Size/color changed: remove old item and add new item
+        removeFromCartAPI(productId, oldSizeId, oldColorId)
+            .then(removed => {
+                if (!removed) {
+                    showNotification('Lỗi khi xóa sản phẩm cũ', 'danger');
+                    return;
+                }
+                
+                // Now add new item with new size/color
+                return fetch('api/cart.php?action=add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: newQty,
+                        size_id: newSizeId || null,
+                        color_id: newColorId || null,
+                        size_name: newSizeName || null,
+                        color_name: newColorName || null
+                    })
+                }).then(r => r.json());
+            })
+            .then(data => {
+                if (data && data.success) {
+                    showNotification('Cập nhật sản phẩm thành công', 'success');
+                    loadCart();
+                    updateCartCount();
+                    
+                    // Đóng modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editCartModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                } else {
+                    showNotification('Lỗi cập nhật sản phẩm', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                showNotification('Lỗi kết nối server', 'danger');
+            });
+    } else {
+        // Only quantity changed: simple update
+        updateCartQuantity(productId, newQty, newSizeId, newColorId);
+        
+        // Đóng modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editCartModal'));
+        if (modal) {
+            modal.hide();
+        }
+        
+        showNotification('Cập nhật sản phẩm thành công', 'success');
+    }
+}
+
+// ===========================
 // ===========================
 
 document.addEventListener('DOMContentLoaded', function() {
     loadCart();
     updateCartCount();
+    
+    // Event delegation - Edit cart item button
+    document.addEventListener('click', function(e) {
+        const editBtn = e.target.closest('.btn-edit-item');
+        if (editBtn) {
+            e.preventDefault();
+            editCartItemBtn(editBtn);
+        }
+        
+        const removeBtn = e.target.closest('.btn-remove-item');
+        if (removeBtn) {
+            e.preventDefault();
+            removeFromCartBtn(removeBtn);
+        }
+    });
     
     // Add animation styles (avoid duplicates)
     if (!document.getElementById('cartAnimStyle')) {
