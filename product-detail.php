@@ -464,44 +464,51 @@ $ratingSummary = $product['rating_summary'];
 
                                 <div class="write-review">
                                     <h4>Viết đánh giá của bạn</h4>
-                                    <form class="review-form">
-                                        <div class="form-group">
-                                            <label>Đánh giá:</label>
-                                            <div class="rating-input">
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
-                                                <i class="far fa-star"></i>
+                                    <?php if (isset($_SESSION['user_id'])): ?>
+                                        <form class="review-form">
+                                            <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                            <div class="form-group">
+                                                <label>Đánh giá:</label>
+                                                <div class="rating-input" style="font-size: 28px; cursor: pointer; gap: 8px; display: flex;">
+                                                    <i class="far fa-star"></i>
+                                                    <i class="far fa-star"></i>
+                                                    <i class="far fa-star"></i>
+                                                    <i class="far fa-star"></i>
+                                                    <i class="far fa-star"></i>
+                                                </div>
                                             </div>
+                                            <div class="form-group">
+                                                <label>Tiêu đề:</label>
+                                                <input type="text" class="form-control" name="title"
+                                                    placeholder="Viết tiêu đề đánh giá..." required minlength="5">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Nội dung:</label>
+                                                <textarea class="form-control" name="content" rows="4"
+                                                    placeholder="Chia sẻ kinh nghiệm của bạn..." required minlength="10"></textarea>
+                                            </div>
+                                            <button type="submit" class="btn-submit-review">Gửi đánh giá</button>
+                                        </form>
+                                    <?php else: ?>
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i> Vui lòng <a href="login.php">đăng nhập</a> để viết đánh giá
                                         </div>
-                                        <div class="form-group">
-                                            <label>Tiêu đề:</label>
-                                            <input type="text" class="form-control"
-                                                placeholder="Viết tiêu đề đánh giá..." required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Nội dung:</label>
-                                            <textarea class="form-control" rows="4"
-                                                placeholder="Chia sẻ kinh nghiệm của bạn..." required></textarea>
-                                        </div>
-                                        <button type="submit" class="btn-submit-review">Gửi đánh giá</button>
-                                    </form>
+                                    <?php endif; ?>
                                 </div>
 
                                 <div class="reviews-list">
                                     <h4>Đánh giá từ khách hàng</h4>
                                     <?php if (!empty($reviews)): ?>
                                         <?php foreach ($reviews as $review): ?>
-                                            <div class="review-item">
+                                            <div class="review-item" data-review-id="<?php echo $review['id']; ?>">
                                                 <div class="review-header">
                                                     <div class="reviewer-info">
-                                                        <img src="<?php echo !empty($review['anh_dai_dien']) ? 'public/' . htmlspecialchars($review['anh_dai_dien']) : 'https://via.placeholder.com/40?text=Avatar'; ?>"
-                                                            alt="Avatar" class="reviewer-avatar">
                                                         <div>
                                                             <h5><?php echo htmlspecialchars($review['ten_nguoi_dung']); ?></h5>
-                                                            <p class="review-date"><?php echo $review['so_sao']; ?> sao -
-                                                                <?php echo date('d/m/Y', strtotime($review['ngay_danh_gia'])); ?>
+                                                            <p class="review-date">
+                                                                <?php echo str_repeat('<i class="fas fa-star" style="color: #ffc107;"></i>', $review['so_sao']); ?>
+                                                                <?php echo str_repeat('<i class="far fa-star"></i>', 5 - $review['so_sao']); ?> -
+                                                                <?php echo date('d/m/Y H:i', strtotime($review['ngay_danh_gia'])); ?>
                                                             </p>
                                                         </div>
                                                     </div>
@@ -513,9 +520,14 @@ $ratingSummary = $product['rating_summary'];
                                                     <?php echo nl2br(htmlspecialchars($review['binh_luan'])); ?>
                                                 </p>
                                                 <div class="review-actions">
-                                                    <button class="helpful-btn">
-                                                        <i class="fas fa-thumbs-up"></i> Hữu ích
+                                                    <button class="helpful-btn" style="border: none; background: none; color: #666; cursor: pointer;">
+                                                        <i class="fas fa-thumbs-up"></i> Hữu ích (0)
                                                     </button>
+                                                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $review['nguoi_dung_id']): ?>
+                                                        <button class="delete-btn" onclick="deleteReview(<?php echo $review['id']; ?>)" style="border: none; background: none; color: #dc3545; cursor: pointer; margin-left: 10px;">
+                                                            <i class="fas fa-trash"></i> Xóa
+                                                        </button>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                         <?php endforeach; ?>
@@ -652,6 +664,20 @@ $ratingSummary = $product['rating_summary'];
     <script src="js/cart.js"></script>
     <script src="js/script.js"></script>
     <script src="js/product-detail.js"></script>
+    <script src="js/review.js"></script>
+    
+    <script>
+        // Đảm bảo form được initialize nếu review.js chậm
+        window.addEventListener('load', function() {
+            console.log('Window load - reinitializing review form');
+            if (typeof initializeReviewForm === 'function') {
+                initializeReviewForm();
+            }
+            if (typeof loadAllReviews === 'function') {
+                loadAllReviews();
+            }
+        });
+    </script>
 </body>
 
 </html>

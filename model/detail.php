@@ -116,7 +116,34 @@ function getProductRatingSummary($conn, $productId) {
     $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
     $stmt->execute();
     
-    return $stmt->fetch(PDO::FETCH_ASSOC);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Tính phần trăm phân bố rating
+    $total = (int)$result['total_reviews'];
+    $result['rating_distribution'] = [
+        5 => [
+            'count' => (int)$result['five_star'],
+            'percentage' => $total > 0 ? round(((int)$result['five_star'] / $total) * 100) : 0
+        ],
+        4 => [
+            'count' => (int)$result['four_star'],
+            'percentage' => $total > 0 ? round(((int)$result['four_star'] / $total) * 100) : 0
+        ],
+        3 => [
+            'count' => (int)$result['three_star'],
+            'percentage' => $total > 0 ? round(((int)$result['three_star'] / $total) * 100) : 0
+        ],
+        2 => [
+            'count' => (int)$result['two_star'],
+            'percentage' => $total > 0 ? round(((int)$result['two_star'] / $total) * 100) : 0
+        ],
+        1 => [
+            'count' => (int)$result['one_star'],
+            'percentage' => $total > 0 ? round(((int)$result['one_star'] / $total) * 100) : 0
+        ]
+    ];
+    
+    return $result;
 }
 function getTotalStock($conn, $productId) {
     $sql = "SELECT COALESCE(SUM(so_luong_ton), 0) as total 
@@ -132,7 +159,9 @@ function getTotalStock($conn, $productId) {
 }
 function getReviewsByProductId($conn, $id, $limit = 5) {
     try {
-        $sql = "SELECT dg.*, nd.ten AS ten_nguoi_dung, nd.anh_dai_dien
+        $sql = "SELECT dg.id, dg.san_pham_id, dg.nguoi_dung_id, dg.so_sao, dg.binh_luan, 
+                       dg.trang_thai, dg.ngay_danh_gia, dg.ngay_cap_nhat,
+                       nd.ten AS ten_nguoi_dung, nd.anh_dai_dien
                 FROM danh_gia dg 
                 JOIN nguoi_dung nd ON dg.nguoi_dung_id = nd.id 
                 WHERE dg.san_pham_id = :id AND dg.trang_thai = 1

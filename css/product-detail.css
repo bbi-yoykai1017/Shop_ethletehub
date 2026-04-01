@@ -747,6 +747,19 @@
     object-fit: cover;
 }
 
+.reviewer-avatar-initial {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
 .reviewer-info h5 {
     font-size: 1rem;
     margin: 0 0 5px 0;

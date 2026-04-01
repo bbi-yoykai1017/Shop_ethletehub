@@ -2,8 +2,79 @@
 
 session_start();
 
-// Lấy giỏ hàng từ session (API sử dụng session)
-$items = $_SESSION['cart'] ?? [];
+require_once __DIR__ . '/Database.php';
+
+$items = [];
+$isEmpty = true;
+
+// Nếu user đăng nhập, load từ database
+if (isset($_SESSION['user_id'])) {
+    $userId = (int)$_SESSION['user_id'];
+    try {
+        $db = new Database();
+        $conn = $db->connect();
+        
+        if ($conn) {
+            // Tìm giỏ hàng của user
+            $stmt = $conn->prepare("SELECT id FROM gio_hang WHERE nguoi_dung_id = :user_id LIMIT 1");
+            $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($cart) {
+                // Lấy tất cả items trong giỏ từ DB, kèm thông tin sản phẩm
+                $stmt = $conn->prepare("
+                    SELECT 
+                        ctgh.id as chi_tiet_id,
+                        ctgh.san_pham_id as product_id,
+                        sp.ten as name,
+                        sp.gia as price,
+                        sp.hinh_anh_chinh as image,
+                        ctgh.kich_thuoc_id as size_id,
+                        ks.ten as size,
+                        ctgh.mau_sac_id as color_id,
+                        ms.ten as color,
+                        ctgh.so_luong as quantity
+                    FROM chi_tiet_gio_hang ctgh
+                    JOIN san_pham sp ON ctgh.san_pham_id = sp.id
+                    LEFT JOIN kich_thuoc ks ON ctgh.kich_thuoc_id = ks.id
+                    LEFT JOIN mau_sac ms ON ctgh.mau_sac_id = ms.id
+                    WHERE ctgh.gio_hang_id = :cart_id
+                ");
+                $stmt->bindParam(':cart_id', $cart['id'], PDO::PARAM_INT);
+                $stmt->execute();
+                $dbItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                foreach ($dbItems as $item) {
+                    $items[] = [
+                        'id' => (int)$item['product_id'],
+                        'name' => $item['name'],
+                        'ten' => $item['name'],
+                        'price' => (float)$item['price'],
+                        'gia' => (float)$item['price'],
+                        'image' => $item['image'],
+                        'hinh_anh_chinh' => $item['image'],
+                        'quantity' => (int)$item['quantity'],
+                        'size_id' => $item['size_id'],
+                        'size' => $item['size'],
+                        'color_id' => $item['color_id'],
+                        'color' => $item['color']
+                    ];
+                }
+                
+                // Đồng bộ session với database
+                $_SESSION['cart'] = $items;
+            }
+        }
+    } catch (Exception $e) {
+        // Nếu lỗi, dùng session
+        $items = $_SESSION['cart'] ?? [];
+    }
+} else {
+    // Khách vãng lai: dùng session
+    $items = $_SESSION['cart'] ?? [];
+}
+
 $isEmpty = empty($items);
 
 // Tính toán summary

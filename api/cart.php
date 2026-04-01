@@ -12,7 +12,6 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../Database.php';
 
-// Xóa bất kỳ output cũ nào
 ob_clean();
 
 try {
@@ -31,6 +30,99 @@ try {
     if (!isset($_SESSION['cart'])) {
         $_SESSION['cart'] = [];
     }
+
+    function getOrCreateCartInDB($conn, $userId = null) {
+        if ($userId) {
+            // Nếu user đăng nhập, lấy giỏ của user
+            $stmt = $conn->prepare("SELECT id FROM gio_hang WHERE nguoi_dung_id = :user_id LIMIT 1");
+            $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($cart) {
+                return $cart['id'];
+            } else {
+                // Tạo giỏ mới
+                $stmt = $conn->prepare("INSERT INTO gio_hang (nguoi_dung_id) VALUES (:user_id)");
+                $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+                $stmt->execute();
+                return $conn->lastInsertId();
+            }
+        } else {
+            // Khách vãng lai: dùng session ID
+            $sessionId = session_id();
+            $stmt = $conn->prepare("SELECT id FROM gio_hang WHERE id_phien_lam_viec = :session_id LIMIT 1");
+            $stmt->bindParam(':session_id', $sessionId);
+            $stmt->execute();
+            $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($cart) {
+                return $cart['id'];
+            } else {
+                $stmt = $conn->prepare("INSERT INTO gio_hang (id_phien_lam_viec) VALUES (:session_id)");
+                $stmt->bindParam(':session_id', $sessionId);
+                $stmt->execute();
+                return $conn->lastInsertId();
+            }
+        }
+    }
+
+    function saveCartItemToDB($conn, $cartId, $productId, $sizeId, $colorId, $qty, $price) {
+        // Kiểm tra xem item này đã tồn tại chưa
+        $stmt = $conn->prepare("
+            SELECT id FROM chi_tiet_gio_hang 
+            WHERE gio_hang_id = :cart_id 
+              AND san_pham_id = :product_id 
+              AND (kich_thuoc_id <=> :size_id) 
+              AND (mau_sac_id <=> :color_id)
+        ");
+        $stmt->bindParam(':cart_id', $cartId, PDO::PARAM_INT);
+        $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+        $stmt->bindParam(':size_id', $sizeId);
+        $stmt->bindParam(':color_id', $colorId);
+        $stmt->execute();
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($existing) {
+            // Cập nhật số lượng
+            $stmt = $conn->prepare("UPDATE chi_tiet_gio_hang SET so_luong = so_luong + :qty WHERE id = :id");
+            $stmt->bindParam(':qty', $qty, PDO::PARAM_INT);
+            $stmt->bindParam(':id', $existing['id'], PDO::PARAM_INT);
+            $stmt->execute();
+        } else {
+            // Thêm mới
+            $stmt = $conn->prepare("
+                INSERT INTO chi_tiet_gio_hang (gio_hang_id, san_pham_id, kich_thuoc_id, mau_sac_id, so_luong, gia)
+                VALUES (:cart_id, :product_id, :size_id, :color_id, :qty, :gia)
+            ");
+            $stmt->bindParam(':cart_id', $cartId, PDO::PARAM_INT);
+            $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+            $stmt->bindParam(':size_id', $sizeId);
+            $stmt->bindParam(':color_id', $colorId);
+            $stmt->bindParam(':qty', $qty, PDO::PARAM_INT);
+            $stmt->bindParam(':gia', $price);
+            $stmt->execute();
+        }
+    }
+
+    function removeCartItemFromDB($conn, $cartId, $productId, $sizeId, $colorId) {
+        $stmt = $conn->prepare("
+            DELETE FROM chi_tiet_gio_hang 
+            WHERE gio_hang_id = :cart_id 
+              AND san_pham_id = :product_id 
+              AND (kich_thuoc_id <=> :size_id) 
+              AND (mau_sac_id <=> :color_id)
+        ");
+        $stmt->bindParam(':cart_id', $cartId, PDO::PARAM_INT);
+        $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+        $stmt->bindParam(':size_id', $sizeId);
+        $stmt->bindParam(':color_id', $colorId);
+        $stmt->execute();
+    }
+
+    // Lấy user ID nếu đã đăng nhập
+    $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+    $gioHangId = null;
 
     switch ($action) {
 
@@ -107,6 +199,13 @@ try {
                         $item['quantity'] += $qty;
                         // Không được vượt quá tồn kho
                         $item['quantity'] = min($item['quantity'], $stock);
+                        
+                        // LƯU VÀO DATABASE
+                        if ($userId) {
+                            $gioHangId = getOrCreateCartInDB($conn, $userId);
+                            saveCartItemToDB($conn, $gioHangId, $productId, $sizeId, $colorId, $qty, $product['gia']);
+                        }
+                        
                         echo json_encode([
                             'success' => true,
                             'message' => $product['ten'] . ' - Số lượng cập nhật: ' . $item['quantity'],
@@ -133,6 +232,12 @@ try {
                     'color' => $colorName
                 ];
 
+                // LƯU VÀO DATABASE
+                if ($userId) {
+                    $gioHangId = getOrCreateCartInDB($conn, $userId);
+                    saveCartItemToDB($conn, $gioHangId, $productId, $sizeId, $colorId, $qty, $product['gia']);
+                }
+
                 echo json_encode([
                     'success' => true,
                     'message' => '"' . $product['ten'] . '" đã được thêm vào giỏ hàng!',
@@ -144,6 +249,7 @@ try {
 
         // ========== CẬP NHẬT SỐ LƯỢNG ==========
         case 'update':
+            $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
             $productId = (int) ($data['product_id'] ?? 0);
             $qty = (int) ($data['quantity'] ?? 1);
             $sizeId = $data['size_id'] ?? null;
@@ -172,6 +278,23 @@ try {
                 });
                 $_SESSION['cart'] = array_values($_SESSION['cart']);
 
+                // Xóa khỏi database nếu user đăng nhập
+                if ($userId) {
+                    $gioHangId = getOrCreateCartInDB($conn, $userId);
+                    $stmt = $conn->prepare("
+                        DELETE FROM chi_tiet_gio_hang 
+                        WHERE gio_hang_id = :cart_id 
+                          AND san_pham_id = :product_id 
+                          AND (kich_thuoc_id <=> :size_id) 
+                          AND (mau_sac_id <=> :color_id)
+                    ");
+                    $stmt->bindParam(':cart_id', $gioHangId, PDO::PARAM_INT);
+                    $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+                    $stmt->bindParam(':size_id', $sizeId);
+                    $stmt->bindParam(':color_id', $colorId);
+                    $stmt->execute();
+                }
+
                 echo json_encode([
                     'success' => true,
                     'message' => 'Sản phẩm đã được xóa khỏi giỏ',
@@ -185,6 +308,26 @@ try {
                 $existingKey = generateCartKeyForUpdate($item['id'], $item['size_id'] ?? null, $item['color_id'] ?? null);
                 if ($existingKey === $targetKey) {
                     $item['quantity'] = $qty;
+                    
+                    // Cập nhật database nếu user đăng nhập
+                    if ($userId) {
+                        $gioHangId = getOrCreateCartInDB($conn, $userId);
+                        $stmt = $conn->prepare("
+                            UPDATE chi_tiet_gio_hang 
+                            SET so_luong = :qty
+                            WHERE gio_hang_id = :cart_id 
+                              AND san_pham_id = :product_id 
+                              AND (kich_thuoc_id <=> :size_id) 
+                              AND (mau_sac_id <=> :color_id)
+                        ");
+                        $stmt->bindParam(':qty', $qty, PDO::PARAM_INT);
+                        $stmt->bindParam(':cart_id', $gioHangId, PDO::PARAM_INT);
+                        $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+                        $stmt->bindParam(':size_id', $sizeId);
+                        $stmt->bindParam(':color_id', $colorId);
+                        $stmt->execute();
+                    }
+                    
                     echo json_encode([
                         'success' => true,
                         'message' => 'Số lượng đã cập nhật',
@@ -200,6 +343,7 @@ try {
 
         // ========== XÓA KHỎI GIỎ ==========
         case 'remove':
+            $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
             $productId = (int) ($data['product_id'] ?? 0);
             $sizeId = $data['size_id'] ?? null;
             $colorId = $data['color_id'] ?? null;
@@ -234,6 +378,23 @@ try {
             });
             $_SESSION['cart'] = array_values($_SESSION['cart']);
 
+            // Xóa khỏi database nếu user đăng nhập
+            if ($userId) {
+                $gioHangId = getOrCreateCartInDB($conn, $userId);
+                $stmt = $conn->prepare("
+                    DELETE FROM chi_tiet_gio_hang 
+                    WHERE gio_hang_id = :cart_id 
+                      AND san_pham_id = :product_id 
+                      AND (kich_thuoc_id <=> :size_id) 
+                      AND (mau_sac_id <=> :color_id)
+                ");
+                $stmt->bindParam(':cart_id', $gioHangId, PDO::PARAM_INT);
+                $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+                $stmt->bindParam(':size_id', $sizeId);
+                $stmt->bindParam(':color_id', $colorId);
+                $stmt->execute();
+            }
+
             echo json_encode([
                 'success' => true,
                 'message' => '"' . $productName . '" đã được xóa khỏi giỏ hàng',
@@ -243,17 +404,106 @@ try {
 
         // ========== LẤY THÔNG TIN GIỎ ==========
         case 'get':
-            echo json_encode([
-                'success' => true,
-                'cart' => $_SESSION['cart'],
-                'cart_count' => countCart(),
-                'total' => getCartTotal()
-            ]);
+            $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+            
+            // Nếu user đăng nhập, load từ database
+            if ($userId) {
+                $gioHangId = null;
+                
+                // Tìm giỏ hàng của user
+                $stmt = $conn->prepare("SELECT id FROM gio_hang WHERE nguoi_dung_id = :user_id LIMIT 1");
+                $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+                $stmt->execute();
+                $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($cart) {
+                    $gioHangId = $cart['id'];
+                    
+                    // Lấy tất cả items trong giỏ từ DB, kèm thông tin sản phẩm
+                    $stmt = $conn->prepare("
+                        SELECT 
+                            ctgh.id as chi_tiet_id,
+                            ctgh.san_pham_id as product_id,
+                            sp.ten as name,
+                            sp.gia as price,
+                            sp.hinh_anh_chinh as image,
+                            ctgh.kich_thuoc_id as size_id,
+                            ks.ten as size,
+                            ctgh.mau_sac_id as color_id,
+                            ms.ten as color,
+                            ctgh.so_luong as quantity
+                        FROM chi_tiet_gio_hang ctgh
+                        JOIN san_pham sp ON ctgh.san_pham_id = sp.id
+                        LEFT JOIN kich_thuoc ks ON ctgh.kich_thuoc_id = ks.id
+                        LEFT JOIN mau_sac ms ON ctgh.mau_sac_id = ms.id
+                        WHERE ctgh.gio_hang_id = :cart_id
+                    ");
+                    $stmt->bindParam(':cart_id', $gioHangId, PDO::PARAM_INT);
+                    $stmt->execute();
+                    $dbItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    // Chuẩn bị dữ liệu theo định dạng session
+                    $cartItems = [];
+                    $totalQty = 0;
+                    $totalPrice = 0;
+                    
+                    foreach ($dbItems as $item) {
+                        $cartItems[] = [
+                            'id' => (int)$item['product_id'],
+                            'name' => $item['name'],
+                            'ten' => $item['name'],
+                            'price' => (float)$item['price'],
+                            'gia' => (float)$item['price'],
+                            'image' => $item['image'],
+                            'hinh_anh_chinh' => $item['image'],
+                            'quantity' => (int)$item['quantity'],
+                            'size_id' => $item['size_id'],
+                            'size' => $item['size'],
+                            'color_id' => $item['color_id'],
+                            'color' => $item['color']
+                        ];
+                        
+                        $totalQty += (int)$item['quantity'];
+                        $totalPrice += (float)$item['price'] * (int)$item['quantity'];
+                    }
+                    
+                    echo json_encode([
+                        'success' => true,
+                        'cart' => $cartItems,
+                        'cart_count' => $totalQty,
+                        'total' => $totalPrice
+                    ]);
+                } else {
+                    // User chưa có giỏ hàng
+                    echo json_encode([
+                        'success' => true,
+                        'cart' => [],
+                        'cart_count' => 0,
+                        'total' => 0
+                    ]);
+                }
+            } else {
+                // Khách vãng lai: dùng session
+                echo json_encode([
+                    'success' => true,
+                    'cart' => $_SESSION['cart'] ?? [],
+                    'cart_count' => countCart(),
+                    'total' => getCartTotal()
+                ]);
+            }
             break;
 
         // ========== XÓA TOÀN BỘ GIỎ ==========
         case 'clear':
             $_SESSION['cart'] = [];
+            
+            if ($userId) {
+                $cartId = getOrCreateCartInDB($conn, $userId);
+                $stmt = $conn->prepare("DELETE FROM chi_tiet_gio_hang WHERE gio_hang_id = :cart_id");
+                $stmt->bindParam(':cart_id', $cartId, PDO::PARAM_INT);
+                $stmt->execute();
+            }
+            
             echo json_encode(['success' => true, 'message' => 'Giỏ hàng đã được xóa trống']);
             break;
 
@@ -295,7 +545,6 @@ function getCartTotal()
     return $total;
 }
 
-// Hàm array_find (PHP 8 không có sẵn, cần thêm vào)
 if (!function_exists('array_find')) {
     function array_find(array $array, callable $callback)
     {
