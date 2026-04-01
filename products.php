@@ -24,6 +24,7 @@ $items = getallproduct($conn);
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/products-page.css">
+    <link rel="stylesheet" href="css/products.css">
 </head>
 
 <body>

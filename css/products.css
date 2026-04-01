@@ -253,6 +253,17 @@
     box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
 }
 
+.btn-add-cart-index {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.btn-add-cart-index:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
 .btn-wishlist {
     background: var(--light);
     color: var(--dark);

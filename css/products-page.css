@@ -384,15 +384,6 @@
     gap: 5px;
 }
 
-.btn-page-add-cart {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-page-add-cart:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-}
 
 .btn-page-buy-now {
     background: var(--secondary);
