@@ -40,19 +40,19 @@ try {
             }
 
             $userId = (int)$_SESSION['user_id'];
-            $productId = (int)($data['product_id'] ?? 0);
+            $sanPhamId = (int)($data['san_pham_id'] ?? 0);
             $soSao = (int)($data['so_sao'] ?? 0);
             $binhLuan = trim($data['binh_luan'] ?? '');
             
             // Logging for debug
-            error_log("Review add request - User: $userId, Product: $productId, Rating: $soSao, Content length: " . strlen($binhLuan));
+            error_log("Review add request - User: $userId, Product: $sanPhamId, Rating: $soSao, Content length: " . strlen($binhLuan));
 
             // Validate
-            if ($productId <= 0) {
+            if ($sanPhamId <= 0) {
                 echo json_encode([
                     'success' => false, 
                     'message' => 'ID sản phẩm không hợp lệ',
-                    'debug' => 'Invalid product_id: ' . ($data['product_id'] ?? 'null')
+                    'debug' => 'Invalid san_pham_id: ' . ($data['san_pham_id'] ?? 'null')
                 ]);
                 exit;
             }
@@ -86,7 +86,7 @@ try {
 
             // Kiểm tra sản phẩm có tồn tại
             $stmt = $conn->prepare("SELECT id FROM san_pham WHERE id = :id AND trang_thai = 1");
-            $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
+            $stmt->bindParam(':id', $sanPhamId, PDO::PARAM_INT);
             $stmt->execute();
             if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
                 echo json_encode(['success' => false, 'message' => 'Sản phẩm không tồn tại']);
@@ -96,9 +96,9 @@ try {
             // Kiểm tra user đã bình luận sản phẩm này chưa (có thể update)
             $stmt = $conn->prepare("
                 SELECT id FROM danh_gia 
-                WHERE san_pham_id = :product_id AND nguoi_dung_id = :user_id
+                WHERE san_pham_id = :san_pham_id AND nguoi_dung_id = :user_id
             ");
-            $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+            $stmt->bindParam(':san_pham_id', $sanPhamId, PDO::PARAM_INT);
             $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
             $stmt->execute();
             $existingReview = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -136,7 +136,7 @@ try {
                         INSERT INTO danh_gia (san_pham_id, nguoi_dung_id, so_sao, binh_luan, trang_thai, ngay_danh_gia)
                         VALUES (:san_pham_id, :nguoi_dung_id, :so_sao, :binh_luan, 1, NOW())
                     ");
-                    $stmt->bindParam(':san_pham_id', $productId, PDO::PARAM_INT);
+                    $stmt->bindParam(':san_pham_id', $sanPhamId, PDO::PARAM_INT);
                     $stmt->bindParam(':nguoi_dung_id', $userId, PDO::PARAM_INT);
                     $stmt->bindParam(':so_sao', $soSao, PDO::PARAM_INT);
                     $stmt->bindParam(':binh_luan', $binhLuan);
@@ -163,21 +163,21 @@ try {
 
         // ========== LẤY DANH SÁCH BÌNH LUẬN CỦA SẢN PHẨM ==========
         case 'getAll':
-            $productId = (int)($_GET['product_id'] ?? 0);
+            $sanPhamId = (int)($_GET['san_pham_id'] ?? 0);
             $limit = (int)($_GET['limit'] ?? 10);
             $offset = (int)($_GET['offset'] ?? 0);
 
-            if ($productId <= 0) {
-                echo json_encode(['success' => false, 'message' => 'ID sản phẩm không hợp lệ', 'product_id' => $productId]);
+            if ($sanPhamId <= 0) {
+                echo json_encode(['success' => false, 'message' => 'ID sản phẩm không hợp lệ', 'san_pham_id' => $sanPhamId]);
                 exit;
             }
 
             // Debug: Check if reviews exist
             $stmtCount = $conn->prepare("
                 SELECT COUNT(*) as cnt FROM danh_gia 
-                WHERE san_pham_id = :product_id AND trang_thai = 1
+                WHERE san_pham_id = :san_pham_id AND trang_thai = 1
             ");
-            $stmtCount->bindParam(':product_id', $productId, PDO::PARAM_INT);
+            $stmtCount->bindParam(':san_pham_id', $sanPhamId, PDO::PARAM_INT);
             $stmtCount->execute();
             $countResult = $stmtCount->fetch(PDO::FETCH_ASSOC);
 
@@ -192,11 +192,11 @@ try {
                     nd.anh_dai_dien
                 FROM danh_gia dg
                 JOIN nguoi_dung nd ON dg.nguoi_dung_id = nd.id
-                WHERE dg.san_pham_id = :product_id AND dg.trang_thai = 1
+                WHERE dg.san_pham_id = :san_pham_id AND dg.trang_thai = 1
                 ORDER BY dg.ngay_danh_gia DESC
                 LIMIT :limit OFFSET :offset
             ");
-            $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+            $stmt->bindParam(':san_pham_id', $sanPhamId, PDO::PARAM_INT);
             $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
             $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
@@ -205,9 +205,9 @@ try {
             // Đếm tổng số bình luận
             $stmt = $conn->prepare("
                 SELECT COUNT(*) as total FROM danh_gia 
-                WHERE san_pham_id = :product_id AND trang_thai = 1
+                WHERE san_pham_id = :san_pham_id AND trang_thai = 1
             ");
-            $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+            $stmt->bindParam(':san_pham_id', $sanPhamId, PDO::PARAM_INT);
             $stmt->execute();
             $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
@@ -218,7 +218,7 @@ try {
                 'limit' => $limit,
                 'offset' => $offset,
                 'debug' => [
-                    'product_id' => $productId,
+                    'san_pham_id' => $sanPhamId,
                     'count_check' => (int)$countResult['cnt'],
                     'reviews_count' => count($reviews)
                 ]
@@ -271,9 +271,9 @@ try {
 
         // ========== LẤY SUMMARY ĐÁNH GIÁ ==========
         case 'summary':
-            $productId = (int)($_GET['product_id'] ?? 0);
+            $sanPhamId = (int)($_GET['san_pham_id'] ?? 0);
 
-            if ($productId <= 0) {
+            if ($sanPhamId <= 0) {
                 echo json_encode(['success' => false, 'message' => 'ID sản phẩm không hợp lệ']);
                 exit;
             }
@@ -288,9 +288,9 @@ try {
                     SUM(CASE WHEN so_sao = 2 THEN 1 ELSE 0 END) as two_star,
                     SUM(CASE WHEN so_sao = 1 THEN 1 ELSE 0 END) as one_star
                 FROM danh_gia
-                WHERE san_pham_id = :product_id AND trang_thai = 1
+                WHERE san_pham_id = :san_pham_id AND trang_thai = 1
             ");
-            $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
+            $stmt->bindParam(':san_pham_id', $sanPhamId, PDO::PARAM_INT);
             $stmt->execute();
             $summary = $stmt->fetch(PDO::FETCH_ASSOC);
 

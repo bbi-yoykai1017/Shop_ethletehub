@@ -124,12 +124,12 @@ function submitReview() {
     const noiDung = noiDungInput.value;
     
     // Get product ID from form or URL
-    const productIdHidden = form.querySelector('input[name="product_id"]');
-    let productId = productIdHidden ? productIdHidden.value : new URLSearchParams(window.location.search).get('id');
-    productId = parseInt(productId);
-    console.log('Product ID:', productId);
+    const sanPhamIdHidden = form.querySelector('input[name="product_id"]');
+    let sanPhamId = sanPhamIdHidden ? sanPhamIdHidden.value : new URLSearchParams(window.location.search).get('id');
+    sanPhamId = parseInt(sanPhamId);
+    console.log('San pham ID:', sanPhamId);
     
-    if (!productId) {
+    if (!sanPhamId) {
         showNotification('Lỗi: Không tìm thấy ID sản phẩm', 'danger');
         return;
     }
@@ -153,7 +153,7 @@ function submitReview() {
     const binhLuan = tieuDe + '\n\n' + noiDung;
     
     console.log('Submitting review:', {
-        product_id: productId,
+        san_pham_id: sanPhamId,
         so_sao: selectedRating,
         binh_luan: binhLuan
     });
@@ -165,7 +165,7 @@ function submitReview() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            product_id: productId,
+            san_pham_id: sanPhamId,
             so_sao: selectedRating,
             binh_luan: binhLuan
         })
@@ -190,16 +190,16 @@ function submitReview() {
 }
 
 function loadAllReviews() {
-    const productId = new URLSearchParams(window.location.search).get('id');
+    const sanPhamId = new URLSearchParams(window.location.search).get('id');
     
-    if (!productId) {
-        console.log('Product ID not found');
+    if (!sanPhamId) {
+        console.log('San pham ID not found');
         return;
     }
     
-    console.log('Loading reviews for product:', productId);
+    console.log('Loading reviews for product:', sanPhamId);
     
-    fetch(`api/review.php?action=getAll&product_id=${productId}&limit=100`)
+    fetch(`api/review.php?action=getAll&san_pham_id=${sanPhamId}&limit=100`)
         .then(response => {
             console.log('Response status:', response.status);
             return response.json();
