@@ -1,9 +1,4 @@
-/**
- * js/script.js
- * Đặt tại: /js/script.js
- * Script chung cho toàn bộ website.
- * addToCart() gọi hàm trong cart.js — chỉ truyền productId, không truyền giá.
- */
+
 
 // ══════════════════════════════════════════
 // CLEAR OLD LOCALSTORAGE

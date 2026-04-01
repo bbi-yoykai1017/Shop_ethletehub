@@ -129,11 +129,24 @@ function loadCart() {
             
             const cart = data.cart;
             cartItemsList.innerHTML = cart.map((item, index) => {
-                // Fix image path - thêm public/ nếu cần
                 let imagePath = item.image || 'public/placeholder.svg';
-                if (!imagePath.startsWith('./') && !imagePath.startsWith('/') && !imagePath.includes('data:')) {
-                    imagePath = './public/' + imagePath;
+                if (!imagePath.startsWith('./') && !imagePath.startsWith('/') && !imagePath.startsWith('http') && !imagePath.includes('data:')) {
+                    imagePath = 'public/' + imagePath;
                 }
+                
+                // Xây dựng HTML cho size/color info
+                let variantInfo = '';
+                if (item.size || item.color) {
+                    variantInfo = '<div class="cart-item-variants">';
+                    if (item.size) {
+                        variantInfo += `<span class="variant-badge">Size: ${item.size}</span>`;
+                    }
+                    if (item.color) {
+                        variantInfo += `<span class="variant-badge">Màu: ${item.color}</span>`;
+                    }
+                    variantInfo += '</div>';
+                }
+                
                 return `
                 <div class="cart-item" id="item-${item.id}">
                     <div class="cart-item-image">
@@ -141,6 +154,7 @@ function loadCart() {
                     </div>
                     <div class="cart-item-info">
                         <h4>${item.name}</h4>
+                        ${variantInfo}
                         <div class="cart-item-price">${formatPrice(item.price)}</div>
                     </div>
                     <div class="cart-item-details">
@@ -158,9 +172,14 @@ function loadCart() {
                     <div class="cart-item-subtotal">
                         <strong>${formatPrice((item.price || 0) * (item.quantity || 1))}</strong>
                     </div>
-                    <button class="btn-remove-item" onclick="removeFromCartAPI(${item.id})">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <div class="cart-item-actions">
+                        <button class="btn-edit-item" onclick="editCartItem(${item.id}, '${item.size || ''}', '${item.color || ''}')" title="Chỉnh sửa sản phẩm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-remove-item" onclick="removeFromCartAPI(${item.id})" title="Xóa sản phẩm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
                 `;
             }).join('');

@@ -354,5 +354,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Render sản phẩm
     renderProducts();
     
+    // Event listener cho nút thêm vào giỏ đã được xử lý trong script.js
+    // Không cần thêm lại ở đây để tránh gọi 2 lần
+    
     console.log('✅ Trang danh sách sản phẩm đã được khởi tạo!');
 });
