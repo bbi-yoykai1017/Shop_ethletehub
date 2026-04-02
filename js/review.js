@@ -287,7 +287,6 @@ function deleteReview(reviewId) {
     .then(data => {
         console.log('Delete response:', data);
         if (data.success) {
-            // Xóa item khỏi HTML ngay lập tức với animation
             const reviewElement = document.querySelector(`[data-review-id="${reviewId}"]`);
             if (reviewElement) {
                 reviewElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th4 01, 2026 lúc 03:20 PM
+-- Thời gian đã tạo: Th4 02, 2026 lúc 11:38 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -241,6 +241,18 @@ CREATE TABLE `chi_tiet_don_hang` (
   `thanh_tien` decimal(15,2) NOT NULL COMMENT 'Thành tiền'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng chi tiết đơn hàng';
 
+--
+-- Đang đổ dữ liệu cho bảng `chi_tiet_don_hang`
+--
+
+INSERT INTO `chi_tiet_don_hang` (`id`, `don_hang_id`, `san_pham_id`, `bien_the_san_pham_id`, `kich_thuoc_id`, `mau_sac_id`, `so_luong`, `gia`, `thanh_tien`) VALUES
+(9, 6, 2, NULL, NULL, NULL, 1, 159000.00, 159000.00),
+(10, 7, 1, NULL, 4, 5, 3, 149000.00, 447000.00),
+(11, 7, 2, NULL, 4, 3, 1, 159000.00, 159000.00),
+(12, 8, 1, NULL, 4, 3, 2, 149000.00, 298000.00),
+(13, 9, 5, NULL, 5, 3, 2, 399000.00, 798000.00),
+(14, 10, 9, NULL, 4, 12, 2, 229000.00, 458000.00);
+
 -- --------------------------------------------------------
 
 --
@@ -258,14 +270,6 @@ CREATE TABLE `chi_tiet_gio_hang` (
   `gia` decimal(15,2) DEFAULT NULL COMMENT 'Giá lúc thêm',
   `ngay_them` datetime DEFAULT current_timestamp() COMMENT 'Ngày thêm'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng chi tiết giỏ hàng';
-
---
--- Đang đổ dữ liệu cho bảng `chi_tiet_gio_hang`
---
-
-INSERT INTO `chi_tiet_gio_hang` (`id`, `gio_hang_id`, `san_pham_id`, `bien_the_san_pham_id`, `kich_thuoc_id`, `mau_sac_id`, `so_luong`, `gia`, `ngay_them`) VALUES
-(8, 6, 1, NULL, 4, 3, 2, 149000.00, '2026-04-01 14:20:36'),
-(9, 7, 2, NULL, 4, 3, 1, 159000.00, '2026-04-01 19:44:10');
 
 -- --------------------------------------------------------
 
@@ -289,10 +293,7 @@ CREATE TABLE `danh_gia` (
 --
 
 INSERT INTO `danh_gia` (`id`, `san_pham_id`, `nguoi_dung_id`, `so_sao`, `binh_luan`, `trang_thai`, `ngay_danh_gia`, `ngay_cap_nhat`) VALUES
-(12, 5, 1, 4, 'ádasdasd\n\nádasdasafa', 1, '2026-04-01 14:57:14', '2026-04-01 14:57:14'),
-(15, 5, 4, 3, 'Áo bình thường, không có gì đặc biệt. Giá hơi cao so với chất lượng.', 1, '2026-04-01 14:39:26', '2026-04-01 14:39:26'),
-(16, 5, 12, 5, 'asdassdf\n\nasdfsafsaf', 1, '2026-04-01 14:57:59', '2026-04-01 14:57:59'),
-(17, 1, 12, 5, 'ádasdasd\n\nadfasdfsadf', 1, '2026-04-01 19:38:54', '2026-04-01 19:38:54');
+(23, 5, 1, 5, 'asdasdas\n\nsafasdfasfsadf', 1, '2026-04-02 15:04:18', '2026-04-02 15:04:18');
 
 -- --------------------------------------------------------
 
@@ -344,8 +345,21 @@ CREATE TABLE `don_hang` (
   `ghi_chu` text DEFAULT NULL COMMENT 'Ghi chú đơn hàng',
   `ngay_dat` datetime DEFAULT current_timestamp() COMMENT 'Ngày đặt',
   `ngay_cap_nhat` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `ngay_giao_hang` date DEFAULT NULL COMMENT 'Ngày giao hàng'
+  `ngay_giao_hang` date DEFAULT NULL COMMENT 'Ngày giao hàng',
+  `lat` decimal(10,8) DEFAULT NULL,
+  `lng` decimal(11,8) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng đơn hàng';
+
+--
+-- Đang đổ dữ liệu cho bảng `don_hang`
+--
+
+INSERT INTO `don_hang` (`id`, `nguoi_dung_id`, `ten_nguoi_nhan`, `so_dien_thoai_nhan`, `dia_chi_giao_hang`, `ma_don_hang`, `tong_tien`, `tien_giam`, `thanh_tien`, `ma_phieu_giam`, `ma_giam_gia_id`, `phuong_thuc_thanh_toan`, `trang_thai`, `ghi_chu`, `ngay_dat`, `ngay_cap_nhat`, `ngay_giao_hang`, `lat`, `lng`) VALUES
+(6, 1, 'nguaa', '123123213213', 'Sân vận động Thống Nhất, 138, Đào Duy Từ, Khu phố 31, Phường Diên Hồng, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72415, Việt Nam', 'ATH-69CD24ACABB36', 159000.00, 0.00, 159000.00, NULL, NULL, '', '', '', '2026-04-01 20:59:08', '2026-04-01 20:59:08', NULL, 10.76081540, 106.66328710),
+(7, 1, 'Admin AthleteHub', '0912345678', 'Hẻm 606 Đường 3 Tháng 2, Khu phố 7, Phường Diên Hồng, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72415, Việt Nam', 'ATH-69CD2994DAF09', 606000.00, 0.00, 606000.00, NULL, NULL, '', '', NULL, '2026-04-01 21:20:04', '2026-04-01 21:20:04', NULL, 10.76737534, 106.66196823),
+(8, 12, 'nguyễn văn a', '0901234567', 'Khu phố 52, Phường Bình Tân, Xã Tân Vĩnh Lộc, Thành phố Hồ Chí Minh, 71913, Việt Nam', 'ATH-69CE10C3132DE', 298000.00, 0.00, 298000.00, NULL, NULL, '', '', NULL, '2026-04-02 13:46:27', '2026-04-02 13:46:27', NULL, 10.76990491, 106.56875610),
+(9, 12, 'nguyễn văn a', '0901234567', 'Hẻm 109 Lạc Long Quân, Khu phố 6, Phường Bình Thới, Thành phố Hồ Chí Minh, 72015, Việt Nam', 'ATH-69CE10EE30B96', 798000.00, 0.00, 798000.00, NULL, NULL, '', '', NULL, '2026-04-02 13:47:10', '2026-04-02 13:47:10', NULL, 10.76079834, 106.64051056),
+(10, 12, 'nguyễn văn a', '0901234567', 'Tạp Hoá 305, 308, Đường Dã Tượng, Khu phố 77, Phường Chánh Hưng, Thành phố Hồ Chí Minh, 73009, Việt Nam', 'ATH-69CE11CE7C8BB', 458000.00, 0.00, 458000.00, NULL, NULL, '', '', NULL, '2026-04-02 13:50:54', '2026-04-02 13:50:54', NULL, 10.74427090, 106.66488647);
 
 -- --------------------------------------------------------
 
@@ -405,14 +419,6 @@ CREATE TABLE `gio_hang` (
   `ngay_cap_nhat` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng giỏ hàng';
 
---
--- Đang đổ dữ liệu cho bảng `gio_hang`
---
-
-INSERT INTO `gio_hang` (`id`, `nguoi_dung_id`, `id_phien_lam_viec`, `ngay_tao`, `ngay_cap_nhat`) VALUES
-(6, 12, NULL, '2026-04-01 14:20:36', '2026-04-01 14:20:36'),
-(7, 1, NULL, '2026-04-01 19:44:10', '2026-04-01 19:44:10');
-
 -- --------------------------------------------------------
 
 --
@@ -460,6 +466,34 @@ INSERT INTO `kich_thuoc` (`id`, `ten`, `mo_ta`) VALUES
 (13, '41', 'Size 41 (Giày)'),
 (14, '42', 'Size 42 (Giày)'),
 (15, '43', 'Size 43 (Giày)');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `like_danh_gia`
+--
+
+CREATE TABLE `like_danh_gia` (
+  `id` int(11) NOT NULL,
+  `danh_gia_id` int(11) NOT NULL,
+  `nguoi_dung_id` int(11) NOT NULL,
+  `trang_thai` int(11) DEFAULT 1,
+  `ngay_tao` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `like_phan_hoi`
+--
+
+CREATE TABLE `like_phan_hoi` (
+  `id` int(11) NOT NULL,
+  `phan_hoi_id` int(11) NOT NULL,
+  `nguoi_dung_id` int(11) NOT NULL,
+  `trang_thai` int(11) DEFAULT 1,
+  `ngay_tao` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -550,7 +584,7 @@ CREATE TABLE `nguoi_dung` (
 --
 
 INSERT INTO `nguoi_dung` (`id`, `ten`, `email`, `mat_khau`, `so_dien_thoai`, `dia_chi`, `anh_dai_dien`, `vai_tro`, `trang_thai`, `ngay_tao`, `ngay_cap_nhat`, `lan_dang_nhap_cuoi`) VALUES
-(1, 'Admin AthleteHub', 'admin@email.com', '$2y$10$kzLAZfIXGu.Oz8Sd.dYvzujJhIJSkkTmxUV8W9t/XLa4BGOem3soC', '0912345678', '123 Đường Thể Thao, TP.HCM', 'admin-avatar.jpg', 'admin', 'hoat_dong', '2026-01-15 08:30:00', '2026-04-01 19:39:08', '2026-04-01 19:39:08'),
+(1, 'Admin AthleteHub', 'admin@email.com', '$2y$10$kzLAZfIXGu.Oz8Sd.dYvzujJhIJSkkTmxUV8W9t/XLa4BGOem3soC', '0912345678', '123 Đường Thể Thao, TP.HCM', 'admin-avatar.jpg', 'admin', 'hoat_dong', '2026-01-15 08:30:00', '2026-04-02 16:15:07', '2026-04-02 16:15:07'),
 (2, 'Nguyễn Văn A', 'khach1@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0987654321', '456 Đường Lê Lợi, Q1, TP.HCM', 'avatar-1.jpg', 'khach_hang', 'hoat_dong', '2026-01-20 10:15:00', '2026-03-04 14:30:54', '2026-03-03 09:45:00'),
 (3, 'Trần Thị B', 'khach2@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0912123456', '789 Đường Nguyễn Huệ, Q1, TP.HCM', 'avatar-2.jpg', 'khach_hang', 'hoat_dong', '2026-01-25 14:30:00', '2026-03-04 14:30:54', '2026-03-02 16:20:00'),
 (4, 'Lê Văn C', 'khach3@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0923456789', '321 Đường Trần Hưng Đạo, Q5, TP.HCM', 'avatar-3.jpg', 'khach_hang', 'hoat_dong', '2026-02-01 11:00:00', '2026-03-04 14:30:54', '2026-03-01 13:15:00'),
@@ -561,10 +595,26 @@ INSERT INTO `nguoi_dung` (`id`, `ten`, `email`, `mat_khau`, `so_dien_thoai`, `di
 (9, 'Đặng Thị H', 'khach8@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0978901234', '753 Đường Hai Bà Trưng, Q1, TP.HCM', 'avatar-8.jpg', 'khach_hang', 'hoat_dong', '2026-02-25 13:35:00', '2026-03-04 14:30:54', '2026-03-01 17:40:00'),
 (10, 'Trương Văn I', 'khach9@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0989012345', '159 Đường Pasteur, Q1, TP.HCM', 'avatar-9.jpg', 'khach_hang', 'hoat_dong', '2026-02-28 10:20:00', '2026-03-04 14:30:54', '2026-03-03 12:00:00'),
 (11, 'Phan Văn J', 'khach10@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0912345679', '852 Đường Ngô Tất Tố, Q1, TP.HCM', 'avatar-10.jpg', 'khach_hang', 'hoat_dong', '2026-03-01 07:50:00', '2026-03-04 14:30:54', '2026-03-03 15:30:00'),
-(12, 'nguyễn văn a', 'a@gmail.com', '$2y$10$pq0gtiU5VfzluOJC3aEdkOH4U6iy0qdRr3zF13yRhRaJd8o8TVGbi', '0901234567', '65a đường 102 lã xuân oai', 'hinh1.jpg', 'khach_hang', 'hoat_dong', '2026-03-18 14:07:03', '2026-04-01 19:38:42', '2026-04-01 19:38:42'),
+(12, 'nguyễn văn a', 'a@gmail.com', '$2y$10$pq0gtiU5VfzluOJC3aEdkOH4U6iy0qdRr3zF13yRhRaJd8o8TVGbi', '0901234567', '65a đường 102 lã xuân oai', 'hinh1.jpg', 'khach_hang', 'hoat_dong', '2026-03-18 14:07:03', '2026-04-02 15:57:41', '2026-04-02 15:57:41'),
 (38, 'khanh huyen', 'khanhhuyen@gmail.com', '$2y$10$nSK8agNkOcrWN4mQM0PcQehJ/JLBwk3pyeo7a.Ofd1.z5njCYapyS', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-21 16:21:43', '2026-03-21 16:21:43', NULL),
 (39, 'abc', 'abc@gmail.com', '$2y$10$3yxEcgOvMZL606V6su0Ccuq/w2189lH2UQCoZBoFFtOqZey7KYVFS', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-21 16:34:24', '2026-03-21 16:34:24', NULL),
-(40, 'duong', 'duong@gmail.com', '$2y$10$nvFan.kSaJ5nIw7GttOV6OjyL.5/h.ZaQzGeDuaPDXmSbPzdVG2Be', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-23 22:47:24', '2026-03-23 22:47:36', '2026-03-23 22:47:36');
+(40, 'duong', 'duong@gmail.com', '$2y$10$nvFan.kSaJ5nIw7GttOV6OjyL.5/h.ZaQzGeDuaPDXmSbPzdVG2Be', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-23 22:47:24', '2026-04-02 15:08:55', '2026-04-02 15:08:55');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `phan_hoi_danh_gia`
+--
+
+CREATE TABLE `phan_hoi_danh_gia` (
+  `id` int(11) NOT NULL,
+  `danh_gia_id` int(11) NOT NULL,
+  `nguoi_dung_id` int(11) NOT NULL,
+  `noi_dung` text NOT NULL,
+  `trang_thai` int(11) DEFAULT 1,
+  `ngay_tao` timestamp NOT NULL DEFAULT current_timestamp(),
+  `ngay_cap_nhat` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -795,6 +845,24 @@ ALTER TABLE `kich_thuoc`
   ADD KEY `idx_ten` (`ten`);
 
 --
+-- Chỉ mục cho bảng `like_danh_gia`
+--
+ALTER TABLE `like_danh_gia`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_like` (`danh_gia_id`,`nguoi_dung_id`),
+  ADD KEY `danh_gia_id` (`danh_gia_id`),
+  ADD KEY `nguoi_dung_id` (`nguoi_dung_id`);
+
+--
+-- Chỉ mục cho bảng `like_phan_hoi`
+--
+ALTER TABLE `like_phan_hoi`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_reply_like` (`phan_hoi_id`,`nguoi_dung_id`),
+  ADD KEY `nguoi_dung_id` (`nguoi_dung_id`),
+  ADD KEY `phan_hoi_id` (`phan_hoi_id`);
+
+--
 -- Chỉ mục cho bảng `mau_sac`
 --
 ALTER TABLE `mau_sac`
@@ -820,6 +888,14 @@ ALTER TABLE `nguoi_dung`
   ADD KEY `idx_email` (`email`),
   ADD KEY `idx_vai_tro` (`vai_tro`),
   ADD KEY `idx_trang_thai` (`trang_thai`);
+
+--
+-- Chỉ mục cho bảng `phan_hoi_danh_gia`
+--
+ALTER TABLE `phan_hoi_danh_gia`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `danh_gia_id` (`danh_gia_id`),
+  ADD KEY `nguoi_dung_id` (`nguoi_dung_id`);
 
 --
 -- Chỉ mục cho bảng `san_pham`
@@ -879,19 +955,19 @@ ALTER TABLE `cai_dat`
 -- AUTO_INCREMENT cho bảng `chi_tiet_don_hang`
 --
 ALTER TABLE `chi_tiet_don_hang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi tiết', AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi tiết', AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT cho bảng `chi_tiet_gio_hang`
 --
 ALTER TABLE `chi_tiet_gio_hang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi tiết', AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi tiết', AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT cho bảng `danh_gia`
 --
 ALTER TABLE `danh_gia`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID đánh giá', AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID đánh giá', AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT cho bảng `danh_muc`
@@ -903,7 +979,7 @@ ALTER TABLE `danh_muc`
 -- AUTO_INCREMENT cho bảng `don_hang`
 --
 ALTER TABLE `don_hang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID đơn hàng', AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID đơn hàng', AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT cho bảng `gia_tri_thong_so`
@@ -915,7 +991,7 @@ ALTER TABLE `gia_tri_thong_so`
 -- AUTO_INCREMENT cho bảng `gio_hang`
 --
 ALTER TABLE `gio_hang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID giỏ hàng', AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID giỏ hàng', AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT cho bảng `hinh_anh_san_pham`
@@ -928,6 +1004,18 @@ ALTER TABLE `hinh_anh_san_pham`
 --
 ALTER TABLE `kich_thuoc`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID kích thước', AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT cho bảng `like_danh_gia`
+--
+ALTER TABLE `like_danh_gia`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=150;
+
+--
+-- AUTO_INCREMENT cho bảng `like_phan_hoi`
+--
+ALTER TABLE `like_phan_hoi`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT cho bảng `mau_sac`
@@ -946,6 +1034,12 @@ ALTER TABLE `ma_giam_gia`
 --
 ALTER TABLE `nguoi_dung`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID người dùng', AUTO_INCREMENT=41;
+
+--
+-- AUTO_INCREMENT cho bảng `phan_hoi_danh_gia`
+--
+ALTER TABLE `phan_hoi_danh_gia`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT cho bảng `san_pham`
@@ -1035,6 +1129,27 @@ ALTER TABLE `gio_hang`
 --
 ALTER TABLE `hinh_anh_san_pham`
   ADD CONSTRAINT `hinh_anh_san_pham_ibfk_1` FOREIGN KEY (`san_pham_id`) REFERENCES `san_pham` (`id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `like_danh_gia`
+--
+ALTER TABLE `like_danh_gia`
+  ADD CONSTRAINT `like_danh_gia_ibfk_1` FOREIGN KEY (`danh_gia_id`) REFERENCES `danh_gia` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `like_danh_gia_ibfk_2` FOREIGN KEY (`nguoi_dung_id`) REFERENCES `nguoi_dung` (`id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `like_phan_hoi`
+--
+ALTER TABLE `like_phan_hoi`
+  ADD CONSTRAINT `like_phan_hoi_ibfk_1` FOREIGN KEY (`phan_hoi_id`) REFERENCES `phan_hoi_danh_gia` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `like_phan_hoi_ibfk_2` FOREIGN KEY (`nguoi_dung_id`) REFERENCES `nguoi_dung` (`id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `phan_hoi_danh_gia`
+--
+ALTER TABLE `phan_hoi_danh_gia`
+  ADD CONSTRAINT `phan_hoi_danh_gia_ibfk_1` FOREIGN KEY (`danh_gia_id`) REFERENCES `danh_gia` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `phan_hoi_danh_gia_ibfk_2` FOREIGN KEY (`nguoi_dung_id`) REFERENCES `nguoi_dung` (`id`) ON DELETE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `san_pham`

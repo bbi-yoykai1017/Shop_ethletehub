@@ -234,7 +234,7 @@ try {
             }
 
             $userId = (int)$_SESSION['user_id'];
-            $userRole = $_SESSION['role'] ?? 'user'; // Lấy role từ session
+            $userRole = $_SESSION['user_role'] ?? 'user'; // Lấy role từ session
             $reviewId = (int)($data['review_id'] ?? 0);
 
             if ($reviewId <= 0) {

@@ -637,7 +637,7 @@ $ratingSummary = $product['rating_summary'];
     <script>
         // Set current user info for JavaScript
         window.currentUserId = <?php echo isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'null'; ?>;
-        window.userRole = '<?php echo isset($_SESSION['role']) ? htmlspecialchars($_SESSION['role']) : 'user'; ?>';
+        window.userRole = '<?php echo isset($_SESSION['user_role']) ? htmlspecialchars($_SESSION['user_role']) : 'user'; ?>';
     </script>
     <script src="js/cart.js"></script>
     <script src="js/script.js"></script>
