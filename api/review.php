@@ -26,6 +26,146 @@ try {
 
     switch ($action) {
 
+        // ========== THÊM TRẢ LỜI BÌNH LUẬN ==========
+        case 'addReply':
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập']);
+                exit;
+            }
+
+            $userId = (int)$_SESSION['user_id'];
+            $reviewId = (int)($data['review_id'] ?? 0);
+            $noiDung = trim($data['content'] ?? '');
+
+            if ($reviewId <= 0) {
+                echo json_encode(['success' => false, 'message' => 'ID bình luận không hợp lệ']);
+                exit;
+            }
+
+            if (strlen($noiDung) < 2) {
+                echo json_encode(['success' => false, 'message' => 'Nội dung trả lời phải tối thiểu 2 ký tự']);
+                exit;
+            }
+
+            // Kiểm tra bình luận tồn tại
+            $stmt = $conn->prepare("SELECT id FROM danh_gia WHERE id = :id AND trang_thai = 1");
+            $stmt->bindParam(':id', $reviewId, PDO::PARAM_INT);
+            $stmt->execute();
+            if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
+                echo json_encode(['success' => false, 'message' => 'Bình luận không tồn tại']);
+                exit;
+            }
+
+            try {
+                $stmt = $conn->prepare("
+                    INSERT INTO phan_hoi_danh_gia (danh_gia_id, nguoi_dung_id, noi_dung, ngay_tao, trang_thai)
+                    VALUES (:danh_gia_id, :nguoi_dung_id, :noi_dung, NOW(), 1)
+                ");
+                $stmt->bindParam(':danh_gia_id', $reviewId, PDO::PARAM_INT);
+                $stmt->bindParam(':nguoi_dung_id', $userId, PDO::PARAM_INT);
+                $stmt->bindParam(':noi_dung', $noiDung);
+                $stmt->execute();
+
+                $replyId = $conn->lastInsertId();
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Trả lời thêm thành công',
+                    'id' => $replyId
+                ]);
+            } catch (PDOException $e) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Lỗi: ' . $e->getMessage()
+                ]);
+            }
+            exit;
+
+        // ========== LẤY DANH SÁCH TRẢ LỜI CỦA BÌNH LUẬN ==========
+        case 'getReplies':
+            $reviewId = (int)($_GET['review_id'] ?? 0);
+
+            if ($reviewId <= 0) {
+                echo json_encode(['success' => false, 'message' => 'ID bình luận không hợp lệ']);
+                exit;
+            }
+
+            $stmt = $conn->prepare("
+                SELECT 
+                    phdg.id,
+                    phdg.noi_dung,
+                    phdg.ngay_tao,
+                    phdg.nguoi_dung_id,
+                    nd.ten,
+                    nd.anh_dai_dien
+                FROM phan_hoi_danh_gia phdg
+                JOIN nguoi_dung nd ON phdg.nguoi_dung_id = nd.id
+                WHERE phdg.danh_gia_id = :review_id AND phdg.trang_thai = 1
+                ORDER BY phdg.ngay_tao ASC
+            ");
+            $stmt->bindParam(':review_id', $reviewId, PDO::PARAM_INT);
+            $stmt->execute();
+            $replies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode([
+                'success' => true,
+                'replies' => $replies,
+                'total' => count($replies)
+            ]);
+            exit;
+
+        // ========== XÓA TRẢ LỜI ==========
+        case 'deleteReply':
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập']);
+                exit;
+            }
+
+            $userId = (int)$_SESSION['user_id'];
+            $userRole = $_SESSION['user_role'] ?? 'user';
+            $replyId = (int)($data['reply_id'] ?? 0);
+
+            if ($replyId <= 0) {
+                echo json_encode(['success' => false, 'message' => 'ID trả lời không hợp lệ']);
+                exit;
+            }
+
+            // Kiểm tra quyền xóa
+            $stmt = $conn->prepare("SELECT nguoi_dung_id FROM phan_hoi_danh_gia WHERE id = :id");
+            $stmt->bindParam(':id', $replyId, PDO::PARAM_INT);
+            $stmt->execute();
+            $reply = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$reply) {
+                echo json_encode(['success' => false, 'message' => 'Trả lời không tồn tại']);
+                exit;
+            }
+
+            if ($reply['nguoi_dung_id'] != $userId && $userRole !== 'admin') {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Bạn không có quyền xóa']);
+                exit;
+            }
+
+            try {
+                $stmt = $conn->prepare("DELETE FROM phan_hoi_danh_gia WHERE id = :id");
+                $stmt->bindParam(':id', $replyId, PDO::PARAM_INT);
+                $stmt->execute();
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Trả lời đã được xóa'
+                ]);
+            } catch (PDOException $e) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Lỗi: ' . $e->getMessage()
+                ]);
+            }
+            exit;
+
         // ========== THÊM ĐÁNH GIÁ MỚI ==========
         case 'add':
             // Kiểm tra user đã đăng nhập
