@@ -436,8 +436,25 @@ if (empty($cart)) {
             const soDienThoai = document.querySelector('input[name="so_dien_thoai_nhan"]').value.trim();
             const diaChiGiao = document.querySelector('input[name="dia_chi_giao_hang"]').value.trim();
             const phuongThuc = document.querySelector('input[name="phuong_thuc_thanh_toan"]:checked').value;
+            const tongTien = parseFloat(document.getElementById('val_total').value);
+            const tienGiam = parseFloat(document.getElementById('val_discount').value);
+            const maGiamGiaId = document.getElementById('val_coupon_id').value;
             const lat = parseFloat(document.getElementById('lat').value);
             const lng = parseFloat(document.getElementById('lng').value);
+
+            // kiem tra 
+            if (!tenNguoiNhan || tenNguoiNhan.length < 3) {
+                showMessage('Tên người nhận phải ít nhất 3 ky tự');
+                return false;
+            }               
+            if (!soDienThoai || !/^0[0-9]{9}$/.test(soDienThoai)) {
+                showMessage('Số điện thoại không hợp lên','warning');
+                return false;
+            }
+            if (!diaChiGiao) {
+                showMessage('Vui lòng nhập địa chỉ giao hàng', 'warning');
+                return false;
+            }
         });
     </script>
 
