@@ -427,6 +427,19 @@ if (empty($cart)) {
                 });
         }
     </script>
+
+      <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container-custom">
+            <div class="footer-bottom">
+                <div class="footer-copyright">
+                    &copy; <?php echo date("Y"); ?> <strong>AthleteHub</strong>. Bảo lưu mọi quyền.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
