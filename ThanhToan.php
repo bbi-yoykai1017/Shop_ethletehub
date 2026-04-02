@@ -66,7 +66,7 @@ if (empty($cart)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="css/navbar.css">
@@ -250,7 +250,7 @@ link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.
     </nav>
     <div class="checkout-container">
         <div class="container-custom py-5">
-            <h1  class="mb-4"><i class="fas fa-credit-card"></i> Thanh Toán Đơn Hàng</h1>
+            <h1 class="mb-4"><i class="fas fa-credit-card"></i> Thanh Toán Đơn Hàng</h1>
             <!-- form thanh toán -->
             <form method="POST" id="checkoutForm">
                 <div class="row">
@@ -376,6 +376,57 @@ link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.
             </form>
         </div>
     </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/map.js"></script>
+    <script>
+        // ma giam gia
+        function applyCoupon() {
+            let code = document.getElementById('coupon_code').value;
+            let total = <?= $total ?>;
+
+            if (!code.trim()) {
+                showMessage('Vui lòng nhập mã giảm giá', 'danger');
+                return;
+            }
+
+            fetch('api/checkout.php?action=check_coupon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    coupon_code: code,
+                    total_amount: total
+                })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    let msg = document.getElementById('coupon_msg');
+                    if (data.success) {
+                        msg.innerHTML = '<i class="fas fa-check-circle"></i> ' + data.message;
+                        msg.className = "small mt-2 text-success";
+
+                        let discount = data.discount;
+                        document.getElementById('txt_discount').innerHTML = "-" + discount.toLocaleString('vi-VN') + "đ";
+                        document.getElementById('txt_total').innerHTML = (total - discount).toLocaleString('vi-VN') + "đ";
+                        document.getElementById('val_discount').value = discount;
+                        document.getElementById('val_coupon_id').value = data.coupon_id;
+                    } else {
+                        msg.innerHTML = '<i class="fas fa-times-circle"></i> ' + data.message;
+                        msg.className = "small mt-2 text-danger";
+                        document.getElementById('txt_discount').innerHTML = "-0đ";
+                        document.getElementById('txt_total').innerHTML = total.toLocaleString('vi-VN') + "đ";
+                        document.getElementById('val_discount').value = 0;
+                        document.getElementById('val_coupon_id').value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('Lỗi kết nối server', 'danger');
+                });
+        }
+    </script>
 </body>
 
 </html>
