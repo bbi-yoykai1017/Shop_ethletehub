@@ -455,7 +455,63 @@ if (empty($cart)) {
                 showMessage('Vui lòng nhập địa chỉ giao hàng', 'warning');
                 return false;
             }
+
+            // goi api
+            const btn = document.querySelector('button[name="btn_dat_hang"]');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+            fetch('api/checkout.php?action=place_order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ten_nguoi_nhan: tenNguoiNhan,
+                    so_dien_thoai_nhan: soDienThoai,
+                    dia_chi_giao_hang: diaChiGiao,
+                    phuong_thuc_thanh_toan: phuongThuc,
+                    tong_tien: tongTien,
+                    tien_giam_gia: tienGiam,
+                    ma_giam_gia_id: maGiamGiaId,
+                    lat: lat,
+                    lng: lng
+                })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+
+                    if (data.success) {
+                        showMessage('oke ròi đó cưng :33 ' + data.message, 'success');
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 1500);
+                    } else {
+                        showMessage('xin lỗi cưng nha haha ' + (data.message || 'cưng không thể tạo đơn hàng'), 'danger');
+                    }
+                })
+                .catch(error => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    console.error('Error:', error);
+                    showMessage('xin lỗi quý khách server của chúng tôi đang đi nhậu hihi', 'danger');
+                });
+
+            return false;
         });
+        // Hiển thị thông báo
+        function showMessage(msg, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alert.style.cssText = 'top: 100px; right: 20px; z-index: 9999; min-width: 400px;';
+            alert.innerHTML = msg + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            document.body.appendChild(alert);
+
+            setTimeout(() => alert && alert.remove(), 5000);
+        }
     </script>
 
     <!-- FOOTER -->
