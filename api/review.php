@@ -234,6 +234,7 @@ try {
             }
 
             $userId = (int)$_SESSION['user_id'];
+            $userRole = $_SESSION['role'] ?? 'user'; // Lấy role từ session
             $reviewId = (int)($data['review_id'] ?? 0);
 
             if ($reviewId <= 0) {
@@ -252,21 +253,40 @@ try {
                 exit;
             }
 
-            if ($review['nguoi_dung_id'] != $userId) {
+            // Kiểm tra quyền: User phải là chủ bình luận HOẶC là admin
+            if ($review['nguoi_dung_id'] != $userId && $userRole !== 'admin') {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'message' => 'Bạn không có quyền xóa bình luận này']);
                 exit;
             }
 
             // Xóa bình luận
-            $stmt = $conn->prepare("DELETE FROM danh_gia WHERE id = :id");
-            $stmt->bindParam(':id', $reviewId, PDO::PARAM_INT);
-            $stmt->execute();
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Bình luận đã được xóa'
-            ]);
+            try {
+                $stmt = $conn->prepare("DELETE FROM danh_gia WHERE id = :id");
+                $stmt->bindParam(':id', $reviewId, PDO::PARAM_INT);
+                $result = $stmt->execute();
+                
+                if ($result && $stmt->rowCount() > 0) {
+                    error_log("Review deleted successfully - ID: $reviewId");
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'Bình luận đã được xóa',
+                        'review_id' => $reviewId
+                    ]);
+                } else {
+                    error_log("Failed to delete review - ID: $reviewId, rowCount: " . $stmt->rowCount());
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Xóa bình luận thất bại hoặc bình luận không tồn tại'
+                    ]);
+                }
+            } catch (PDOException $e) {
+                error_log("Delete review error: " . $e->getMessage());
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Lỗi xóa bình luận: ' . $e->getMessage()
+                ]);
+            }
             exit;
 
         // ========== LẤY SUMMARY ĐÁNH GIÁ ==========

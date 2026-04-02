@@ -191,14 +191,14 @@ function submitReview() {
 
 function loadAllReviews() {
     const sanPhamId = new URLSearchParams(window.location.search).get('id');
-    
+
     if (!sanPhamId) {
         console.log('San pham ID not found');
         return;
     }
-    
+
     console.log('Loading reviews for product:', sanPhamId);
-    
+
     fetch(`api/review.php?action=getAll&san_pham_id=${sanPhamId}&limit=100`)
         .then(response => {
             console.log('Response status:', response.status);
@@ -213,7 +213,14 @@ function loadAllReviews() {
                         // Tạo avatar - chỉ dùng chữ cái đầu của tên
                         const initial = review.ten_nguoi_dung ? review.ten_nguoi_dung.charAt(0).toUpperCase() : 'U';
                         const bgColor = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'][review.id % 7];
-                        
+
+                        // Lấy current user ID từ data attribute hoặc window object
+                        const currentUserId = window.currentUserId || null;
+                        const userRole = window.userRole || 'user';
+
+                        // Kiểm tra quyền xóa: user owner hoặc admin
+                        const canDelete = currentUserId && (currentUserId == review.nguoi_dung_id || userRole === 'admin');
+
                         return `
                         <div class="review-item" data-review-id="${review.id}">
                             <div class="review-header">
@@ -237,11 +244,18 @@ function loadAllReviews() {
                                 <button class="helpful-btn" style="border: none; background: none; color: #666; cursor: pointer;">
                                     <i class="fas fa-thumbs-up"></i> Hữu ích (0)
                                 </button>
+                                ${canDelete ? `
+                                    <button class="delete-btn"
+                                        onclick="deleteReview(${review.id})"
+                                        style="border: none; background: none; color: #dc3545; cursor: pointer; margin-left: 10px;">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                ` : ''}
                             </div>
                         </div>
                     `;
                     }).join('');
-                    
+
                     reviewsList.innerHTML = '<h4>Đánh giá từ khách hàng (' + data.total + ')</h4>' + reviewsContent;
                 } else {
                     console.log('Reviews list container not found');
@@ -271,9 +285,30 @@ function deleteReview(reviewId) {
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Delete response:', data);
         if (data.success) {
+            // Xóa item khỏi HTML ngay lập tức với animation
+            const reviewElement = document.querySelector(`[data-review-id="${reviewId}"]`);
+            if (reviewElement) {
+                reviewElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                reviewElement.style.opacity = '0';
+                reviewElement.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    reviewElement.remove();
+                    
+                    // Cập nhật số lượng đánh giá
+                    const reviewsList = document.querySelector('.reviews-list h4');
+                    if (reviewsList) {
+                        const currentText = reviewsList.textContent;
+                        const currentCount = parseInt(currentText.match(/\d+/)?.[0] || 0);
+                        if (currentCount > 0) {
+                            reviewsList.textContent = `Đánh giá từ khách hàng (${currentCount - 1})`;
+                        }
+                    }
+                }, 300);
+            }
+            
             showNotification(data.message, 'success');
-            loadAllReviews();
         } else {
             showNotification(data.message || 'Lỗi khi xóa bình luận', 'danger');
         }

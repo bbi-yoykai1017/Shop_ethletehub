@@ -505,47 +505,6 @@ $ratingSummary = $product['rating_summary'];
                                 </div>
 
                                 <div class="reviews-list">
-                                    <h4>Đánh giá từ khách hàng</h4>
-                                    <?php if (!empty($reviews)): ?>
-                                        <?php foreach ($reviews as $review): ?>
-                                            <div class="review-item" data-review-id="<?php echo $review['id']; ?>">
-                                                <div class="review-header">
-                                                    <div class="reviewer-info">
-                                                        <div>
-                                                            <h5><?php echo htmlspecialchars($review['ten_nguoi_dung']); ?></h5>
-                                                            <p class="review-date">
-                                                                <?php echo str_repeat('<i class="fas fa-star" style="color: #ffc107;"></i>', $review['so_sao']); ?>
-                                                                <?php echo str_repeat('<i class="far fa-star"></i>', 5 - $review['so_sao']); ?>
-                                                                -
-                                                                <?php echo date('d/m/Y H:i', strtotime($review['ngay_danh_gia'])); ?>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <span class="verified-badge">
-                                                        <i class="fas fa-check-circle"></i> Đã xác minh
-                                                    </span>
-                                                </div>
-                                                <p class="review-content">
-                                                    <?php echo nl2br(htmlspecialchars($review['binh_luan'])); ?>
-                                                </p>
-                                                <div class="review-actions">
-                                                    <button class="helpful-btn"
-                                                        style="border: none; background: none; color: #666; cursor: pointer;">
-                                                        <i class="fas fa-thumbs-up"></i> Hữu ích (0)
-                                                    </button>
-                                                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $review['nguoi_dung_id']): ?>
-                                                        <button class="delete-btn"
-                                                            onclick="deleteReview(<?php echo $review['id']; ?>)"
-                                                            style="border: none; background: none; color: #dc3545; cursor: pointer; margin-left: 10px;">
-                                                            <i class="fas fa-trash"></i> Xóa
-                                                        </button>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <p>Chưa có đánh giá nào cho sản phẩm này.</p>
-                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -675,6 +634,11 @@ $ratingSummary = $product['rating_summary'];
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Set current user info for JavaScript
+        window.currentUserId = <?php echo isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'null'; ?>;
+        window.userRole = '<?php echo isset($_SESSION['role']) ? htmlspecialchars($_SESSION['role']) : 'user'; ?>';
+    </script>
     <script src="js/cart.js"></script>
     <script src="js/script.js"></script>
     <script src="js/product-detail.js"></script>
