@@ -426,9 +426,22 @@ if (empty($cart)) {
                     showMessage('Lỗi kết nối server', 'danger');
                 });
         }
+        
+        // xu ly dat hang
+        document.getElementById('checkoutForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            //validate form
+            const tenNguoiNhan = document.querySelector('input[name="ten_nguoi_nhan"]').value.trim();
+            const soDienThoai = document.querySelector('input[name="so_dien_thoai_nhan"]').value.trim();
+            const diaChiGiao = document.querySelector('input[name="dia_chi_giao_hang"]').value.trim();
+            const phuongThuc = document.querySelector('input[name="phuong_thuc_thanh_toan"]:checked').value;
+            const lat = parseFloat(document.getElementById('lat').value);
+            const lng = parseFloat(document.getElementById('lng').value);
+        });
     </script>
 
-      <!-- FOOTER -->
+    <!-- FOOTER -->
     <footer class="footer">
         <div class="container-custom">
             <div class="footer-bottom">
