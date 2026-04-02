@@ -127,21 +127,18 @@ $ratingSummary = $product['rating_summary'];
 
                     <div class="user-account-wrapper d-flex align-items-center">
                         <div class="user-action-dropdown dropdown">
-                            <a href="#" class="user-icon-link me-2 text-decoration-none dropdown-toggle" id="userMenu"
-                                data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">
+                            <a href="#" class="user-icon-link me-2 text-decoration-none dropdown-toggle"
+                                id="userMenu" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">
                                 <i class="fas fa-user-circle fa-lg"></i>
                             </a>
 
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                                 <?php if (isset($_SESSION['user_name'])): ?>
                                     <li>
-                                        <h6 class="dropdown-header"> <?php echo htmlspecialchars($_SESSION['user_name']); ?>
-                                        </h6>
+                                        <h6 class="dropdown-header"> <?php echo htmlspecialchars($_SESSION['user_name']); ?></h6>
                                     </li>
-                                    <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-edit me-2"></i> Hồ
-                                            sơ của tôi</a></li>
-                                    <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i>
-                                            Đơn hàng đã mua</a></li>
+                                    <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-edit me-2"></i> Hồ sơ của tôi</a></li>
+                                    <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i> Đơn hàng đã mua</a></li>
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
@@ -453,13 +450,11 @@ $ratingSummary = $product['rating_summary'];
                                     <div class="rating-breakdown">
                                         <?php for ($i = 5; $i >= 1; $i--):
                                             $dist = $ratingSummary['rating_distribution'][$i] ?? ['count' => 0, 'percentage' => 0];
-                                            ?>
+                                        ?>
                                             <div class="rating-bar">
-                                                <span class="rating-label"><?php echo $i; ?> <i
-                                                        class="fas fa-star"></i></span>
+                                                <span class="rating-label"><?php echo $i; ?> <i class="fas fa-star"></i></span>
                                                 <div class="bar">
-                                                    <div class="fill" style="width: <?php echo $dist['percentage']; ?>%;">
-                                                    </div>
+                                                    <div class="fill" style="width: <?php echo $dist['percentage']; ?>%;"></div>
                                                 </div>
                                                 <span class="rating-count"><?php echo $dist['count']; ?></span>
                                             </div>
@@ -474,8 +469,7 @@ $ratingSummary = $product['rating_summary'];
                                             <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
                                             <div class="form-group">
                                                 <label>Đánh giá:</label>
-                                                <div class="rating-input"
-                                                    style="font-size: 28px; cursor: pointer; gap: 8px; display: flex;">
+                                                <div class="rating-input" style="font-size: 28px; cursor: pointer; gap: 8px; display: flex;">
                                                     <i class="far fa-star"></i>
                                                     <i class="far fa-star"></i>
                                                     <i class="far fa-star"></i>
@@ -491,56 +485,29 @@ $ratingSummary = $product['rating_summary'];
                                             <div class="form-group">
                                                 <label>Nội dung:</label>
                                                 <textarea class="form-control" name="content" rows="4"
-                                                    placeholder="Chia sẻ kinh nghiệm của bạn..." required
-                                                    minlength="10"></textarea>
+                                                    placeholder="Chia sẻ kinh nghiệm của bạn..." required minlength="10"></textarea>
                                             </div>
                                             <button type="submit" class="btn-submit-review">Gửi đánh giá</button>
                                         </form>
                                     <?php else: ?>
                                         <div class="alert alert-info">
-                                            <i class="fas fa-info-circle"></i> Vui lòng <a href="login.php">đăng nhập</a> để
-                                            viết đánh giá
+                                            <i class="fas fa-info-circle"></i> Vui lòng <a href="login.php">đăng nhập</a> để viết đánh giá
                                         </div>
                                     <?php endif; ?>
                                 </div>
 
                                 <div class="reviews-list">
-                                    <h4>Đánh giá từ khách hàng (<?php echo count($reviews); ?>)</h4>
+                                    <h4>Đánh giá từ khách hàng</h4>
                                     <?php if (!empty($reviews)): ?>
-                                        <?php
-                                        // Lấy danh sách các review_id mà user hiện tại đã like
-                                        $userLikedReviews = [];
-                                        if (isset($_SESSION['user_id'])) {
-                                            $stmt = $conn->prepare("
-                                                SELECT danh_gia_id FROM like_danh_gia 
-                                                WHERE nguoi_dung_id = ? AND trang_thai = 1
-                                            ");
-                                            $stmt->execute([(int) $_SESSION['user_id']]);
-                                            $userLikedReviews = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'danh_gia_id');
-                                        }
-                                        ?>
-                                        <?php foreach ($reviews as $review):
-                                            $isReviewOwner = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $review['nguoi_dung_id'];
-                                            $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
-                                            $canDelete = $isReviewOwner || $isAdmin;
-                                            $isBgColor = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'][$review['id'] % 7];
-                                            $initial = substr($review['ten_nguoi_dung'], 0, 1);
-                                            $hasLiked = in_array($review['id'], $userLikedReviews);
-                                            $likeCount = (int) ($review['so_like'] ?? 0);
-                                            ?>
+                                        <?php foreach ($reviews as $review): ?>
                                             <div class="review-item" data-review-id="<?php echo $review['id']; ?>">
                                                 <div class="review-header">
                                                     <div class="reviewer-info">
-                                                        <div class="reviewer-avatar-initial"
-                                                            style="background-color: <?php echo $isBgColor; ?>; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 10px;">
-                                                            <?php echo strtoupper($initial); ?>
-                                                        </div>
                                                         <div>
                                                             <h5><?php echo htmlspecialchars($review['ten_nguoi_dung']); ?></h5>
                                                             <p class="review-date">
                                                                 <?php echo str_repeat('<i class="fas fa-star" style="color: #ffc107;"></i>', $review['so_sao']); ?>
-                                                                <?php echo str_repeat('<i class="far fa-star"></i>', 5 - $review['so_sao']); ?>
-                                                                -
+                                                                <?php echo str_repeat('<i class="far fa-star"></i>', 5 - $review['so_sao']); ?> -
                                                                 <?php echo date('d/m/Y H:i', strtotime($review['ngay_danh_gia'])); ?>
                                                             </p>
                                                         </div>
@@ -552,56 +519,20 @@ $ratingSummary = $product['rating_summary'];
                                                 <p class="review-content">
                                                     <?php echo nl2br(htmlspecialchars($review['binh_luan'])); ?>
                                                 </p>
-                                                <div class="review-actions"
-                                                    style="display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap;">
-                                                    <!-- Like Button -->
-                                                    <button class="like-review-btn"
-                                                        data-review-id="<?php echo $review['id']; ?>"
-                                                        style="border: none; background: none; color: <?php echo $hasLiked ? '#FF6B6B' : '#666'; ?>; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                                                        <i class="<?php echo $hasLiked ? 'fas' : 'far'; ?> fa-heart"></i>
-                                                        <span class="like-count"
-                                                            data-review-id="<?php echo $review['id']; ?>"><?php echo $likeCount; ?></span>
+                                                <div class="review-actions">
+                                                    <button class="helpful-btn" style="border: none; background: none; color: #666; cursor: pointer;">
+                                                        <i class="fas fa-thumbs-up"></i> Hữu ích (0)
                                                     </button>
-
-                                                    <!-- Reply Button (only for logged-in users) -->
-                                                    <?php if (isset($_SESSION['user_id'])): ?>
-                                                        <button class="reply-btn" data-review-id="<?php echo $review['id']; ?>"
-                                                            style="border: none; background: none; color: #666; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                                                            <i class="fas fa-reply"></i> Trả lời
-                                                        </button>
-                                                    <?php endif; ?>
-
-                                                    <!-- Delete Button (only for reviewer or admin) -->
-                                                    <?php if ($canDelete): ?>
-                                                        <button class="delete-btn"
-                                                            onclick="deleteReview(<?php echo $review['id']; ?>)"
-                                                            style="border: none; background: none; color: #dc3545; cursor: pointer; margin-left: auto;">
+                                                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $review['nguoi_dung_id']): ?>
+                                                        <button class="delete-btn" onclick="deleteReview(<?php echo $review['id']; ?>)" style="border: none; background: none; color: #dc3545; cursor: pointer; margin-left: 10px;">
                                                             <i class="fas fa-trash"></i> Xóa
                                                         </button>
                                                     <?php endif; ?>
                                                 </div>
-
-                                                <!-- Reply Form (hidden by default) -->
-                                                <div class="reply-form-container" id="reply-form-<?php echo $review['id']; ?>"
-                                                    style="display: none; margin-top: 15px; margin-left: 40px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                                                    <textarea class="form-control reply-textarea" placeholder="Viết trả lời..."
-                                                        style="margin-bottom: 10px;" rows="3"></textarea>
-                                                    <div style="display: flex; gap: 10px;">
-                                                        <button class="btn btn-sm btn-primary submit-reply-btn"
-                                                            data-review-id="<?php echo $review['id']; ?>">Gửi trả lời</button>
-                                                        <button class="btn btn-sm btn-secondary cancel-reply-btn"
-                                                            data-review-id="<?php echo $review['id']; ?>">Hủy</button>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Replies Container -->
-                                                <div class="replies-container" id="replies-<?php echo $review['id']; ?>"
-                                                    style="margin-top: 20px; margin-left: 40px;"></div>
                                             </div>
                                         <?php endforeach; ?>
                                     <?php else: ?>
-                                        <p style="text-align: center; color: #999; padding: 20px;">Chưa có đánh giá nào cho
-                                            sản phẩm này.</p>
+                                        <p>Chưa có đánh giá nào cho sản phẩm này.</p>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -644,13 +575,11 @@ $ratingSummary = $product['rating_summary'];
                                             <?php echo $related['star_rating']; ?>
                                             <span>(<?php echo $related['so_luong_danh_gia']; ?>)</span>
                                         </div>
-                                        <a href="product-detail.php?id=<?php echo $related['id']; ?>"
-                                            class="btn-add-to-cart-detail" role="button">
+                                        <a href="product-detail.php?id=<?php echo $related['id']; ?>" class="btn-add-to-cart-detail" role="button">
                                             <i class="fas fa-shopping-cart"></i>
                                             Xem chi tiết
                                         </a>
-                                        <a href="product-detail.php?id=<?php echo $related['id']; ?>" class="btn-buy-now-detail"
-                                            role="button">
+                                        <a href="product-detail.php?id=<?php echo $related['id']; ?>" class="btn-buy-now-detail" role="button">
                                             <i class="fas fa-bolt"></i>
                                             Mua ngay
                                         </a>
@@ -736,16 +665,16 @@ $ratingSummary = $product['rating_summary'];
     <script src="js/script.js"></script>
     <script src="js/product-detail.js"></script>
     <script src="js/review.js"></script>
-
+    
     <script>
-        // Ensure event listeners are attached after page loads
-        window.addEventListener('load', function () {
-            console.log('Window load - attaching review event listeners');
-            if (typeof attachReviewEventListeners === 'function') {
-                attachReviewEventListeners();
+        // Đảm bảo form được initialize nếu review.js chậm
+        window.addEventListener('load', function() {
+            console.log('Window load - reinitializing review form');
+            if (typeof initializeReviewForm === 'function') {
+                initializeReviewForm();
             }
-            if (typeof loadRepliesForAllReviews === 'function') {
-                loadRepliesForAllReviews();
+            if (typeof loadAllReviews === 'function') {
+                loadAllReviews();
             }
         });
     </script>
