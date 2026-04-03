@@ -72,19 +72,77 @@ document.addEventListener('click', function (e) {
     const btnBuyNow = e.target.closest('.btn-buy-now-detail');
     if (btnBuyNow) {
         e.preventDefault();
-        const productId = parseInt(
-            btnBuyNow.dataset.productId ||
-            btnBuyNow.closest('.product-card, .product-card-small')?.dataset?.productId ||
-            document.querySelector('.btn-add-to-cart-detail')?.dataset?.productId ||
-            0
-        );
-        if (!productId) return;
-        const qty = parseInt(document.getElementById('quantity')?.value || 1);
-        // Thêm vào giỏ rồi chuyển thẳng sang checkout
-        if (typeof addToCart === 'function') {
-            addToCart(productId, qty).then(() => {
-                setTimeout(() => window.location.href = 'ThanhToan.php', 600);
+        
+        // Check if on product-detail page
+        const isDetailPage = !!document.querySelector('.btn-add-to-cart-detail');
+        
+        if (isDetailPage) {
+            // Validation for product detail page
+            const sizeBtn = document.querySelector('.size-btn.active');
+            const colorBtn = document.querySelector('.color-btn.active');
+            
+            // Check if product has variants
+            const hasSizeOptions = document.querySelectorAll('.size-btn').length > 0;
+            const hasColorOptions = document.querySelectorAll('.color-btn').length > 0;
+            
+            if (hasSizeOptions && !sizeBtn) {
+                showNotification('Vui lòng chọn size!', 'danger');
+                return;
+            }
+            
+            if (hasColorOptions && !colorBtn) {
+                showNotification('Vui lòng chọn màu sắc!', 'danger');
+                return;
+            }
+            
+            const productId = parseInt(document.querySelector('.btn-add-to-cart-detail').dataset.productId);
+            const qty = parseInt(document.getElementById('quantity')?.value || 1);
+            
+            // Add to cart with variants data
+            const sizeId = sizeBtn ? sizeBtn.dataset.sizeId : null;
+            const colorId = colorBtn ? colorBtn.dataset.colorId : null;
+            const sizeName = sizeBtn ? sizeBtn.dataset.sizeName : null;
+            const colorName = colorBtn ? colorBtn.dataset.colorName : null;
+            
+            fetch('api/cart.php?action=add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: qty,
+                    size_id: sizeId,
+                    color_id: colorId,
+                    size_name: sizeName,
+                    color_name: colorName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Chuyển hướng tới trang thanh toán...', 'info');
+                    setTimeout(() => {
+                        window.location.href = 'ThanhToan.php';
+                    }, 1000);
+                } else {
+                    showNotification(data.message || 'Lỗi khi thêm sản phẩm', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                showNotification('Lỗi kết nối server', 'danger');
             });
+        } else {
+            // For other pages (index, products), just redirect to detail page
+            const productId = parseInt(
+                btnBuyNow.dataset.productId ||
+                btnBuyNow.closest('.product-card, .product-card-small')?.dataset?.productId ||
+                0
+            );
+            if (productId) {
+                window.location.href = `product-detail.php?id=${productId}`;
+            }
         }
     }
 });

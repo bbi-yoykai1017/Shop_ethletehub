@@ -61,7 +61,7 @@ function renderProducts() {
                     <button class="btn-add-cart" onclick="window.location.href='product-detail.php?id=${product.id}'">
                         <i class="fas fa-shopping-cart"></i> Thêm
                     </button>
-                    <button class="btn-page-buy-now" onclick="buyNow(${product.id})">
+                    <button class="btn-page-buy-now" onclick="window.location.href='product-detail.php?id=${product.id}'">
                         <i class="fas fa-bolt"></i> Mua Ngay
                     </button>
                 </div>
