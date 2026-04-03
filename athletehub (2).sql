@@ -242,20 +242,6 @@ CREATE TABLE `chi_tiet_don_hang` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng chi tiết đơn hàng';
 
 --
--- Đang đổ dữ liệu cho bảng `chi_tiet_don_hang`
---
-
-INSERT INTO `chi_tiet_don_hang` (`id`, `don_hang_id`, `san_pham_id`, `bien_the_san_pham_id`, `kich_thuoc_id`, `mau_sac_id`, `so_luong`, `gia`, `thanh_tien`) VALUES
-(9, 6, 2, NULL, NULL, NULL, 1, 159000.00, 159000.00),
-(10, 7, 1, NULL, 4, 5, 3, 149000.00, 447000.00),
-(11, 7, 2, NULL, 4, 3, 1, 159000.00, 159000.00),
-(12, 8, 1, NULL, 4, 3, 2, 149000.00, 298000.00),
-(13, 9, 5, NULL, 5, 3, 2, 399000.00, 798000.00),
-(14, 10, 9, NULL, 4, 12, 2, 229000.00, 458000.00);
-
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `chi_tiet_gio_hang`
 --
 
@@ -288,15 +274,7 @@ CREATE TABLE `danh_gia` (
   `ngay_cap_nhat` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng đánh giá sản phẩm';
 
---
--- Đang đổ dữ liệu cho bảng `danh_gia`
---
-
-INSERT INTO `danh_gia` (`id`, `san_pham_id`, `nguoi_dung_id`, `so_sao`, `binh_luan`, `trang_thai`, `ngay_danh_gia`, `ngay_cap_nhat`) VALUES
-(23, 5, 1, 5, 'asdasdas\n\nsafasdfasfsadf', 1, '2026-04-02 15:04:18', '2026-04-02 15:04:18');
-
 -- --------------------------------------------------------
-
 --
 -- Cấu trúc bảng cho bảng `danh_muc`
 --
@@ -350,23 +328,7 @@ CREATE TABLE `don_hang` (
   `lng` decimal(11,8) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng đơn hàng';
 
---
--- Đang đổ dữ liệu cho bảng `don_hang`
---
-
-INSERT INTO `don_hang` (`id`, `nguoi_dung_id`, `ten_nguoi_nhan`, `so_dien_thoai_nhan`, `dia_chi_giao_hang`, `ma_don_hang`, `tong_tien`, `tien_giam`, `thanh_tien`, `ma_phieu_giam`, `ma_giam_gia_id`, `phuong_thuc_thanh_toan`, `trang_thai`, `ghi_chu`, `ngay_dat`, `ngay_cap_nhat`, `ngay_giao_hang`, `lat`, `lng`) VALUES
-(6, 1, 'nguaa', '123123213213', 'Sân vận động Thống Nhất, 138, Đào Duy Từ, Khu phố 31, Phường Diên Hồng, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72415, Việt Nam', 'ATH-69CD24ACABB36', 159000.00, 0.00, 159000.00, NULL, NULL, '', '', '', '2026-04-01 20:59:08', '2026-04-01 20:59:08', NULL, 10.76081540, 106.66328710),
-(7, 1, 'Admin AthleteHub', '0912345678', 'Hẻm 606 Đường 3 Tháng 2, Khu phố 7, Phường Diên Hồng, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72415, Việt Nam', 'ATH-69CD2994DAF09', 606000.00, 0.00, 606000.00, NULL, NULL, '', '', NULL, '2026-04-01 21:20:04', '2026-04-01 21:20:04', NULL, 10.76737534, 106.66196823),
-(8, 12, 'nguyễn văn a', '0901234567', 'Khu phố 52, Phường Bình Tân, Xã Tân Vĩnh Lộc, Thành phố Hồ Chí Minh, 71913, Việt Nam', 'ATH-69CE10C3132DE', 298000.00, 0.00, 298000.00, NULL, NULL, '', '', NULL, '2026-04-02 13:46:27', '2026-04-02 13:46:27', NULL, 10.76990491, 106.56875610),
-(9, 12, 'nguyễn văn a', '0901234567', 'Hẻm 109 Lạc Long Quân, Khu phố 6, Phường Bình Thới, Thành phố Hồ Chí Minh, 72015, Việt Nam', 'ATH-69CE10EE30B96', 798000.00, 0.00, 798000.00, NULL, NULL, '', '', NULL, '2026-04-02 13:47:10', '2026-04-02 13:47:10', NULL, 10.76079834, 106.64051056),
-(10, 12, 'nguyễn văn a', '0901234567', 'Tạp Hoá 305, 308, Đường Dã Tượng, Khu phố 77, Phường Chánh Hưng, Thành phố Hồ Chí Minh, 73009, Việt Nam', 'ATH-69CE11CE7C8BB', 458000.00, 0.00, 458000.00, NULL, NULL, '', '', NULL, '2026-04-02 13:50:54', '2026-04-02 13:50:54', NULL, 10.74427090, 106.66488647);
-
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `gia_tri_thong_so`
---
-
 CREATE TABLE `gia_tri_thong_so` (
   `id` int(11) NOT NULL COMMENT 'ID giá trị thông số',
   `san_pham_id` int(11) NOT NULL COMMENT 'ID sản phẩm',
@@ -374,10 +336,7 @@ CREATE TABLE `gia_tri_thong_so` (
   `gia_tri` varchar(255) NOT NULL COMMENT 'Giá trị thông số'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng giá trị thông số sản phẩm';
 
---
 -- Đang đổ dữ liệu cho bảng `gia_tri_thong_so`
---
-
 INSERT INTO `gia_tri_thong_so` (`id`, `san_pham_id`, `thong_so_id`, `gia_tri`) VALUES
 (1, 1, 1, '100% Cotton'),
 (2, 1, 2, 'XS, S, M, L, XL, XXL'),
@@ -419,12 +378,7 @@ CREATE TABLE `gio_hang` (
   `ngay_cap_nhat` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng giỏ hàng';
 
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `hinh_anh_san_pham`
---
-
 CREATE TABLE `hinh_anh_san_pham` (
   `id` int(11) NOT NULL COMMENT 'ID hình ảnh',
   `san_pham_id` int(11) NOT NULL COMMENT 'ID sản phẩm',
@@ -689,17 +643,6 @@ CREATE TABLE `su_dung_ma_giam_gia` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng lịch sử sử dụng mã giảm giá';
 
 --
--- Đang đổ dữ liệu cho bảng `su_dung_ma_giam_gia`
---
-
-INSERT INTO `su_dung_ma_giam_gia` (`id`, `nguoi_dung_id`, `ma_giam_gia_id`, `don_hang_id`, `ngay_su_dung`) VALUES
-(1, 3, 1, NULL, '2026-02-26 14:15:00'),
-(2, 5, 4, NULL, '2026-03-01 11:00:00'),
-(3, 2, 4, NULL, '2026-03-02 08:20:00');
-
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `thong_so`
 --
 
@@ -732,10 +675,6 @@ CREATE TABLE `yeu_thich` (
   `san_pham_id` int(11) NOT NULL COMMENT 'ID sản phẩm',
   `ngay_them` datetime DEFAULT current_timestamp() COMMENT 'Ngày thêm'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng danh sách yêu thích';
-
---
--- Chỉ mục cho các bảng đã đổ
---
 
 --
 -- Chỉ mục cho bảng `bien_the_san_pham`
