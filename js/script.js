@@ -1,54 +1,45 @@
 
 
-// ══════════════════════════════════════════
-// CLEAR OLD LOCALSTORAGE
-// ══════════════════════════════════════════
-// Xóa dữ liệu giỏ cũ từ localStorage, chỉ dùng session backend
+/* Clear Old LocalStorage */
 localStorage.removeItem('cart');
 localStorage.removeItem('cartDiscount');
 
-// ══════════════════════════════════════════
-// NAVBAR SCROLL
-// ══════════════════════════════════════════
+/* Navbar Scroll Effect */
 window.addEventListener('scroll', () => {
     document.querySelector('.navbar')?.classList.toggle('navbar-scrolled', window.scrollY > 50);
 });
 
-// ══════════════════════════════════════════
-// BACK TO TOP
-// ══════════════════════════════════════════
+/* Back to Top Button */
 const backToTopBtn = document.getElementById('backToTop');
 if (backToTopBtn) {
     window.addEventListener('scroll', () => backToTopBtn.classList.toggle('show', window.scrollY > 300));
     backToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
-// ══════════════════════════════════════════
-// EVENT DELEGATION — XỬ LÝ CLICK SẢN PHẨM
-// Dùng cho: products.php, Category_products.php, index.php, product-detail.php
-// ══════════════════════════════════════════
+/* Event Delegation - Product Actions */
+// Used for: products.php, Category_products.php, index.php, product-detail.php
 document.addEventListener('click', function (e) {
 
-    // 1. NÚT "Thêm vào giỏ" (class btn-add-cart ONLY - product-detail.php có handler riêng)
+    // Add to Cart button (btn-add-cart only)
     const btnAdd = e.target.closest('.btn-add-cart');
     if (btnAdd && !btnAdd.closest('.btn-add-to-cart-detail')) {
         e.preventDefault();
 
-        // Lấy product id — ưu tiên data-product-id trên nút, sau đó trên card
+        // Get product ID - prioritize data-product-id on button, then on card
         const productId = parseInt(
             btnAdd.dataset.productId ||
             btnAdd.closest('.product-card, .product-card-small')?.dataset?.productId ||
             0
         );
 
-        if (!productId) { console.warn('Không tìm được product id'); return; }
+        if (!productId) { console.warn('Product ID not found'); return; }
 
         const qty = parseInt(document.getElementById('quantity')?.value || 1);
 
-        // Gọi addToCart() từ cart.js — CHỈ truyền id, không truyền giá
+        // Call addToCart() from cart.js
         if (typeof addToCart === 'function') {
             addToCart(productId, qty).then(() => {
-                // Sau khi thêm vào giỏ thành công, navigate tới product-detail page
+                // Navigate to product detail after successful add
                 setTimeout(() => {
                     window.location.href = `product-detail.php?id=${productId}`;
                 }, 500);
@@ -56,7 +47,7 @@ document.addEventListener('click', function (e) {
         }
     }
 
-    // 2. NÚT YÊU THÍCH
+    // Wishlist button
     const btnWishlist = e.target.closest('.btn-wishlist, .btn-wishlist-detail');
     if (btnWishlist) {
         e.preventDefault();
@@ -69,7 +60,7 @@ document.addEventListener('click', function (e) {
         }
     }
 
-    // 3. NÚT XEM NHANH / MUA NGAY
+    // Quick View and Buy Now buttons
     const btnQuickView = e.target.closest('.btn-quick-view');
     if (btnQuickView) {
         e.preventDefault();

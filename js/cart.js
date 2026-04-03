@@ -1,14 +1,10 @@
-// ===========================
-// SHOPPING CART JAVASCRIPT
-// ===========================
+/* Shopping Cart Functions */
 
-// ===========================
-// ADD TO CART (Gửi tới Backend API)
-// ===========================
+/* Add to Cart - Send to Backend API */
 
 function addToCart(productId, qty = 1) {
     return new Promise((resolve) => {
-        // Gửi request tới API backend
+        // Send request to API backend
         fetch('api/cart.php?action=add', {
             method: 'POST',
             headers: {
@@ -38,12 +34,10 @@ function addToCart(productId, qty = 1) {
     });
 }
 
-// ===========================
-// UPDATE CART QUANTITY
-// ===========================
+/* Update Cart Quantity */
 
 function updateCartQuantity(productId, qty, sizeId = null, colorId = null) {
-    // Chuyển empty string thành null
+    // Convert empty strings to null
     sizeId = sizeId === '' ? null : sizeId;
     colorId = colorId === '' ? null : colorId;
     
@@ -71,7 +65,7 @@ function updateCartQuantity(productId, qty, sizeId = null, colorId = null) {
 
 function removeFromCartAPI(productId, sizeId = null, colorId = null) {
     return new Promise((resolve) => {
-        // Chuyển empty string thành null
+        // Convert empty strings to null
         sizeId = sizeId === '' ? null : sizeId;
         colorId = colorId === '' ? null : colorId;
         
@@ -144,7 +138,7 @@ function loadCart() {
                     imagePath = 'public/' + imagePath;
                 }
                 
-                // Xây dựng HTML cho size/color info
+                // Build HTML for size/color info
                 let variantInfo = '';
                 if (item.size || item.color) {
                     variantInfo = '<div class="cart-item-variants">';
@@ -220,7 +214,7 @@ function changeQty(productId, newQty, sizeId = null, colorId = null) {
 }
 
 // ===========================
-// UPDATE CART SUMMARY
+/* Update Cart Summary */
 // ===========================
 
 function updateCartSummary() {
@@ -231,17 +225,17 @@ function updateCartSummary() {
             
             const cart = data.cart;
             
-            // Tính toán
+            // Calculate totals
             const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
             const subtotal = cart.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
             
-            // Phí vận chuyển (miễn phí nếu >= 500k)
+            // Shipping fee (free if >= 500k)
             const shippingFee = subtotal >= 500000 ? 0 : 25000;
             
-            // Giảm giá
-            const discount = 0; // Có thể thêm logic giảm giá sau
+            // Discount
+            const discount = 0; // Can add discount logic later
             
-            // Tổng cộng
+            // Total amount
             const total = subtotal + shippingFee - discount;
             
             // Cập nhật hiển thị - SỬA LỖI ID
@@ -267,7 +261,7 @@ function updateCartSummary() {
             
             if (totalEl) totalEl.textContent = formatPrice(total);
             
-            // Hiển thị giảm giá nếu có
+            // Show discount if exists
             if (discountItemEl) {
                 if (discount > 0) {
                     discountItemEl.style.display = 'grid';
@@ -279,12 +273,10 @@ function updateCartSummary() {
             
             updateCartCount();
         })
-        .catch(error => console.error('Lỗi cập nhật summary:', error));
+        .catch(error => console.error('Error updating summary:', error));
 }
 
-// ===========================
-// PROMO CODE
-// ===========================
+/* Promo Code */
 
 document.getElementById('applyPromo')?.addEventListener('click', function() {
     const promoCode = document.getElementById('promoCode').value.toUpperCase().trim();
@@ -312,9 +304,7 @@ document.getElementById('applyPromo')?.addEventListener('click', function() {
     }
 });
 
-// ===========================
-// CHECKOUT
-// ===========================
+/* Checkout */
 
 document.getElementById('checkoutBtn')?.addEventListener('click', function() {
     fetch('api/cart.php?action=get')
@@ -332,10 +322,7 @@ document.getElementById('checkoutBtn')?.addEventListener('click', function() {
         });
 });
 
-// ===========================
-// UTILITIES
-// ===========================
-
+/* Utility Functions */
 function formatPrice(price) {
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
@@ -354,7 +341,7 @@ function updateCartCount() {
                 cartCount.textContent = data.cart_count || 0;
             }
         })
-        .catch(error => console.error('Lỗi cập nhật cart count:', error));
+        .catch(error => console.error('Error updating cart count:', error));
 }
 
 function showNotification(message, type = 'info') {
@@ -378,9 +365,7 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// ===========================
-// CHECKOUT FUNCTION
-// ===========================
+/* Checkout Function */
 
 function goCheckout() {
     fetch('api/cart.php?action=get')
@@ -398,9 +383,7 @@ function goCheckout() {
         });
 }
 
-// ===========================
-// APPLY PROMO CODE
-// ===========================
+/* Apply Promo Code */
 
 function applyPromo() {
     const promoCode = document.getElementById('promoCode').value.toUpperCase().trim();
@@ -428,9 +411,7 @@ function applyPromo() {
     }
 }
 
-// ===========================
-// BUTTON HANDLERS (wrapper functions)
-// ===========================
+/* Button Handlers */
 
 function editCartItemBtn(btn) {
     const productId = parseInt(btn.dataset.productId);
@@ -450,30 +431,28 @@ function removeFromCartBtn(btn) {
     removeFromCartAPI(productId, sizeId, colorId);
 }
 
-// ===========================
-// EDIT CART ITEM
-// ===========================
+/* Edit Cart Item */
 
 function editCartItem(productId, size, color, sizeId = null, colorId = null) {
-    // Fetch thông tin sản phẩm từ session và variants từ database
+    // Fetch product info from session and variants from database
     Promise.all([
         fetch('api/cart.php?action=get').then(r => r.json()),
         fetch(`api/product-variants.php?product_id=${productId}`).then(r => r.json())
     ])
     .then(([cartData, variantsData]) => {
         if (!cartData.cart || !variantsData.success) {
-            showNotification('Lỗi tải dữ liệu sản phẩm', 'danger');
+            showNotification('Error loading product data', 'danger');
             return;
         }
         
-        // Tìm item trong giỏ hàng - match với size/color
+        // Find item in cart - match with size/color
         const item = cartData.cart.find(i => 
             i.id == productId && 
             (i.size_id == sizeId || (i.size_id === null && sizeId === null)) &&
             (i.color_id == colorId || (i.color_id === null && colorId === null))
         );
         if (!item) {
-            showNotification('Không tìm thấy sản phẩm trong giỏ hàng', 'danger');
+            showNotification('Product not found in cart', 'danger');
             return;
         }
         
@@ -483,7 +462,7 @@ function editCartItem(productId, size, color, sizeId = null, colorId = null) {
         // Render size buttons
         let sizesHTML = '';
         if (sizes.length > 0) {
-            sizesHTML = '<div class="form-group mt-3"><label class="form-label">Kích thước:</label><div id="editSizeOptions" class="d-flex flex-wrap gap-2">';
+            sizesHTML = '<div class="form-group mt-3"><label class="form-label">Size:</label><div id="editSizeOptions" class="d-flex flex-wrap gap-2">';
             sizes.forEach(s => {
                 const isActive = sizeId == s.id ? 'active' : '';
                 sizesHTML += `<button type="button" class="btn btn-outline-primary size-btn-edit ${isActive}" data-size-id="${s.id}" data-size-name="${s.ten}">${s.ten}</button>`;
@@ -494,7 +473,7 @@ function editCartItem(productId, size, color, sizeId = null, colorId = null) {
         // Render color buttons
         let colorsHTML = '';
         if (colors.length > 0) {
-            colorsHTML = '<div class="form-group mt-3"><label class="form-label">Màu sắc:</label><div id="editColorOptions" class="d-flex flex-wrap gap-2">';
+            colorsHTML = '<div class="form-group mt-3"><label class="form-label">Color:</label><div id="editColorOptions" class="d-flex flex-wrap gap-2">';
             colors.forEach(c => {
                 const isActive = colorId == c.id ? 'active' : '';
                 const colorHex = c.ma_hex || '#999999';
@@ -505,7 +484,7 @@ function editCartItem(productId, size, color, sizeId = null, colorId = null) {
             colorsHTML += '</div></div>';
         }
         
-        // Tạo modal để chỉnh sửa
+        // Create modal for editing
         const modalHTML = `
             <div class="modal fade" id="editCartModal" tabindex="-1">
                 <div class="modal-dialog modal-lg">

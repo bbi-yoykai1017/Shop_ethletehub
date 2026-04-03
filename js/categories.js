@@ -1,12 +1,8 @@
-// ===========================
-// CATEGORIES DROPDOWN & SEARCH
-// ===========================
+/* Categories Dropdown and Search */
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ===========================
-    // DROPDOWN FUNCTIONALITY
-    // ===========================
+/* Dropdown Functionality */
     
     const dropdownBtn = document.getElementById('categoriesDropdownBtn');
     const dropdownMenu = document.getElementById('categoriesDropdownMenu');
@@ -52,9 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ===========================
-    // SEARCH FUNCTIONALITY
-    // ===========================
+/* Search Functionality */
     
     const categorySearch = document.getElementById('categorySearch');
     const categoriesGrid = document.getElementById('categoriesGrid');

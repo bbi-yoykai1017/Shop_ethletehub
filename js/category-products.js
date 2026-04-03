@@ -1,5 +1,5 @@
 /**
- * Category Products Page - Xử lý lọc và hiển thị sản phẩm theo danh mục
+ * Category Products Page - Filter and display products by category
  */
 
 // Filter state
@@ -16,9 +16,7 @@ let filterState = {
 let currentCategory = '';
 
 
-// ===========================
-// FILTER PRODUCTS
-// ===========================
+/* Filter Products */
 
 function filterProducts(data) {
     let filtered = data.filter(product => {
@@ -69,9 +67,7 @@ function filterProducts(data) {
     return filtered;
 }
 
-// ===========================
-// EVENT LISTENERS
-// ===========================
+/* Event Listeners */
 
 // Category Filter
 document.querySelectorAll('.category-filter').forEach(checkbox => {

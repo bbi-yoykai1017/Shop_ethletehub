@@ -1,6 +1,4 @@
-// ===========================
-// REVIEW/COMMENT JAVASCRIPT
-// ===========================
+/* Review and Comment Functions */
 
 let selectedRating = 0;
 

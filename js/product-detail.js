@@ -1,10 +1,6 @@
-// ===========================
-// PRODUCT DETAIL PAGE JS
-// ===========================
+/* Product Detail Page */
 
-// ===========================
-// CHANGE PRODUCT IMAGE
-// ===========================
+/* Change Product Image */
 
 function changeImage(element) {
     // Remove active from all thumbnails
@@ -29,9 +25,7 @@ function changeImage(element) {
     }, 150);
 }
 
-// ===========================
-// QUANTITY SELECTOR
-// ===========================
+/* Quantity Selector */
 
 function increaseQty() {
     const input = document.getElementById('quantity');
