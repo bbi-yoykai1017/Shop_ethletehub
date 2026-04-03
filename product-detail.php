@@ -551,7 +551,7 @@ $ratingSummary = $product['rating_summary'];
                                             <i class="fas fa-shopping-cart"></i>
                                             Xem chi tiết
                                         </a>
-                                        <a href="product-detail.php?id=<?php echo $related['id']; ?>" class="btn-buy-now-detail"
+                                        <a href="ThanhToan.php?id=<?php echo $related['id']; ?>" class="btn-buy-now-detail"
                                             role="button">
                                             <i class="fas fa-bolt"></i>
                                             Mua ngay

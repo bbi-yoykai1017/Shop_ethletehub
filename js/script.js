@@ -66,7 +66,7 @@ document.addEventListener('click', function (e) {
         e.preventDefault();
         const card = btnQuickView.closest('.product-card');
         const id   = card?.dataset?.productId;
-        window.location.href = id ? `product-detail.php?id=${id}` : 'product-detail.php';
+        window.location.href = id ? `ThanhToan.php?id=${id}` : 'ThanhToan.php';
     }
 
     const btnBuyNow = e.target.closest('.btn-buy-now-detail');
@@ -83,7 +83,7 @@ document.addEventListener('click', function (e) {
         // Thêm vào giỏ rồi chuyển thẳng sang checkout
         if (typeof addToCart === 'function') {
             addToCart(productId, qty).then(() => {
-                setTimeout(() => window.location.href = 'checkout.php', 600);
+                setTimeout(() => window.location.href = 'ThanhToan.php', 600);
             });
         }
     }
