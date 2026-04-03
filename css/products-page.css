@@ -1,6 +1,4 @@
-/* ===========================
-   PRODUCTS PAGE STYLES
-   =========================== */
+/* Products Page Styles */
 
 /* Page Header */
 .page-header {
@@ -11,6 +9,20 @@
     margin-bottom: var(--spacing-3xl);
 }
 
+@media (max-width: 768px) {
+    .page-header {
+        padding: var(--spacing-xl) 0;
+        margin-bottom: var(--spacing-2xl);
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header {
+        padding: var(--spacing-lg) 0;
+        margin-bottom: var(--spacing-xl);
+    }
+}
+
 .page-header h1 {
     font-size: 2.5rem;
     font-weight: var(--font-weight-black);
@@ -19,9 +31,34 @@
     letter-spacing: 2px;
 }
 
+@media (max-width: 768px) {
+    .page-header h1 {
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+}
+
 .page-header p {
     font-size: 1.1rem;
     color: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+    .page-header p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header p {
+        font-size: 0.9rem;
+    }
 }
 
 /* Products Page */
@@ -39,6 +76,21 @@
     top: 100px;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .sidebar-filters {
+        margin-bottom: var(--spacing-2xl);
+        position: relative;
+        top: auto;
+        max-height: auto;
+    }
+}
+
+@media (max-width: 576px) {
+    .sidebar-filters {
+        padding: var(--spacing-md);
+    }
 }
 
 .filter-group {
@@ -370,18 +422,37 @@
 .btn-page-add-cart,
 .btn-page-buy-now {
     flex: 1;
-    padding: 8px 10px;
+    padding: 10px 12px;
     border: none;
     border-radius: var(--border-radius);
     font-weight: var(--font-weight-bold);
     cursor: pointer;
     transition: all var(--transition-base);
     text-transform: uppercase;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 5px;
+    min-height: 40px;
+}
+
+@media (max-width: 768px) {
+    .btn-page-add-cart,
+    .btn-page-buy-now {
+        padding: 12px 14px;
+        font-size: 0.9rem;
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 576px) {
+    .btn-page-add-cart,
+    .btn-page-buy-now {
+        padding: 14px 16px;
+        font-size: 0.95rem;
+        min-height: 48px;
+    }
 }
 
 

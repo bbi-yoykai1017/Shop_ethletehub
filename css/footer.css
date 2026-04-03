@@ -1,18 +1,27 @@
-/* ========================
-   TỔNG THỂ FOOTER
-   ======================== */
+/* Footer Sections */
 .footer {
-    background-color: #151515; /* Màu nền đen nhám thể thao */
-    color: #b3b3b3; /* Màu chữ xám sáng để không bị chói mắt */
+    background-color: #151515;
+    color: #b3b3b3;
     padding: 70px 0 20px;
     font-family: inherit;
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: 40px 0 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer {
+        padding: 30px 0 15px;
+    }
 }
 
 .footer-section {
     margin-bottom: 40px;
 }
 
-/* Tiêu đề của từng cột */
 .footer-title {
     color: #ffffff;
     font-size: 1.25rem;
@@ -24,7 +33,21 @@
     padding-bottom: 12px;
 }
 
-/* Thêm đường kẻ ngang màu nhấn dưới tiêu đề */
+@media (max-width: 768px) {
+    .footer-title {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-title {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+}
+
+
 .footer-title::after {
     content: '';
     position: absolute;
@@ -32,13 +55,11 @@
     bottom: 0;
     width: 40px;
     height: 3px;
-    background-color: #ff4500; /* Bạn có thể đổi màu cam/đỏ/xanh tùy theme của bạn */
+    background-color: #ff4500;
     border-radius: 2px;
 }
 
-/* ========================
-   MẠNG XÃ HỘI
-   ======================== */
+/* Footer Socials */
 .footer-socials {
     display: flex;
     gap: 12px;
@@ -53,20 +74,18 @@
     height: 40px;
     background-color: rgba(255, 255, 255, 0.05);
     color: #ffffff;
-    border-radius: 50%; /* Nút bo tròn */
+    border-radius: 50%;
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
 .social-link:hover {
-    background-color: #ff4500; /* Màu khi di chuột vào */
-    transform: translateY(-5px); /* Hiệu ứng nhảy lên */
+    background-color: #ff4500;
+    transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
 }
 
-/* ========================
-   LIÊN KẾT & MENU
-   ======================== */
+/* Footer Links and Menu */
 .footer-links {
     list-style: none;
     padding: 0;

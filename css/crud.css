@@ -1,6 +1,8 @@
+/* CRUD Table Styles */
+
 body { 
     background-color: #f8f9fa; 
-    font-family: 'Inter', sans-serif; /* Nếu bạn dùng font Inter */
+    font-family: 'Inter', sans-serif;
 }
 
 .table-container {

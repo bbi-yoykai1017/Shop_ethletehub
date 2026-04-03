@@ -1,3 +1,5 @@
+/* Login Page Styles */
+
  body {
      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
      min-height: 100vh;
@@ -13,6 +15,12 @@
      padding: 20px;
  }
 
+@media (max-width: 576px) {
+    .login-container {
+        padding: 15px;
+    }
+}
+
  .login-card {
      background: white;
      border-radius: 15px;
@@ -22,23 +30,35 @@
      max-width: 450px;
  }
 
- .login-header {
-     text-align: center;
-     margin-bottom: 30px;
- }
+@media (max-width: 768px) {
+    .login-card {
+        padding: 30px;
+        max-width: 100%;
+    }
+}
 
- .login-header h1 {
-     color: #333;
+@media (max-width: 576px) {
+    .login-card {
+        padding: 20px;
+        border-radius: 10px;
+    }
+}
      font-size: 28px;
      font-weight: 700;
      margin-bottom: 10px;
  }
 
- .login-header p {
-     color: #666;
-     font-size: 14px;
- }
+@media (max-width: 768px) {
+    .login-header h1 {
+        font-size: 24px;
+    }
+}
 
+@media (max-width: 576px) {
+    .login-header h1 {
+        font-size: 22px;
+    }
+}
  .form-group {
      margin-bottom: 20px;
  }

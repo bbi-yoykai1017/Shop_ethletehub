@@ -1,6 +1,4 @@
-/* ===========================
-   UTILITIES & GENERAL STYLES
-   =========================== */
+/* Utilities and General Styles */
 
 /* Container Padding */
 .container-custom {
@@ -9,67 +7,59 @@
     padding: 0 var(--spacing-lg);
 }
 
+@media (max-width: 992px) {
+    .container-custom {
+        padding: 0 var(--spacing-lg);
+    }
+}
+
+@media (max-width: 768px) {
+    .container-custom {
+        padding: 0 var(--spacing-md);
+    }
+}
+
+@media (max-width: 576px) {
+    .container-custom {
+        padding: 0 var(--spacing-sm);
+    }
+}
+
 /* Spacing Utilities */
-.mt-custom-xs { margin-top: var(--spacing-xs); }
-.mt-custom-sm { margin-top: var(--spacing-sm); }
 .mt-custom-md { margin-top: var(--spacing-md); }
 .mt-custom-lg { margin-top: var(--spacing-lg); }
 .mt-custom-xl { margin-top: var(--spacing-xl); }
 .mt-custom-2xl { margin-top: var(--spacing-2xl); }
-.mt-custom-3xl { margin-top: var(--spacing-3xl); }
 
-.mb-custom-xs { margin-bottom: var(--spacing-xs); }
-.mb-custom-sm { margin-bottom: var(--spacing-sm); }
 .mb-custom-md { margin-bottom: var(--spacing-md); }
 .mb-custom-lg { margin-bottom: var(--spacing-lg); }
 .mb-custom-xl { margin-bottom: var(--spacing-xl); }
 .mb-custom-2xl { margin-bottom: var(--spacing-2xl); }
-.mb-custom-3xl { margin-bottom: var(--spacing-3xl); }
 
-.my-custom-lg { margin-top: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
-.my-custom-xl { margin-top: var(--spacing-xl); margin-bottom: var(--spacing-xl); }
-.my-custom-2xl { margin-top: var(--spacing-2xl); margin-bottom: var(--spacing-2xl); }
+.my-custom-lg { margin: var(--spacing-lg) 0; }
+.my-custom-xl { margin: var(--spacing-xl) 0; }
+.my-custom-2xl { margin: var(--spacing-2xl) 0; }
 
-.px-custom-lg { padding-left: var(--spacing-lg); padding-right: var(--spacing-lg); }
-.px-custom-xl { padding-left: var(--spacing-xl); padding-right: var(--spacing-xl); }
-
-.py-custom-lg { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
-.py-custom-xl { padding-top: var(--spacing-xl); padding-bottom: var(--spacing-xl); }
-.py-custom-2xl { padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-2xl); }
-.py-custom-3xl { padding-top: var(--spacing-3xl); padding-bottom: var(--spacing-3xl); }
+.px-custom-lg { padding: 0 var(--spacing-lg); }
+.py-custom-lg { padding: var(--spacing-lg) 0; }
+.py-custom-xl { padding: var(--spacing-xl) 0; }
+.py-custom-2xl { padding: var(--spacing-2xl) 0; }
+.py-custom-3xl { padding: var(--spacing-3xl) 0; }
 
 /* Text Utilities */
 .text-primary { color: var(--primary); }
 .text-secondary { color: var(--secondary); }
 .text-accent { color: var(--accent); }
 .text-dark { color: var(--dark); }
-.text-light { color: var(--light); }
 .text-gray { color: var(--gray); }
 
 .text-uppercase { text-transform: uppercase; }
-.text-capitalize { text-transform: capitalize; }
-.text-lowercase { text-transform: lowercase; }
-
 .text-bold { font-weight: var(--font-weight-bold); }
-.text-extra-bold { font-weight: var(--font-weight-extra-bold); }
-.text-black { font-weight: var(--font-weight-black); }
-
 .text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
 
 .text-sm { font-size: var(--font-size-sm); }
-.text-base { font-size: var(--font-size-base); }
 .text-lg { font-size: var(--font-size-lg); }
 .text-xl { font-size: var(--font-size-xl); }
-
-.letter-spacing-wide {
-    letter-spacing: 2px;
-}
-
-.letter-spacing-wider {
-    letter-spacing: 3px;
-}
 
 /* Background Colors */
 .bg-primary { background-color: var(--primary); }
@@ -200,9 +190,7 @@
     color: var(--dark);
 }
 
-/* ===========================
-   BACK TO TOP BUTTON
-   =========================== */
+/* Back to Top Button */
 .back-to-top {
     position: fixed;
     bottom: -60px;
@@ -338,3 +326,123 @@
 .delay-3 { animation-delay: 0.3s; }
 .delay-4 { animation-delay: 0.4s; }
 .delay-5 { animation-delay: 0.5s; }
+
+/* ===========================
+   MOBILE & TOUCH FRIENDLY STYLES
+   =========================== */
+
+/* Touch-friendly button minimum size (48x48px) */
+@media (hover: none) and (pointer: coarse) {
+    button,
+    .btn,
+    a.btn,
+    input[type="button"],
+    input[type="submit"] {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 12px 16px;
+    }
+    
+    /* Increase tap target area for nav items on mobile */
+    .nav-link,
+    .navbar-nav .nav-item {
+        padding: 10px 15px;
+    }
+    
+    /* Increase clickable area for icons */
+    .cart-icon,
+    .nav-notification,
+    .user-account,
+    .social-link {
+        padding: 8px;
+    }
+}
+
+/* Table overflow handling on mobile */
+@media (max-width: 768px) {
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Hide less important columns on mobile */
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Image responsive with max-width */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Ensure all iframes are responsive */
+iframe {
+    max-width: 100%;
+}
+
+/* Improve readability on small screens */
+@media (max-width: 576px) {
+    /* Increase line height for better mobile readability */
+    body {
+        line-height: 1.6;
+    }
+    
+    /* Reduce padding on small screens */
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    /* Ensure forms are usable on mobile */
+    input,
+    select,
+    textarea {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+    }
+    
+    /* Make dropdowns full width on mobile */
+    .dropdown-menu {
+        width: 100%;
+    }
+    
+    /* Improve modal usability */
+    .modal-dialog {
+        margin: 10px;
+    }
+}
+
+/* Prevent horizontal scroll on mobile */
+* {
+    max-width: 100%;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* Disable text selection to prevent long press issues */
+.no-text-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Smooth scrolling on mobile */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Touch-friendly link padding */
+a {
+    padding: 5px; /* Gives more area to tap */
+    display: inline-block;
+}

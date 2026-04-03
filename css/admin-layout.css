@@ -1,6 +1,4 @@
-/* EthleteHub Admin Shared Styles 
-   Dùng cho: CRUDuser.php, CRUDproduct.php, CRUDdonhang.php...
-*/
+/* Admin Layout Styles */
 
 :root {
     --sidebar-width: 260px;
@@ -15,13 +13,13 @@ body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Cấu trúc Layout chính */
+/* Main Layout Structure */
 .layout {
     display: flex;
     min-height: calc(100vh - 56px);
 }
 
-/* SIDEBAR TRÊN DESKTOP */
+/* Sidebar Desktop */
 .sidebar {
     width: var(--sidebar-width);
     background: var(--dark-bg);
@@ -73,7 +71,7 @@ body {
     background: var(--primary-color);
 }
 
-/* NỘI DUNG CHÍNH */
+/* Main Content Area */
 .main-content {
     flex: 1;
     padding: 2rem;
@@ -81,7 +79,7 @@ body {
     overflow-x: hidden;
 }
 
-/* STYLE CHO CARD & TABLE */
+/* Card and Table Styles */
 .card {
     border-radius: 12px;
     overflow: hidden;
@@ -95,7 +93,7 @@ body {
     border-radius: 8px;
 }
 
-/* RESPONSIVE CHO MOBILE & TABLET (Dưới 992px) */
+/* Responsive Mobile and Tablet (max-width 992px) */
 @media (max-width: 991.98px) {
     .layout {
         flex-direction: column;
@@ -115,11 +113,11 @@ body {
         overflow-x: auto;
         gap: 10px;
         padding: 0.5rem 0;
-        scrollbar-width: none; /* Ẩn scrollbar trên Firefox */
+        scrollbar-width: none;
     }
 
     .sidebar ul::-webkit-scrollbar {
-        display: none; /* Ẩn scrollbar trên Chrome/Safari */
+        display: none;
     }
 
     .sidebar a {
@@ -136,9 +134,54 @@ body {
         padding: 1rem;
     }
 
-    /* Tối ưu bảng trên Mobile */
+    /* Optimize table for mobile */
     .table-responsive {
         font-size: 0.9rem;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .sidebar {
+        padding: 0.5rem 0.5rem;
+    }
+    
+    .sidebar a {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .main-content {
+        padding: 0.8rem;
+    }
+}
+
+
+@media (max-width: 576px) {
+    .sidebar {
+        padding: 0.5rem;
+    }
+    
+    .sidebar a {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .main-content {
+        padding: 0.5rem;
+    }
+    
+    /* Optimize table for mobile */
+    .table {
+        font-size: 0.8rem;
+    }
+    
+    .table thead th {
+        padding: 0.5rem;
+    }
+    
+    .table tbody td {
+        padding: 0.5rem;
     }
 }
 
