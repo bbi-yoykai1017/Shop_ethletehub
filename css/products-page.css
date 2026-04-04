@@ -416,7 +416,24 @@
 /* Product Actions Page - Two buttons */
 .product-actions-page {
     display: flex;
-    gap: var(--spacing-sm);
+    flex-direction: row; /* Chuyển thành hàng ngang */
+    gap: 10px;           /* Khoảng cách giữa 2 nút */
+    width: 100%;         /* Đảm bảo khung chứa chiếm hết chiều rộng thẻ card */
+    margin-top: 10px;
+}
+.product-actions-page button {
+    flex: 1;             /* Quan trọng: Để 2 nút có độ rộng bằng nhau */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 5px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap; /* Ngăn chữ bị rớt dòng làm mất chữ */
 }
 
 .btn-page-add-cart,
