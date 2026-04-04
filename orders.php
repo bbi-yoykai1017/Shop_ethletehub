@@ -40,8 +40,6 @@ try {
 } catch (PDOException $e) {
     die("Lỗi truy vấn: " . $e->getMessage());
 }
-
-// Helper function để format giá giống file cart.php
 function formatPrice($price) {
     return number_format($price ?? 0, 0, ',', '.') . '₫';
 }
