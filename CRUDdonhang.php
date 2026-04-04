@@ -42,6 +42,15 @@ if (isset($_POST['save_order'])) {
     $pttt = $_POST['phuong_thuc_thanh_toan'];
     $trang_thai = $_POST['trang_thai'];
 
+    if ($user_id <= 0) {
+        // Nếu ID <= 0, hiện thông báo và dừng thực thi, quay lại trang trước
+        echo "<script>
+                alert('Lỗi: ID Người dùng phải là số dương (lớn hơn 0)!');
+                window.history.back();
+              </script>";
+        exit; // Dừng chương trình tại đây không cho lưu vào DB
+    }
+    // --- KẾT THÚC PHẦN KIỂM TRA ---
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
         // CẬP NHẬT
@@ -62,7 +71,7 @@ if (isset($_POST['save_order'])) {
 // ================= 3. XỬ LÝ XÓA =================
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
-    
+
     // 1. Kiểm tra xem đơn hàng này có chi tiết sản phẩm không
     $check_sql = "SELECT COUNT(*) FROM chi_tiet_don_hang WHERE don_hang_id = ?";
     $check_stmt = $conn->prepare($check_sql);
@@ -119,7 +128,7 @@ $listorders = getAllOrders($conn);
     <nav class="navbar navbar-dark bg-dark shadow">
         <div class="container-fluid px-4">
             <span class="navbar-brand fw-bold">
-                <i class="bi bi-speedometer2"></i> EthleteHub Admin
+                <i class="bi bi-speedometer2"></i> AthleteHub Admin
             </span>
 
             <a href="index.php" class="btn btn-outline-light btn-sm">
@@ -163,8 +172,9 @@ $listorders = getAllOrders($conn);
 
                         <div class="col-md-2">
                             <label class="form-label fw-bold">ID Người dùng</label>
-                            <input type="number" name="nguoi_dung_id" class="form-control"
-                                value="<?= $edit_order['nguoi_dung_id'] ?>" required>
+                            <input type="number" id="nguoi_dung_id" name="nguoi_dung_id" class="form-control"
+                                value="<?= $edit_order['nguoi_dung_id'] ?>" required min="1">
+                            <div class="invalid-feedback">ID người dùng phải là số dương!</div>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Mã đơn hàng</label>
@@ -175,7 +185,7 @@ $listorders = getAllOrders($conn);
                             <label class="form-label fw-bold">Tổng tiền</label>
                             <input type="number" id="tong_tien" name="tong_tien" class="form-control"
                                 value="<?= $edit_order['tong_tien'] ?>" required min="1">
-                                <div class="invalid-feedback">Tổng tiền phải lớn hơn 0!</div>
+                            <div class="invalid-feedback">Tổng tiền phải lớn hơn 0!</div>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Tiền giảm</label>
@@ -244,7 +254,7 @@ $listorders = getAllOrders($conn);
                     <tbody>
                         <?php foreach ($listorders as $donhang) { ?>
                             <tr>
-                                <td><?= $donhang['id'] ?></td>
+                                <td><a href="orders.php?id=<?= $donhang['id'] ?>" style="color: #0d6efd; text-decoration: underline;"><?= $donhang['id'] ?></a></td>
                                 <td><?= $donhang['nguoi_dung_id'] ?></td>
                                 <td><?= $donhang['ma_don_hang'] ?></td>
                                 <td><?= $donhang['tong_tien'] ?></td>
@@ -315,59 +325,68 @@ $listorders = getAllOrders($conn);
 
     <script src="bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const tongTienInput = document.getElementById('tong_tien');
-            const tienGiamInput = document.getElementById('tien_giam');
-            const thanhTienInput = document.getElementById('thanh_tien');
-            const btnSave = document.querySelector('button[name="save_order"]');
+    document.addEventListener('DOMContentLoaded', function() {
+        const userIdInput = document.getElementById('nguoi_dung_id');
+        const tongTienInput = document.getElementById('tong_tien');
+        const tienGiamInput = document.getElementById('tien_giam');
+        const thanhTienInput = document.getElementById('thanh_tien');
+        const btnSave = document.querySelector('button[name="save_order"]');
+        const form = document.querySelector('form');
 
-            function calculateAndValidate() {
-                let tongTien = parseFloat(tongTienInput.value) || 0;
-                let tienGiam = parseFloat(tienGiamInput.value) || 0;
+        function calculateAndValidate() {
+            // LẤY GIÁ TRỊ MỚI NHẤT TẠI ĐÂY (Phải nằm trong hàm)
+            let userId = parseInt(userIdInput.value); 
+            let tongTien = parseFloat(tongTienInput.value) || 0;
+            let tienGiam = parseFloat(tienGiamInput.value) || 0;
 
-                // 1. Tự động tính Thành tiền
-                let thanhTien = tongTien - tienGiam;
+            // 1. Tự động tính Thành tiền
+            let thanhTien = tongTien - tienGiam;
+            thanhTienInput.value = thanhTien > 0 ? thanhTien : 0;
 
-                // Hiển thị kết quả (không cho phép âm)
-                thanhTienInput.value = thanhTien > 0 ? thanhTien : 0;
+            // 2. Kiểm tra logic ràng buộc
+            let isValid = true;
 
-                // 2. Kiểm tra logic ràng buộc
-                let isValid = true;
-
-                if (tienGiam > tongTien) {
-                    tienGiamInput.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    tienGiamInput.classList.remove('is-invalid');
-                }
-
-                if (tongTien <= 0) {
-                    tongTienInput.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    tongTienInput.classList.remove('is-invalid');
-                }
-
-                // Khóa/Mở nút lưu
-                if (btnSave) btnSave.disabled = !isValid;
-
-                return isValid;
+            // Ràng buộc ID Người dùng (Phải là số và > 0)
+            if (isNaN(userId) || userId <= 0) {
+                userIdInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                userIdInput.classList.remove('is-invalid');
             }
 
-            // Lắng nghe sự kiện gõ phím trên cả 2 ô
-            tongTienInput.addEventListener('input', calculateAndValidate);
-            tienGiamInput.addEventListener('input', calculateAndValidate);
+            // Ràng buộc Tiền giảm
+            if (tienGiam > tongTien) {
+                tienGiamInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                tienGiamInput.classList.remove('is-invalid');
+            }
 
-            // CHẶN TUYỆT ĐỐI nếu cố tình nhấn Enter để submit khi dữ liệu sai
-            form.addEventListener('submit', function(e) {
-                if (!calculateAndValidate()) {
-                    e.preventDefault();
-                    alert('Lỗi: Tiền giảm không thể lớn hơn tổng tiền!');
-                }
-            });
+            // Ràng buộc Tổng tiền
+            if (tongTien <= 0) {
+                tongTienInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                tongTienInput.classList.remove('is-invalid');
+            }
+
+            if (btnSave) btnSave.disabled = !isValid;
+
+            return isValid;
+        }
+        tongTienInput.addEventListener('input', calculateAndValidate);
+        tienGiamInput.addEventListener('input', calculateAndValidate);
+        userIdInput.addEventListener('input', calculateAndValidate);
+
+        form.addEventListener('submit', function(e) {
+            if (!calculateAndValidate()) {
+                e.preventDefault();
+                alert('Vui lòng kiểm tra lại dữ liệu nhập vào!');
+            }
         });
-    </script>
+        calculateAndValidate();
+    });
+</script>
 </body>
 
 </html>
