@@ -48,7 +48,7 @@ if (isset($_POST['save_user'])) {
     exit;
 }
 
-// ================= 3. XỬ LÝ "XÓA" (CHUYỂN TRẠNG THÁI) =================
+// ================= 3. XỬ LÝ "Khóa" (CHUYỂN TRẠNG THÁI) =================
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
 
@@ -167,7 +167,7 @@ $listusers = getAllUsers($conn);
                                     <option value="hoat_dong" <?= ($update_mode && $edit_user['trang_thai'] === 'hoat_dong') ? 'selected' : '' ?>>Hoạt động</option>
                                     <option value="bi_khoa" <?= ($update_mode && $edit_user['trang_thai'] === 'bi_khoa') ? 'selected' : '' ?>>Bị khóa</option>
                                 </select>
-                            </div>
+                            </div>          
                             <div class="col-12 col-lg-2 d-flex align-items-end">
                                 <?php if ($update_mode): ?>
                                     <div class="w-100">
@@ -178,7 +178,11 @@ $listusers = getAllUsers($conn);
                                     <button type="submit" name="save_user" class="btn btn-success w-100"><i class="fas fa-plus me-1"></i> Thêm mới</button>
                                 <?php endif; ?>
                             </div>
+                             <div class="col-md-10 text-end d-flex align-items-end justify-content-end">
+                                <span class="badge bg-secondary">Tổng cộng: <?= count($listusers) ?> người dùng</span>
+                            </div>
                         </form>
+
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
                                 <thead class="table-light">
@@ -197,7 +201,7 @@ $listusers = getAllUsers($conn);
                                             <td class="text-center fw-bold text-muted"><?= $user['id'] ?></td>
                                             <td>
                                                 <div class="fw-bold"><?= htmlspecialchars($user['ten'] ?? 0) ?></div>
-                                                <div class="small text-muted"><?= htmlspecialchars($user['email']?? 0) ?></div>
+                                                <div class="small text-muted"><?= htmlspecialchars($user['email'] ?? 0) ?></div>
                                             </td>
                                             <td class="text-center d-none d-md-table-cell"><?= htmlspecialchars($user['so_dien_thoai'] ?? 0) ?></td>
                                             <td class="text-center">
