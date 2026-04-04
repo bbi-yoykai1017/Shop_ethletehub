@@ -75,7 +75,7 @@ $displayProducts = array_slice($products, 0, 6);
                             </li>
                             <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="CRUDuser.php">Quản trị</a>
+                                    <a class="nav-link" href="CRUDproduct.php">Quản trị</a>
                                 </li>
                             <?php endif; ?>
                             <li class="nav-item">
