@@ -119,7 +119,7 @@ $displayProducts = array_slice($products, 0, 6);
                                                 <h6 class="dropdown-header"> <?php echo htmlspecialchars($_SESSION['user_name']); ?></h6>
                                             </li>
                                             <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-edit me-2"></i> Hồ sơ của tôi</a></li>
-                                            <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i> Đơn hàng đã mua</a></li>
+                                            <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i> Đơn hàng </a></li>
                                             <li>
                                                 <hr class="dropdown-divider">
                                             </li>

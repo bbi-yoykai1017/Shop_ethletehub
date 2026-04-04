@@ -109,7 +109,7 @@ $list = getAllDiscounts($conn);
     <nav class="navbar navbar-dark bg-dark shadow">
         <div class="container-fluid px-4">
             <span class="navbar-brand fw-bold">
-                <i class="bi bi-speedometer2"></i> EthleteHub Admin
+                <i class="bi bi-speedometer2"></i> AthleteHub Admin
             </span>
 
             <a href="index.php" class="btn btn-outline-light btn-sm">
