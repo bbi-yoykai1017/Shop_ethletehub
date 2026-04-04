@@ -196,10 +196,10 @@ $listusers = getAllUsers($conn);
                                         <tr>
                                             <td class="text-center fw-bold text-muted"><?= $user['id'] ?></td>
                                             <td>
-                                                <div class="fw-bold"><?= htmlspecialchars($user['ten']) ?></div>
-                                                <div class="small text-muted"><?= htmlspecialchars($user['email']) ?></div>
+                                                <div class="fw-bold"><?= htmlspecialchars($user['ten'] ?? 0) ?></div>
+                                                <div class="small text-muted"><?= htmlspecialchars($user['email']?? 0) ?></div>
                                             </td>
-                                            <td class="text-center d-none d-md-table-cell"><?= htmlspecialchars($user['so_dien_thoai']) ?></td>
+                                            <td class="text-center d-none d-md-table-cell"><?= htmlspecialchars($user['so_dien_thoai'] ?? 0) ?></td>
                                             <td class="text-center">
                                                 <span class="badge rounded-pill bg-light text-dark border"><?= $user['vai_tro'] ?></span>
                                             </td>
