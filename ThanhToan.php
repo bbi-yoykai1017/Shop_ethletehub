@@ -307,12 +307,12 @@ if (empty($cart)) {
                         <div class="card p-4">
                             <h5 class="mb-4"><i class="fas fa-wallet"></i> Phương thức thanh toán</h5>
                             <div class="payment-method">
-                                <input type="radio" id="cod" name="phuong_thuc_thanh_toan" value="cod" checked>
+                                <input type="radio" id="cod" name="phuong_thuc_thanh_toan" value="tien_mat" checked>
                                 <label for="cod" class="ms-2 fw-bold">Thanh toán khi nhận hàng (COD)</label>
                                 <p class="text-muted ms-4 small">Thanh toán trực tiếp khi nhân viên giao hàng đến</p>
                             </div>
                             <div class="payment-method">
-                                <input type="radio" id="banking" name="phuong_thuc_thanh_toan" value="banking">
+                                <input type="radio" id="banking" name="phuong_thuc_thanh_toan" value="bank_transfer">
                                 <label for="banking" class="ms-2 fw-bold">Chuyển khoản ngân hàng</label>
                                 <p class="text-muted ms-4 small">Chuyển tiền trước khi nhận hàng</p>
                             </div>
@@ -459,8 +459,7 @@ if (empty($cart)) {
             const maGiamGiaId = document.getElementById('val_coupon_id').value;
             const lat = parseFloat(document.getElementById('lat').value);
             const lng = parseFloat(document.getElementById('lng').value);
-
-            // kiem tra 
+            // kiem tra
             if (!tenNguoiNhan || tenNguoiNhan.length < 3) {
                 showMessage('Tên người nhận phải ít nhất 3 ky tự');
                 return false;

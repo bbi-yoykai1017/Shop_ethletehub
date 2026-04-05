@@ -89,7 +89,7 @@ try {
             $tenNguoiNhan = trim($data['ten_nguoi_nhan'] ?? '');
             $soDienThoai = trim($data['so_dien_thoai_nhan'] ?? '');
             $diaChiGiao = trim($data['dia_chi_giao_hang'] ?? '');
-            $phuongThuc = trim($data['phuong_thuc_thanh_toan'] ?? 'cod');
+            $phuongThuc = trim($data['phuong_thuc_thanh_toan'] ?? 'tien_mat');
             $tongTien = floatval($data['tong_tien'] ?? 0);
             $tienGiam = floatval($data['tien_giam_gia'] ?? 0);
             $maGiamGiaId = !empty($data['ma_giam_gia_id']) ? (int)$data['ma_giam_gia_id'] : null;
