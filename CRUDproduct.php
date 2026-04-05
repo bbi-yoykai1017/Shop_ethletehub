@@ -4,7 +4,10 @@ require_once 'Database.php';
 require_once 'model/CRUD.php';
 require_once 'auth.php';
 // Truy vấn lấy ID và Tên danh mục
-
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: index.php");
+    exit();
+}
 $db = new Database();
 $conn = $db->connect();
 

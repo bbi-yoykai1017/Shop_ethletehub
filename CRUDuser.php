@@ -3,7 +3,10 @@ session_start();
 require_once 'Database.php';
 require_once 'model/CRUD.php';
 require_once 'auth.php';
-
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: index.php");
+    exit();
+}
 $db = new Database();
 $conn = $db->connect();
 
