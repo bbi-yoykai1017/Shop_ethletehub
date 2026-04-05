@@ -1,5 +1,73 @@
 /* Shopping Cart Functions */
 
+/* ============================== */
+/* Navigate to Product Detail */
+/* ============================== */
+
+function goProductDetail(event, productId) {
+    console.log('🔗 goProductDetail called with:', productId);
+    window.location.href = `product-detail.php?id=${productId}`;
+}
+
+/* ============================== */
+/* Update Total for Selected Items */
+/* ============================== */
+
+function parsePrice(priceText) {
+    // Convert "1.000.000₫" → 1000000
+    return parseInt(priceText.replace(/[^\d]/g, ''));
+}
+
+function updateTotal() {
+    const allItems = document.querySelectorAll('.cart-item');
+
+    let selectedTotal = 0;
+    let selectedCount = 0;
+
+    allItems.forEach(item => {
+        const checkbox = item.querySelector('.item-select-checkbox');
+
+        if (checkbox && checkbox.checked) {
+            const priceEl = item.querySelector('.cart-item-price');
+            const qtyInput = item.querySelector('.qty-control-input');
+
+            if (priceEl && qtyInput) {
+                const price = parsePrice(priceEl.textContent);
+                const qty = parseInt(qtyInput.value) || 1;
+
+                selectedTotal += price * qty;
+                selectedCount += qty;
+            }
+        }
+    });
+
+    // Update summary
+    const totalQuantityEl = document.getElementById('totalQuantity');
+    const subtotalEl = document.getElementById('subtotalDisplay');
+    const shippingEl = document.getElementById('shippingDisplay');
+    const totalEl = document.getElementById('totalDisplay');
+
+    if (totalQuantityEl) totalQuantityEl.textContent = selectedCount;
+
+    const subtotal = selectedTotal;
+    const shipping = subtotal >= 500000 ? 0 : 25000;
+    const total = subtotal + shipping;
+
+    if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal);
+
+    if (shippingEl) {
+        if (shipping === 0) {
+            shippingEl.textContent = 'Miễn phí';
+            shippingEl.className = 'shipping-fee';
+        } else {
+            shippingEl.textContent = formatPrice(shipping);
+            shippingEl.className = '';
+        }
+    }
+
+    if (totalEl) totalEl.textContent = formatPrice(total);
+}
+
 /* Add to Cart - Send to Backend API */
 
 function addToCart(productId, qty = 1) {
@@ -104,9 +172,14 @@ function removeFromCartAPI(productId, sizeId = null, colorId = null) {
 // ===========================
 
 function loadCart() {
+    console.log('📦 Loading cart...');
     fetch('api/cart.php?action=get')
-        .then(response => response.json())
+        .then(response => {
+            console.log('📡 API Response status:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('📊 API Response data:', data);
             if (!data.success || !data.cart || data.cart.length === 0) {
                 const cartItemsList = document.getElementById('cartItemsList');
                 if (cartItemsList) {
@@ -132,12 +205,12 @@ function loadCart() {
             const cart = data.cart;
             
             cartItemsList.innerHTML = cart.map((item, index) => {
-                
+
                 let imagePath = item.image || 'public/placeholder.svg';
                 if (!imagePath.startsWith('./') && !imagePath.startsWith('/') && !imagePath.startsWith('http') && !imagePath.includes('data:')) {
                     imagePath = 'public/' + imagePath;
                 }
-                
+
                 // Build HTML for size/color info
                 let variantInfo = '';
                 if (item.size || item.color) {
@@ -150,11 +223,19 @@ function loadCart() {
                     }
                     variantInfo += '</div>';
                 }
-                
+
                 return `
-                <div class="cart-item" id="item-${item.id}" data-size-id="${item.size_id || ''}" data-color-id="${item.color_id || ''}">
+                <div class="cart-item" id="item-${item.id}" data-product-id="${item.id}"
+                     data-size-id="${item.size_id || ''}" data-color-id="${item.color_id || ''}"
+                     style="cursor: pointer;">
+                    <input type="checkbox" class="item-select-checkbox"
+                           data-product-id="${item.id}"
+                           onchange="updateTotal()"
+                           onclick="event.stopPropagation()">
                     <div class="cart-item-image">
-                        <img src="${imagePath}" alt="${item.name}" onerror="this.src='public/placeholder.svg'">
+                        <img src="${imagePath}" alt="${item.name}"
+                             onerror="this.src='public/placeholder.svg'"
+                             onclick="event.stopPropagation()">
                     </div>
                     <div class="cart-item-info">
                         <h4>${item.name}</h4>
@@ -163,12 +244,13 @@ function loadCart() {
                     </div>
                     <div class="cart-item-details">
                         <div class="quantity-control">
-                            <button class="qty-control-btn" onclick="changeQty(${item.id}, ${item.quantity - 1}, '${item.size_id || ''}', '${item.color_id || ''}')">
+                            <button class="qty-control-btn" onclick="event.stopPropagation(); changeQty(${item.id}, ${item.quantity - 1}, '${item.size_id || ''}', '${item.color_id || ''}')">
                                 <i class="fas fa-minus"></i>
                             </button>
-                            <input type="number" class="qty-control-input" value="${item.quantity}" min="1" max="100" 
+                            <input type="number" class="qty-control-input" value="${item.quantity}" min="1" max="100"
+                                   onclick="event.stopPropagation()"
                                    onchange="changeQty(${item.id}, this.value, '${item.size_id || ''}', '${item.color_id || ''}')">
-                            <button class="qty-control-btn" onclick="changeQty(${item.id}, ${item.quantity + 1}, '${item.size_id || ''}', '${item.color_id || ''}')">
+                            <button class="qty-control-btn" onclick="event.stopPropagation(); changeQty(${item.id}, ${item.quantity + 1}, '${item.size_id || ''}', '${item.color_id || ''}')">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
@@ -176,7 +258,7 @@ function loadCart() {
                     <div class="cart-item-subtotal">
                         <strong>${formatPrice((item.price || 0) * (item.quantity || 1))}</strong>
                     </div>
-                    <div class="cart-item-actions">
+                     <div class="cart-item-actions">
                         <button class="btn-edit-item" data-product-id="${item.id}" data-size-name="${(item.size || '').replace(/'/g, '&#39;')}" data-color-name="${(item.color || '').replace(/'/g, '&#39;')}" data-size-id="${item.size_id || ''}" data-color-id="${item.color_id || ''}" title="Chỉnh sửa sản phẩm">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -187,8 +269,9 @@ function loadCart() {
                 </div>
                 `;
             }).join('');
-            
+
             updateCartSummary();
+            updateTotal();  // Calculate for selected items
             document.querySelector('.cart-summary').style.display = 'block';
         })
         .catch(error => console.error('Lỗi tải giỏ hàng:', error));
@@ -368,19 +451,27 @@ function showNotification(message, type = 'info') {
 /* Checkout Function */
 
 function goCheckout() {
-    fetch('api/cart.php?action=get')
-        .then(response => response.json())
-        .then(data => {
-            if (!data.cart || data.cart.length === 0) {
-                showNotification('Giỏ hàng của bạn trống!', 'danger');
-                return;
-            }
-            
-            showNotification('Chuyển hướng tới trang thanh toán...', 'info');
-            setTimeout(() => {
-                window.location.href = 'ThanhToan.php';
-            }, 1000);
-        });
+    // Lấy danh sách items được chọn
+    const checkedCheckboxes = document.querySelectorAll('.item-select-checkbox:checked');
+
+    if (checkedCheckboxes.length === 0) {
+        showNotification('Vui lòng chọn ít nhất 1 sản phẩm!', 'warning');
+        return;
+    }
+
+    const selectedProductIds = Array.from(checkedCheckboxes).map(cb =>
+        parseInt(cb.dataset.productId)
+    );
+
+    // Lưu selected items vào sessionStorage + URL params
+    sessionStorage.setItem('selectedItems', JSON.stringify(selectedProductIds));
+
+    showNotification('Chuyển hướng tới trang thanh toán...', 'info');
+    setTimeout(() => {
+        // Gửi selected items qua GET parameter
+        const selectedItemsParam = selectedProductIds.join(',');
+        window.location.href = `ThanhToan.php?selected_items=${encodeURIComponent(selectedItemsParam)}`;
+    }, 1000);
 }
 
 /* Apply Promo Code */
@@ -677,21 +768,42 @@ function saveEditCartItem(productId) {
 // ===========================
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔍 DOMContentLoaded - Initializing cart...');
     loadCart();
     updateCartCount();
-    
-    // Event delegation - Edit cart item button
+    updateTotal();
+
+    // Event delegation for cart actions
     document.addEventListener('click', function(e) {
+        console.log('✅ Click detected - target:', e.target, 'classList:', e.target.className);
+
+        // Check for Edit button
         const editBtn = e.target.closest('.btn-edit-item');
         if (editBtn) {
+            console.log('🔧 Edit button clicked!', editBtn);
             e.preventDefault();
+            e.stopPropagation();
             editCartItemBtn(editBtn);
+            return;
         }
-        
+
+        // Check for Remove button
         const removeBtn = e.target.closest('.btn-remove-item');
         if (removeBtn) {
+            console.log('🗑️ Remove button clicked!', removeBtn);
             e.preventDefault();
+            e.stopPropagation();
             removeFromCartBtn(removeBtn);
+            return;
+        }
+
+        // Check for cart item click (navigate to detail)
+        const cartItem = e.target.closest('.cart-item');
+        if (cartItem && !e.target.closest('input') && !e.target.closest('button')) {
+            const productId = cartItem.dataset.productId;
+            console.log('🛍️ Cart item clicked, navigating to product:', productId);
+            goProductDetail(e, productId);
+            return;
         }
     });
     

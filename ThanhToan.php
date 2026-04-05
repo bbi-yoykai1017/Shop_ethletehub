@@ -26,13 +26,22 @@ if (!$user) {
 
 // Lấy giỏ hàng từ database
 $cart = [];
+$selectedItemIds = []; // Track selected items
+
+// Lấy selected items từ GET parameter (nếu có)
+if (isset($_GET['selected_items'])) {
+    $selectedItemsStr = $_GET['selected_items'];
+    $selectedItemIds = array_map('intval', explode(',', $selectedItemsStr));
+    $selectedItemIds = array_filter($selectedItemIds); // Remove 0 values
+}
+
 $stmt = $conn->prepare("SELECT id FROM gio_hang WHERE nguoi_dung_id = ? LIMIT 1");
 $stmt->execute([$user_id]);
 $giohang = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($giohang) {
     $stmt = $conn->prepare("
-        SELECT 
+        SELECT
             ctgh.id as chi_tiet_id,
             ctgh.san_pham_id as id,
             sp.ten as name,
@@ -50,7 +59,16 @@ if ($giohang) {
         WHERE ctgh.gio_hang_id = ?
     ");
     $stmt->execute([$giohang['id']]);
-    $cart = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $allCartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Filter by selected items if provided
+    if (!empty($selectedItemIds)) {
+        $cart = array_filter($allCartItems, function($item) use ($selectedItemIds) {
+            return in_array($item['id'], $selectedItemIds);
+        });
+    } else {
+        $cart = $allCartItems;
+    }
 }
 
 // Kiểm tra giỏ hàng rỗng
@@ -289,12 +307,12 @@ if (empty($cart)) {
                         <div class="card p-4">
                             <h5 class="mb-4"><i class="fas fa-wallet"></i> Phương thức thanh toán</h5>
                             <div class="payment-method">
-                                <input type="radio" id="cod" name="phuong_thuc_thanh_toan" value="cod" checked>
+                                <input type="radio" id="cod" name="phuong_thuc_thanh_toan" value="tien_mat" checked>
                                 <label for="cod" class="ms-2 fw-bold">Thanh toán khi nhận hàng (COD)</label>
                                 <p class="text-muted ms-4 small">Thanh toán trực tiếp khi nhân viên giao hàng đến</p>
                             </div>
                             <div class="payment-method">
-                                <input type="radio" id="banking" name="phuong_thuc_thanh_toan" value="banking">
+                                <input type="radio" id="banking" name="phuong_thuc_thanh_toan" value="bank_transfer">
                                 <label for="banking" class="ms-2 fw-bold">Chuyển khoản ngân hàng</label>
                                 <p class="text-muted ms-4 small">Chuyển tiền trước khi nhận hàng</p>
                             </div>
@@ -441,8 +459,7 @@ if (empty($cart)) {
             const maGiamGiaId = document.getElementById('val_coupon_id').value;
             const lat = parseFloat(document.getElementById('lat').value);
             const lng = parseFloat(document.getElementById('lng').value);
-
-            // kiem tra 
+            // kiem tra
             if (!tenNguoiNhan || tenNguoiNhan.length < 3) {
                 showMessage('Tên người nhận phải ít nhất 3 ky tự');
                 return false;
