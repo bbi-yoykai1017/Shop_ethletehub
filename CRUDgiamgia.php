@@ -109,7 +109,7 @@ $list = getAllDiscounts($conn);
     <nav class="navbar navbar-dark bg-dark shadow">
         <div class="container-fluid px-4">
             <span class="navbar-brand fw-bold">
-                <i class="bi bi-speedometer2"></i> EthleteHub Admin
+                <i class="bi bi-speedometer2"></i> AthleteHub Admin
             </span>
 
             <a href="index.php" class="btn btn-outline-light btn-sm">
@@ -220,9 +220,9 @@ $list = getAllDiscounts($conn);
                                     <td><strong><?= $giamgia['ma_code'] ?></strong></td>
                                     <td><?= $giamgia['mo_ta'] ?></td>
                                     <td><?= $giamgia['phan_tram_giam'] ?>%</td>
-                                    <td><?= number_format($giamgia['so_tien_giam']) ?></td>
-                                    <td><?= number_format($giamgia['don_hang_toi_thieu']) ?></td>
-                                    <td><?= number_format($giamgia['giam_toi_da']) ?></td>
+                                    <td><?= number_format($giamgia['so_tien_giam']?? 0) ?></td>
+                                    <td><?= number_format($giamgia['don_hang_toi_thieu']?? 0) ?></td>
+                                    <td><?= number_format($giamgia['giam_toi_da']?? 0) ?></td>
                                     <td><?= $giamgia['gioi_han_su_dung'] ?></td>
                                     <td><?= $giamgia['da_su_dung'] ?></td>
                                     <td>

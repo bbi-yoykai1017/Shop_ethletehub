@@ -75,7 +75,7 @@ $displayProducts = array_slice($products, 0, 6);
                             </li>
                             <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="CRUDuser.php">Quản trị</a>
+                                    <a class="nav-link" href="CRUDproduct.php">Quản trị</a>
                                 </li>
                             <?php endif; ?>
                             <li class="nav-item">
@@ -119,7 +119,7 @@ $displayProducts = array_slice($products, 0, 6);
                                                 <h6 class="dropdown-header"> <?php echo htmlspecialchars($_SESSION['user_name']); ?></h6>
                                             </li>
                                             <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-edit me-2"></i> Hồ sơ của tôi</a></li>
-                                            <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i> Đơn hàng đã mua</a></li>
+                                            <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i> Đơn hàng </a></li>
                                             <li>
                                                 <hr class="dropdown-divider">
                                             </li>
@@ -380,7 +380,7 @@ $displayProducts = array_slice($products, 0, 6);
                                 <button class="product-btn btn-add-cart-index" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                     <i class="fas fa-shopping-cart"></i> Thêm
                                 </button>
-                                <button class="btn-buy-now-detail " onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
+                                <button class="btn-buy-now-detail  " style="background-color: #004e89 !important; color: white !important; border-radius: 5px ; font-weight: bold;"  onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                     <i class="fas fa-bolt"></i>
                                     Mua Ngay
                                 </button>

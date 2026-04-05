@@ -141,7 +141,7 @@ $ratingSummary = $product['rating_summary'];
                                     <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-edit me-2"></i> Hồ
                                             sơ của tôi</a></li>
                                     <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i>
-                                            Đơn hàng đã mua</a></li>
+                                            Đơn hàng </a></li>
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>

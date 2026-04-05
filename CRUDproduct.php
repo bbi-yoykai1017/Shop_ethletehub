@@ -124,7 +124,7 @@ $listproduct = getAllProducts($conn);
     <nav class="navbar navbar-dark bg-dark shadow">
         <div class="container-fluid px-4">
             <span class="navbar-brand fw-bold">
-                <i class="bi bi-speedometer2"></i> EthleteHub Admin
+                <i class="bi bi-speedometer2"></i> AthleteHub Admin
             </span>
 
             <a href="index.php" class="btn btn-outline-light btn-sm">
@@ -162,8 +162,8 @@ $listproduct = getAllProducts($conn);
                 </div>
                 <div class="card-body">
                     <form method="POST" class="row g-3" enctype="multipart/form-data">
-                        <input type="hidden" name="id" value="<?= $edit_product['id'] ?>">
-                        <div class="col-md-4">
+                        <input type="hidden" name="id" value="<?= $edit_product['id'] ?>">  
+                        <div class="col-md-2">
                             <label class="form-label fw-bold">Danh mục sản phẩm</label>
                             <select name="danh_muc_id" class="form-select" required>
                                 <option value="">-- Chọn danh mục --</option>
@@ -209,7 +209,7 @@ $listproduct = getAllProducts($conn);
                                 <small class="text-muted">Ảnh hiện tại: <?= $edit_product['hinh_anh_chinh'] ?></small>
                                 <input type="hidden" name="hinh_anh_cu" value="<?= $edit_product['hinh_anh_chinh'] ?>">
                             <?php endif; ?>
-                        </div>
+                        </div>                  
                         <div class="col-md-3 d-flex align-items-end">
                             <?php if ($update_mode): ?>
                                 <button name="save_product" class="btn btn-warning w-50 me-2">Cập nhật</button>
@@ -218,6 +218,9 @@ $listproduct = getAllProducts($conn);
                                 <button name="save_product" class="btn btn-success w-100">Lưu sản phẩm</button>
                             <?php endif; ?>
                         </div>
+                        <div class="col-md-2 ">
+                                <span class="badge bg-secondary">Tổng cộng: <?= count($listproduct) ?> sản phẩm</span>
+                         </div>
                     </form>
                 </div>
             </div>
