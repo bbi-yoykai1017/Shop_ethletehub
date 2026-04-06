@@ -66,7 +66,7 @@ document.addEventListener('click', function (e) {
         e.preventDefault();
         const card = btnQuickView.closest('.product-card');
         const id   = card?.dataset?.productId;
-        window.location.href = id ? `ThanhToan.php?id=${id}` : 'ThanhToan.php';
+        window.location.href = id ? `product-detail.php?id=${id}` : '#';
     }
 
     const btnBuyNow = e.target.closest('.btn-buy-now-detail');
