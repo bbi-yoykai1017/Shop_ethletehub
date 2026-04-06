@@ -4,10 +4,7 @@ require_once 'Database.php';
 require_once 'model/CRUD.php';
 require_once 'auth.php';
 // Truy vấn lấy ID và Tên danh mục
-if ($_SESSION['role'] !== 'admin') {
-    header("Location: index.php");
-    exit();
-}
+
 $db = new Database();
 $conn = $db->connect();
 
@@ -153,7 +150,7 @@ $listproduct = getAllProducts($conn);
         <!-- NỘI DUNG -->
         <div class="main-content">
 
-            <div class="card shadow border-0 mb-4">
+            <div class="card shadow border-0 mb-4" >
                 <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0">
                         <?php if ($update_mode): ?>

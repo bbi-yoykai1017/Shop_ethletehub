@@ -26,17 +26,26 @@ try {
         $order = $stmt_order->fetch(PDO::FETCH_ASSOC);
 
         if ($order) {
-            $sql_items = "SELECT ct.*, sp.ten as ten_sp, sp.hinh_anh_chinh 
+            $sql_items = "SELECT ct.*, sp.ten as ten_sp, sp.hinh_anh_chinh , ms.ten as ten_mau
                           FROM chi_tiet_don_hang ct 
-                          JOIN san_pham sp ON ct.san_pham_id = sp.id 
-                          WHERE ct.don_hang_id = :id";
+                          JOIN san_pham sp ON ct.san_pham_id = sp.id
+                          JOIN mau_sac ms on ct.mau_sac_id = ms.id
+                          WHERE ct.don_hang_id =:id";
             $stmt_items = $conn->prepare($sql_items);
             $stmt_items->execute(['id' => $order_id]);
             $items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
         }
     } else {
         // TRƯỜNG HỢP 2: XEM DANH SÁCH TẤT CẢ ĐƠN HÀNG (Khi vào orders.php mà không có ID)
-        $sql_all = "SELECT * FROM don_hang WHERE nguoi_dung_id = :user_id ORDER BY ngay_dat DESC";
+        $sql_all = "SELECT dh.id, dh.ma_don_hang, dh.ngay_dat, dh.thanh_tien, dh.trang_thai, 
+                   GROUP_CONCAT(DISTINCT ms.ten SEPARATOR ', ') as ten_mau
+            FROM don_hang dh 
+            LEFT JOIN chi_tiet_don_hang ct ON dh.id = ct.don_hang_id
+            LEFT JOIN mau_sac ms ON ct.mau_sac_id = ms.id
+            WHERE dh.nguoi_dung_id = :user_id 
+            GROUP BY dh.id, dh.ma_don_hang, dh.ngay_dat, dh.thanh_tien, dh.trang_thai
+            ORDER BY dh.ngay_dat DESC"; // Đã thêm dấu ; ở đây
+
         $stmt_all = $conn->prepare($sql_all);
         $stmt_all->execute(['user_id' => $user_id]);
         $all_orders = $stmt_all->fetchAll(PDO::FETCH_ASSOC);
@@ -124,6 +133,7 @@ function formatPrice($price)
                                             <h4><?= htmlspecialchars($item['ten_sp']) ?></h4>
                                             <div class="cart-item-price"><?= formatPrice($item['gia']) ?></div>
                                         </div>
+                                        <span>Màu sắc : <?= htmlspecialchars($item['ten_mau']?? 'N/A')  ?> </span>
                                         <div class="cart-item-details text-center">
                                             <span class="text-muted">Số lượng:</span>
                                             <strong><?= $item['so_luong'] ?></strong>
@@ -142,7 +152,7 @@ function formatPrice($price)
                             <h2>Thông tin đơn hàng</h2>
                             <div class="summary-item">
                                 <span>Trạng thái:</span>
-                                <span class="status-badge status-<?= $order['trang_thai'] ?>"><?= $order['trang_thai'] ?></span>
+                                <span class="status-badge status-"><?= $order['trang_thai'] ?></span>
                             </div>
                             <div class="summary-item">
                                 <span>Ngày đặt:</span>
@@ -150,18 +160,18 @@ function formatPrice($price)
                             </div>
                             <div class="summary-item">
                                 <span>Tên người nhận:</span>
-                                <span class="status-badge status-<?= $order['trang_thai'] ?>"><?= $order['ten_nguoi_nhan'] ?></span>
+                                <span class="status-badge status-"><?= $order['ten_nguoi_nhan'] ?></span>
                             </div>
                             <div class="summary-item">
                                 <span>SDT:</span>
-                                <span class="status-badge status-<?= $order['trang_thai'] ?>"><?= $order['so_dien_thoai_nhan'] ?></span>
+                                <span class="status-badge status-"><?= $order['so_dien_thoai_nhan'] ?></span>
                             </div>
                             <div class="summary-item">
                                 <span>Địa chỉ nhận hàng:</span>
-                                <span class="status-badge status-<?= $order['trang_thai'] ?>"><?= $order['dia_chi_giao_hang'] ?></span>
+                                <span class="status-badge status-"><?= $order['dia_chi_giao_hang'] ?></span>
                             </div>
                             <div class="summary-divider"></div>
-                             <div class="summary-total">
+                            <div class="summary-total">
                                 <span>Tiền giảm:</span>
                                 <span style="color:var(--primary-color);"><?= formatPrice($order['tien_giam']) ?></span>
                             </div>
@@ -193,6 +203,7 @@ function formatPrice($price)
                                         <th>Mã đơn</th>
                                         <th>Ngày đặt</th>
                                         <th>Tổng tiền</th>
+                                        <th>Màu sắc</th>
                                         <th>Trạng thái</th>
                                         <th class="text-center">Hành động</th>
                                     </tr>
@@ -203,6 +214,7 @@ function formatPrice($price)
                                             <td><strong>#<?= $o['ma_don_hang'] ?></strong></td>
                                             <td><?= date('d/m/Y', strtotime($o['ngay_dat'])) ?></td>
                                             <td><span class="text-primary fw-bold"><?= formatPrice($o['thanh_tien']) ?></span></td>
+                                            <td><span class="text-primary fw-bold"><?= htmlspecialchars($o['ten_mau'] ?? 'N/A') ?></span></td>
                                             <td><span class="status-badge status-<?= $o['trang_thai'] ?>"><?= $o['trang_thai'] ?></span></td>
                                             <td class="text-center">
                                                 <a href="orders.php?id=<?= $o['id'] ?>" class="btn btn-sm btn-primary">

@@ -3,10 +3,7 @@ session_start();
 require_once 'Database.php';
 require_once 'model/CRUD.php';
 require_once 'auth.php';
-if ($_SESSION['role'] !== 'admin') {
-    header("Location: index.php");
-    exit();
-}
+
 $db = new Database();
 $conn = $db->connect();
 
@@ -161,12 +158,11 @@ $listorders = getAllOrders($conn);
             <div class="card shadow border-0 mb-4">
                 <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0">
-                        <?php if ($update_mode): ?>
+                        <?php  ($update_mode) ?>
                             <i class="fas fa-file-invoice me-2"></i> Chỉnh sửa đơn hàng <span
                                 class="badge bg-light text-primary"></span>
-                        <?php else: ?>
-                            <i class="fas fa-cart-plus me-2"></i> Thêm đơn hàng mới
-                        <?php endif; ?>
+                        <?php ?>
+                       
                     </h5>
                 </div>
                 <div class="card-body">
@@ -201,16 +197,7 @@ $listorders = getAllOrders($conn);
                             <input type="number" id="thanh_tien" name="thanh_tien" class="form-control"
                                 value="<?= $edit_order['thanh_tien'] ?>" required readonly style="background-color: #e9ecef;">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">Thanh toán</label>
-                            <select name="phuong_thuc_thanh_toan" class="form-select">
-                                <option value="tien_mat" <?= $edit_order['phuong_thuc_thanh_toan'] == 'tien_mat' ? 'selected' : '' ?>>COD (Tiền mặt)</option>
-                                <option value="credit_card" <?= $edit_order['phuong_thuc_thanh_toan'] == 'credit_card' ? 'selected' : '' ?>>Thẻ tín dụng</option>
-                                <option value="bank_transfer" <?= $edit_order['phuong_thuc_thanh_toan'] == 'bank_transfer' ? 'selected' : '' ?>>Chuyển khoản</option>
-                                <option value="e_wallet" <?= $edit_order['phuong_thuc_thanh_toan'] == 'e_wallet' ? 'selected' : '' ?>>Ví điện tử</option>
-
-                            </select>
-                        </div>
+                        
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Trạng thái</label>
                             <select name="trang_thai" class="form-select">
@@ -227,12 +214,10 @@ $listorders = getAllOrders($conn);
                         </div>
 
                         <div class="col-md-10 d-flex align-items-end justify-content-end">
-                            <?php if ($update_mode): ?>
+                            <?php  ($update_mode)?>
                                 <button name="save_order" class="btn btn-warning me-2">Cập nhật đơn hàng</button>
                                 <a href="CRUDdonhang.php" class="btn btn-secondary">Hủy</a>
-                            <?php else: ?>
-                                <button name="save_order" class="btn btn-success">Thêm đơn hàng</button>
-                            <?php endif; ?>
+                            <?php ?>
                         </div>
                     </form>
                 </div>
