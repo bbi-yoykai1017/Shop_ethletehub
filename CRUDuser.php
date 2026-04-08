@@ -80,9 +80,9 @@ $where_sql = "";
 if (!empty($search)) {
     // Nếu nội dung tìm kiếm là số, ưu tiên tìm chính xác ID người dùng
     if (is_numeric($search)) {
-        $where_sql = " WHERE id = ? OR ten LIKE ? ";
+        $where_sql = " WHERE id = ? ";
         $params[] = $search; // Tìm chính xác số ID
-        $params[] = "%$search%"; // Hoặc mã đơn hàng chứa số đó
+       // $params[] = "%$search%"; // tuong doi
     } else {
         // Nếu là chữ, tìm gần đúng theo ten
         $where_sql = " WHERE ten LIKE ? ";
@@ -98,11 +98,10 @@ $total_rows = $total_stmt->fetchColumn();
 $total_pages = ceil($total_rows / $limit);
 
 // Lấy dữ liệu theo trang và tìm kiếm
-$sql_list = "SELECT * FROM nguoi_dung" . $where_sql . " ORDER BY id DESC LIMIT $limit OFFSET $offset";
+$sql_list = "SELECT * FROM nguoi_dung" . $where_sql . " ORDER BY id ASC LIMIT $limit OFFSET $offset";
 $stmt_list = $conn->prepare($sql_list);
 $stmt_list->execute($params);
 $listusers = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
-//$listusers = getAllUsers($conn);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -220,6 +219,7 @@ $listusers = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                                 <span class="badge bg-secondary">Tổng cộng: <?= count($listusers) ?> người dùng</span>
                             </div>
                         </form>
+                           <!-- Tim kiem -->
                         <div class="filter-group mb-3">
                             <h4 class="filter-title"><i class="fas fa-search"></i> Tìm kiếm</h4>
                             <form method="GET" action="CRUDuser.php" class="search-box d-flex gap-2">

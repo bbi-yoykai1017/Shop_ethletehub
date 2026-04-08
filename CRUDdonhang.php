@@ -115,9 +115,9 @@ $where_sql = "";
 if (!empty($search)) {
     // Nếu nội dung tìm kiếm là số, ưu tiên tìm chính xác ID người dùng
     if (is_numeric($search)) {
-        $where_sql = " WHERE nguoi_dung_id = ? OR ma_don_hang LIKE ? ";
+        $where_sql = " WHERE id = ?  ";
         $params[] = $search; // Tìm chính xác số ID
-        $params[] = "%$search%"; // Hoặc mã đơn hàng chứa số đó
+       // $params[] = "%$search%"; // Hoặc tiong doi mã đơn hàng chứa số đó
     } else {
         // Nếu là chữ, tìm gần đúng theo mã đơn hàng
         $where_sql = " WHERE ma_don_hang LIKE ? ";
@@ -133,7 +133,7 @@ $total_rows = $total_stmt->fetchColumn();
 $total_pages = ceil($total_rows / $limit);
 
 // Lấy dữ liệu theo trang và tìm kiếm
-$sql_list = "SELECT * FROM don_hang" . $where_sql . " ORDER BY id DESC LIMIT $limit OFFSET $offset";
+$sql_list = "SELECT * FROM don_hang" . $where_sql . " ORDER BY id ASC LIMIT $limit OFFSET $offset";
 $stmt_list = $conn->prepare($sql_list);
 $stmt_list->execute($params);
 $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
@@ -272,6 +272,7 @@ $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                     </form>
                 </div>
             </div>
+               <!-- Tim kiem -->
             <div class="filter-group mb-3">
                 <h4 class="filter-title"><i class="fas fa-search"></i> Tìm kiếm</h4>
                 <form method="GET" action="CRUDdonhang.php" class="search-box d-flex gap-2">
@@ -303,8 +304,8 @@ $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                     <tbody>
                         <?php foreach ($listorders as $donhang) { ?>
                             <tr>
-                                <td><a href="orders.php?id=<?= $donhang['id'] ?>" style="color: #0d6efd; text-decoration: underline;"><?= $donhang['id'] ?></a></td>
-                                <td><?= $donhang['nguoi_dung_id'] ?></td>
+                                <td><?= $donhang['id'] ?></a></td>
+                                <td><a href="orders.php?id=<?= $donhang['nguoi_dung_id'] ?>" style="color: #0d6efd; text-decoration: underline;"><?= $donhang['nguoi_dung_id'] ?></td>
                                 <td><?= $donhang['ma_don_hang'] ?></td>
                                 <td><?= $donhang['tong_tien'] ?></td>
                                 <td><?= $donhang['tien_giam'] ?></td>
@@ -381,7 +382,7 @@ $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                     </ul>
                 </nav>
                 <div class="text-center mt-2 small text-muted">
-                    Hiển thị trang <?= $page ?> / <?= $total_pages ?> (Tổng <?= $total_rows ?> đơn hàng)
+                    Hiển thị trang <?= $page ?> / <?= $total_pages ?> (Tổng <?= $total_rows ?> Đơn hàng)
                 </div>
             </div>
 

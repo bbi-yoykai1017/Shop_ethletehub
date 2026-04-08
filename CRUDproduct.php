@@ -21,7 +21,7 @@ $edit_product = [
     'hinh_anh_chinh' => ''
 ];
 // Truy vấn lấy ID và Tên danh mục sap xep theoo id tang dan
-$sql_dm = "SELECT id, ten_danh_muc FROM danh_muc ORDER BY id ASC";
+$sql_dm = "SELECT id, ten_danh_muc FROM danh_muc ORDER BY id DESC";
 /** @var PDOStatement $stmt_dm */
 $stmt_dm = $conn->prepare($sql_dm);
 $stmt_dm->execute();
@@ -47,7 +47,7 @@ if (isset($_POST['save_product'])) {
     $gia = $_POST['gia'];
     $gia_goc = $_POST['gia_goc'];
     $phan_tram_giam = $_POST['phan_tram_giam'];
-   
+
 
 
     // Xử lý Upload Ảnh
@@ -85,8 +85,45 @@ if (isset($_GET['delete'])) {
     header("Location: CRUDproduct.php");
     exit;
 }
+// ================= 4. XỬ LÝ TÌM KIẾM & PHÂN TRANG =================
 
-$listproduct = getAllProducts($conn);
+// Cấu hình phân trang
+$limit = 10; // Số dòng trên mỗi trang
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
+// Xử lý từ khóa tìm kiếm
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$params = [];
+$where_sql = "";
+
+if (!empty($search)) {
+    // Nếu nội dung tìm kiếm là số, ưu tiên tìm chính xác ID san pham
+    if (is_numeric($search)) {
+        $where_sql = " WHERE id = ? ";
+        $params[] = (int)$search; // Tìm chính xác số ID
+      
+    } else {
+        // Nếu là chữ, tìm gần đúng theo ten
+        $where_sql = " WHERE ten LIKE ? ";
+        $params[] = "%$search%";
+    }
+}
+
+// Đếm tổng số dòng để tính số trang
+$total_sql = "SELECT COUNT(*) FROM san_pham" . $where_sql;
+$total_stmt = $conn->prepare($total_sql);
+$total_stmt->execute($params);
+$total_rows = $total_stmt->fetchColumn();
+$total_pages = ceil($total_rows / $limit);
+
+// Lấy dữ liệu theo trang và tìm kiếm
+$sql_list = "SELECT * FROM san_pham" . $where_sql . " ORDER BY id ASC LIMIT $limit OFFSET $offset";
+$stmt_list = $conn->prepare($sql_list);
+$stmt_list->execute($params);
+$listproduct = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -114,6 +151,7 @@ $listproduct = getAllProducts($conn);
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/admin-layout.css">
+    <link rel="stylesheet" href="css/page-link.css">
 </head>
 
 <body style="background:#f4f6f9;">
@@ -150,7 +188,7 @@ $listproduct = getAllProducts($conn);
         <!-- NỘI DUNG -->
         <div class="main-content">
 
-            <div class="card shadow border-0 mb-4" >
+            <div class="card shadow border-0 mb-4">
                 <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0">
                         <?php if ($update_mode): ?>
@@ -162,7 +200,7 @@ $listproduct = getAllProducts($conn);
                 </div>
                 <div class="card-body">
                     <form method="POST" class="row g-3" enctype="multipart/form-data">
-                        <input type="hidden" name="id" value="<?= $edit_product['id'] ?>">  
+                        <input type="hidden" name="id" value="<?= $edit_product['id'] ?>">
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Danh mục sản phẩm</label>
                             <select name="danh_muc_id" class="form-select" required>
@@ -209,7 +247,7 @@ $listproduct = getAllProducts($conn);
                                 <small class="text-muted">Ảnh hiện tại: <?= $edit_product['hinh_anh_chinh'] ?></small>
                                 <input type="hidden" name="hinh_anh_cu" value="<?= $edit_product['hinh_anh_chinh'] ?>">
                             <?php endif; ?>
-                        </div>                  
+                        </div>
                         <div class="col-md-3 d-flex align-items-end">
                             <?php if ($update_mode): ?>
                                 <button name="save_product" class="btn btn-warning w-50 me-2">Cập nhật</button>
@@ -219,10 +257,22 @@ $listproduct = getAllProducts($conn);
                             <?php endif; ?>
                         </div>
                         <div class="col-md-2 ">
-                                <span class="badge bg-secondary">Tổng cộng: <?= count($listproduct) ?> sản phẩm</span>
-                         </div>
+                            <span class="badge bg-secondary">Tổng cộng: <?= count($listproduct) ?> sản phẩm</span>
+                        </div>
                     </form>
                 </div>
+            </div>
+            <!-- Tim kiem -->
+            <div class="filter-group mb-3">
+                <h4 class="filter-title"><i class="fas fa-search"></i> Tìm kiếm</h4>
+                <form method="GET" action="CRUDproduct.php" class="search-box d-flex gap-2">
+                    <input type="text" name="search" id="searchInput" class="form-control"
+                        placeholder="Nhập ID  hoặc tên sản phẩm..." value="<?= htmlspecialchars($search) ?>">
+                    <button type="submit" class="btn btn-primary">Tìm</button>
+                    <?php if (!empty($search)): ?>
+                        <a href="CRUDproduct.php" class="btn btn-outline-secondary">Xóa</a>
+                    <?php endif; ?>
+                </form>
             </div>
             <div class="table-responsive">
 
@@ -236,8 +286,8 @@ $listproduct = getAllProducts($conn);
                             <th>Mô tả</th>
                             <th>Giá bán</th>
                             <th>Giá gốc</th>
-                            <th>Phần trăm giảm</th>                  
-                          <th>Hình ảnh</th>
+                            <th>Phần trăm giảm</th>
+                            <th>Hình ảnh</th>
                             <th width="180">Hành động</th>
                         </tr>
                     </thead>
@@ -250,7 +300,7 @@ $listproduct = getAllProducts($conn);
                                 <td><?= $product['mo_ta'] ?></td>
                                 <td><?= $product['gia'] ?></td>
                                 <td><?= $product['gia_goc'] ?></td>
-                                <td><?= $product['phan_tram_giam'] ?></td>                        
+                                <td><?= $product['phan_tram_giam'] ?></td>
                                 <td>
                                     <img src="./public/<?php echo htmlspecialchars($product['hinh_anh_chinh']); ?>"
                                         alt="<?= $product['ten'] ?>" width="80" height="80">
@@ -266,6 +316,32 @@ $listproduct = getAllProducts($conn);
 
                 </table>
 
+            </div>
+            <div class="pagination-section">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>">
+                                <i class="fas fa-chevron-left"></i> Trước
+                            </a>
+                        </li>
+
+                        <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                            <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                                <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+
+                        <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>">
+                                <span>Tiếp</span> <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="text-center mt-2 small text-muted">
+                    Hiển thị trang <?= $page ?> / <?= $total_pages ?> (Tổng <?= $total_rows ?> Sản phẩm)
+                </div>
             </div>
 
         </div>
@@ -283,80 +359,80 @@ $listproduct = getAllProducts($conn);
 
     <script src="bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const giaGocInput = document.getElementById('gia_goc');
-        const giaBanInput = document.getElementById('gia_ban');
-        const phanTramInput = document.getElementById('phan_tram_giam');
-        const btnSave = document.querySelector('button[name="save_product"]');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const giaGocInput = document.getElementById('gia_goc');
+            const giaBanInput = document.getElementById('gia_ban');
+            const phanTramInput = document.getElementById('phan_tram_giam');
+            const btnSave = document.querySelector('button[name="save_product"]');
 
-        function validateForm(e) {
-            let giaGoc = parseFloat(giaGocInput.value) || 0;
-            let giaBan = parseFloat(giaBanInput.value) || 0;
-            let phanTram = parseFloat(phanTramInput.value) || 0;
-            let isValid = true;
+            function validateForm(e) {
+                let giaGoc = parseFloat(giaGocInput.value) || 0;
+                let giaBan = parseFloat(giaBanInput.value) || 0;
+                let phanTram = parseFloat(phanTramInput.value) || 0;
+                let isValid = true;
 
-            // Lấy ID của ô đang trực tiếp gõ vào
-            const activeId = e ? e.target.id : "";
+                // Lấy ID của ô đang trực tiếp gõ vào
+                const activeId = e ? e.target.id : "";
 
-            if (giaGoc > 0) {
-                // TRƯỜNG HỢP 1: Đang gõ vào ô Giá Bán -> Tính % Giảm
-                if (activeId === 'gia_ban') {
-                    if (giaBanInput.value === "") {
-                        phanTramInput.value = "";
-                    } else if (giaBan <= giaGoc) {
-                        phanTramInput.value = (((giaGoc - giaBan) / giaGoc) * 100).toFixed(1);
+                if (giaGoc > 0) {
+                    // TRƯỜNG HỢP 1: Đang gõ vào ô Giá Bán -> Tính % Giảm
+                    if (activeId === 'gia_ban') {
+                        if (giaBanInput.value === "") {
+                            phanTramInput.value = "";
+                        } else if (giaBan <= giaGoc) {
+                            phanTramInput.value = (((giaGoc - giaBan) / giaGoc) * 100).toFixed(1);
+                        }
                     }
-                } 
-                // TRƯỜNG HỢP 2: Đang gõ vào ô % Giảm -> Tính Giá Bán
-                else if (activeId === 'phan_tram_giam') {
-                    if (phanTramInput.value === "") {
-                        giaBanInput.value = giaGoc; // Nếu xóa trống % thì giá bán = giá gốc
-                    } else if (phanTram >= 0 && phanTram <= 100) {
-                        let tinhGiaBan = Math.round(giaGoc * (1 - phanTram / 100));
-                        giaBanInput.value = tinhGiaBan;
-                        giaBan = tinhGiaBan; // Cập nhật để validate bên dưới
+                    // TRƯỜNG HỢP 2: Đang gõ vào ô % Giảm -> Tính Giá Bán
+                    else if (activeId === 'phan_tram_giam') {
+                        if (phanTramInput.value === "") {
+                            giaBanInput.value = giaGoc; // Nếu xóa trống % thì giá bán = giá gốc
+                        } else if (phanTram >= 0 && phanTram <= 100) {
+                            let tinhGiaBan = Math.round(giaGoc * (1 - phanTram / 100));
+                            giaBanInput.value = tinhGiaBan;
+                            giaBan = tinhGiaBan; // Cập nhật để validate bên dưới
+                        }
+                    }
+                    // TRƯỜNG HỢP 3: Đang gõ vào ô Giá Gốc -> Cập nhật lại % hoặc Giá bán tùy bạn chọn
+                    // Ở đây ta ưu tiên giữ nguyên % và tính lại Giá bán
+                    else if (activeId === 'gia_goc' && phanTramInput.value !== "") {
+                        giaBanInput.value = Math.round(giaGoc * (1 - phanTram / 100));
+                        giaBan = parseFloat(giaBanInput.value);
                     }
                 }
-                // TRƯỜNG HỢP 3: Đang gõ vào ô Giá Gốc -> Cập nhật lại % hoặc Giá bán tùy bạn chọn
-                // Ở đây ta ưu tiên giữ nguyên % và tính lại Giá bán
-                else if (activeId === 'gia_goc' && phanTramInput.value !== "") {
-                     giaBanInput.value = Math.round(giaGoc * (1 - phanTram / 100));
-                     giaBan = parseFloat(giaBanInput.value);
+
+                // --- KIỂM TRA VALIDATE ---
+                // Validate Giá bán
+                if (giaGoc > 0 && giaBan > giaGoc) {
+                    giaBanInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    giaBanInput.classList.remove('is-invalid');
+                    if (giaGoc > 0 && giaBan > 0) giaBanInput.classList.add('is-valid');
                 }
+
+                // Validate % Giảm
+                if (phanTramInput.value !== "" && (phanTram < 0 || phanTram > 100)) {
+                    phanTramInput.classList.add('is-invalid');
+                    phanTramInput.classList.remove('is-valid');
+                    isValid = false;
+                } else {
+                    phanTramInput.classList.remove('is-invalid');
+                    // Nếu ô không trống, thì dù là 0 vẫn tính là hợp lệ (is-valid)
+                    if (phanTramInput.value !== "") phanTramInput.classList.add('is-valid');
+                }
+
+                if (btnSave) btnSave.disabled = !isValid;
             }
 
-            // --- KIỂM TRA VALIDATE ---
-            // Validate Giá bán
-            if (giaGoc > 0 && giaBan > giaGoc) {
-                giaBanInput.classList.add('is-invalid');
-                isValid = false;
-            } else {
-                giaBanInput.classList.remove('is-invalid');
-                if (giaGoc > 0 && giaBan > 0) giaBanInput.classList.add('is-valid');
-            }
-
-            // Validate % Giảm
-           if (phanTramInput.value !== "" && (phanTram < 0 || phanTram > 100)) {
-                phanTramInput.classList.add('is-invalid');
-                phanTramInput.classList.remove('is-valid');
-                isValid = false;
-            } else {
-                phanTramInput.classList.remove('is-invalid');
-                // Nếu ô không trống, thì dù là 0 vẫn tính là hợp lệ (is-valid)
-                if (phanTramInput.value !== "") phanTramInput.classList.add('is-valid');
-            }
-
-            if (btnSave) btnSave.disabled = !isValid;
-        }
-
-        // Lắng nghe sự kiện
-        [giaGocInput, giaBanInput, phanTramInput].forEach(input => {
-            // Truyền event 'e' vào hàm để biết chính xác target
-            input.addEventListener('input', (e) => validateForm(e));
+            // Lắng nghe sự kiện
+            [giaGocInput, giaBanInput, phanTramInput].forEach(input => {
+                // Truyền event 'e' vào hàm để biết chính xác target
+                input.addEventListener('input', (e) => validateForm(e));
+            });
         });
-    });
-</script>
+    </script>
 </body>
 
 </html>
