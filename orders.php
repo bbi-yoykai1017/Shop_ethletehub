@@ -3,6 +3,7 @@ session_start();
 require_once "Database.php";
 require_once "auth.php";
 
+
 // 1. Khởi tạo kết nối
 $db = new Database();
 $conn = $db->connect();
@@ -133,7 +134,7 @@ function formatPrice($price)
                                             <h4><?= htmlspecialchars($item['ten_sp']) ?></h4>
                                             <div class="cart-item-price"><?= formatPrice($item['gia']) ?></div>
                                         </div>
-                                        <span>Màu sắc : <?= htmlspecialchars($item['ten_mau']?? 'N/A')  ?> </span>
+                                        <span>Màu sắc : <?= htmlspecialchars($item['ten_mau'] ?? 'N/A')  ?> </span>
                                         <div class="cart-item-details text-center">
                                             <span class="text-muted">Số lượng:</span>
                                             <strong><?= $item['so_luong'] ?></strong>
@@ -182,6 +183,27 @@ function formatPrice($price)
                             <a href="orders.php" class="btn btn-outline-primary w-100 mt-3">
                                 <i class="fas fa-arrow-left"></i> Quay lại danh sách
                             </a>
+                            <?php
+                            // 1. Tính toán khoảng cách thời gian
+                            $ngay_dat = strtotime($order['ngay_dat']);
+                            $bay_gio = time();
+                            $diff_hours = ($bay_gio - $ngay_dat) / 3600; // Đổi giây sang giờ
+
+                            // 2. Chỉ cho phép hủy nếu thời gian < 24h và trạng thái là 'dang_xu_ly' hoặc 'cho_xac_nhan'
+                            // (Đạt nên kiểm tra thêm trạng thái để tránh trường hợp đang giao hàng vẫn bấm hủy được)
+                            if ($diff_hours < 24 && ($order['trang_thai']=='cho_xu_ly')):
+                            ?>  
+                                <button onclick="confirmCancel(<?= $order['id'] ?>)" class="btn btn-danger w-100 mt-2">
+                                    <i class="fas fa-times-circle"></i> Hủy đơn hàng
+                                </button>
+                                <small class="text-muted d-block text-center mt-1">
+                                    (Bạn có thể hủy đơn trong vòng 24h kể từ khi đặt)
+                                </small>
+                            <?php else: ?>
+                                <button class="btn btn-secondary w-100 mt-2" disabled title="Quá 24h hoặc đơn hàng đã được xử lý">
+                                    <i class="fas fa-ban"></i> Không thể hủy đơn
+                                </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -246,6 +268,14 @@ function formatPrice($price)
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+function confirmCancel(orderId) {
+    if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.')) {
+        // Chuyển hướng đến file xử lý hủy đơn (Bạn cần tạo file này)
+        window.location.href = 'cancel_order.php?id=' + orderId;
+    }
+}
+</script>
 </body>
 
 </html>
