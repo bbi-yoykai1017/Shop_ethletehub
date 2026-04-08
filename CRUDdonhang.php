@@ -72,21 +72,30 @@ if (isset($_POST['save_order'])) {
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
 
-    // 1. Kiểm tra xem đơn hàng này có chi tiết sản phẩm không
-    $check_sql = "SELECT COUNT(*) FROM chi_tiet_don_hang WHERE don_hang_id = ?";
-    $check_stmt = $conn->prepare($check_sql);
-    $check_stmt->execute([$id]);
-    $count = $check_stmt->fetchColumn();
+    try {
+        // Bắt đầu một Transaction để đảm bảo an toàn dữ liệu
+        // Nếu xóa bảng 1 lỗi thì bảng 2 sẽ không bị xóa theo
+        $conn->beginTransaction();
 
-    if ($count > 0) {
-        // Nếu có dữ liệu liên quan, không cho xóa
-        header("Location: CRUDdonhang.php?error=cannot_delete");
-    } else {
-        // Nếu trống trải, tiến hành xóa
-        $sql = "DELETE FROM don_hang WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
+        // 1. Xóa tất cả chi tiết của đơn hàng này trước (Bảng con)
+        $sql_delete_items = "DELETE FROM chi_tiet_don_hang WHERE don_hang_id = ?";
+        $stmt_items = $conn->prepare($sql_delete_items);
+        $stmt_items->execute([$id]);
+
+        // 2. Sau đó mới xóa đơn hàng (Bảng cha)
+        $sql_delete_order = "DELETE FROM don_hang WHERE id = ?";
+        $stmt_order = $conn->prepare($sql_delete_order);
+        $stmt_order->execute([$id]);
+
+        // Hoàn tất giao dịch
+        $conn->commit();
+
         header("Location: CRUDdonhang.php?success=deleted");
+    } catch (Exception $e) {
+        // Nếu có lỗi xảy ra, hoàn tác lại toàn bộ
+        $conn->rollBack();
+        error_log($e->getMessage());
+        header("Location: CRUDdonhang.php?error=delete_failed");
     }
     exit;
 }
@@ -158,11 +167,11 @@ $listorders = getAllOrders($conn);
             <div class="card shadow border-0 mb-4">
                 <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0">
-                        <?php  ($update_mode) ?>
-                            <i class="fas fa-file-invoice me-2"></i> Chỉnh sửa đơn hàng <span
-                                class="badge bg-light text-primary"></span>
+                        <?php ($update_mode) ?>
+                        <i class="fas fa-file-invoice me-2"></i> Chỉnh sửa đơn hàng <span
+                            class="badge bg-light text-primary"></span>
                         <?php ?>
-                       
+
                     </h5>
                 </div>
                 <div class="card-body">
@@ -197,7 +206,7 @@ $listorders = getAllOrders($conn);
                             <input type="number" id="thanh_tien" name="thanh_tien" class="form-control"
                                 value="<?= $edit_order['thanh_tien'] ?>" required readonly style="background-color: #e9ecef;">
                         </div>
-                        
+
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Trạng thái</label>
                             <select name="trang_thai" class="form-select">
@@ -214,9 +223,9 @@ $listorders = getAllOrders($conn);
                         </div>
 
                         <div class="col-md-10 d-flex align-items-end justify-content-end">
-                            <?php  ($update_mode)?>
-                                <button name="save_order" class="btn btn-warning me-2">Cập nhật đơn hàng</button>
-                                <a href="CRUDdonhang.php" class="btn btn-secondary">Hủy</a>
+                            <?php ($update_mode) ?>
+                            <button name="save_order" class="btn btn-warning me-2">Cập nhật đơn hàng</button>
+                            <a href="CRUDdonhang.php" class="btn btn-secondary">Hủy</a>
                             <?php ?>
                         </div>
                     </form>
@@ -313,68 +322,68 @@ $listorders = getAllOrders($conn);
 
     <script src="bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const userIdInput = document.getElementById('nguoi_dung_id');
-        const tongTienInput = document.getElementById('tong_tien');
-        const tienGiamInput = document.getElementById('tien_giam');
-        const thanhTienInput = document.getElementById('thanh_tien');
-        const btnSave = document.querySelector('button[name="save_order"]');
-        const form = document.querySelector('form');
+        document.addEventListener('DOMContentLoaded', function() {
+            const userIdInput = document.getElementById('nguoi_dung_id');
+            const tongTienInput = document.getElementById('tong_tien');
+            const tienGiamInput = document.getElementById('tien_giam');
+            const thanhTienInput = document.getElementById('thanh_tien');
+            const btnSave = document.querySelector('button[name="save_order"]');
+            const form = document.querySelector('form');
 
-        function calculateAndValidate() {
-            // LẤY GIÁ TRỊ MỚI NHẤT TẠI ĐÂY (Phải nằm trong hàm)
-            let userId = parseInt(userIdInput.value); 
-            let tongTien = parseFloat(tongTienInput.value) || 0;
-            let tienGiam = parseFloat(tienGiamInput.value) || 0;
+            function calculateAndValidate() {
+                // LẤY GIÁ TRỊ MỚI NHẤT TẠI ĐÂY (Phải nằm trong hàm)
+                let userId = parseInt(userIdInput.value);
+                let tongTien = parseFloat(tongTienInput.value) || 0;
+                let tienGiam = parseFloat(tienGiamInput.value) || 0;
 
-            // 1. Tự động tính Thành tiền
-            let thanhTien = tongTien - tienGiam;
-            thanhTienInput.value = thanhTien > 0 ? thanhTien : 0;
+                // 1. Tự động tính Thành tiền
+                let thanhTien = tongTien - tienGiam;
+                thanhTienInput.value = thanhTien > 0 ? thanhTien : 0;
 
-            // 2. Kiểm tra logic ràng buộc
-            let isValid = true;
+                // 2. Kiểm tra logic ràng buộc
+                let isValid = true;
 
-            // Ràng buộc ID Người dùng (Phải là số và > 0)
-            if (isNaN(userId) || userId <= 0) {
-                userIdInput.classList.add('is-invalid');
-                isValid = false;
-            } else {
-                userIdInput.classList.remove('is-invalid');
+                // Ràng buộc ID Người dùng (Phải là số và > 0)
+                if (isNaN(userId) || userId <= 0) {
+                    userIdInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    userIdInput.classList.remove('is-invalid');
+                }
+
+                // Ràng buộc Tiền giảm
+                if (tienGiam > tongTien) {
+                    tienGiamInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    tienGiamInput.classList.remove('is-invalid');
+                }
+
+                // Ràng buộc Tổng tiền
+                if (tongTien <= 0) {
+                    tongTienInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    tongTienInput.classList.remove('is-invalid');
+                }
+
+                if (btnSave) btnSave.disabled = !isValid;
+
+                return isValid;
             }
+            tongTienInput.addEventListener('input', calculateAndValidate);
+            tienGiamInput.addEventListener('input', calculateAndValidate);
+            userIdInput.addEventListener('input', calculateAndValidate);
 
-            // Ràng buộc Tiền giảm
-            if (tienGiam > tongTien) {
-                tienGiamInput.classList.add('is-invalid');
-                isValid = false;
-            } else {
-                tienGiamInput.classList.remove('is-invalid');
-            }
-
-            // Ràng buộc Tổng tiền
-            if (tongTien <= 0) {
-                tongTienInput.classList.add('is-invalid');
-                isValid = false;
-            } else {
-                tongTienInput.classList.remove('is-invalid');
-            }
-
-            if (btnSave) btnSave.disabled = !isValid;
-
-            return isValid;
-        }
-        tongTienInput.addEventListener('input', calculateAndValidate);
-        tienGiamInput.addEventListener('input', calculateAndValidate);
-        userIdInput.addEventListener('input', calculateAndValidate);
-
-        form.addEventListener('submit', function(e) {
-            if (!calculateAndValidate()) {
-                e.preventDefault();
-                alert('Vui lòng kiểm tra lại dữ liệu nhập vào!');
-            }
+            form.addEventListener('submit', function(e) {
+                if (!calculateAndValidate()) {
+                    e.preventDefault();
+                    alert('Vui lòng kiểm tra lại dữ liệu nhập vào!');
+                }
+            });
+            calculateAndValidate();
         });
-        calculateAndValidate();
-    });
-</script>
+    </script>
 </body>
 
 </html>
