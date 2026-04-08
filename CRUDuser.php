@@ -64,8 +64,45 @@ if (isset($_GET['delete'])) {
     }
     exit;
 }
+// ================= 4. XỬ LÝ TÌM KIẾM & PHÂN TRANG =================
 
-$listusers = getAllUsers($conn);
+// Cấu hình phân trang
+$limit = 10; // Số dòng trên mỗi trang
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
+// Xử lý từ khóa tìm kiếm
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$params = [];
+$where_sql = "";
+
+if (!empty($search)) {
+    // Nếu nội dung tìm kiếm là số, ưu tiên tìm chính xác ID người dùng
+    if (is_numeric($search)) {
+        $where_sql = " WHERE id = ? OR ten LIKE ? ";
+        $params[] = $search; // Tìm chính xác số ID
+        $params[] = "%$search%"; // Hoặc mã đơn hàng chứa số đó
+    } else {
+        // Nếu là chữ, tìm gần đúng theo ten
+        $where_sql = " WHERE ten LIKE ? ";
+        $params[] = "%$search%";
+    }
+}
+
+// Đếm tổng số dòng để tính số trang
+$total_sql = "SELECT COUNT(*) FROM nguoi_dung" . $where_sql;
+$total_stmt = $conn->prepare($total_sql);
+$total_stmt->execute($params);
+$total_rows = $total_stmt->fetchColumn();
+$total_pages = ceil($total_rows / $limit);
+
+// Lấy dữ liệu theo trang và tìm kiếm
+$sql_list = "SELECT * FROM nguoi_dung" . $where_sql . " ORDER BY id DESC LIMIT $limit OFFSET $offset";
+$stmt_list = $conn->prepare($sql_list);
+$stmt_list->execute($params);
+$listusers = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
+//$listusers = getAllUsers($conn);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -93,6 +130,7 @@ $listusers = getAllUsers($conn);
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/admin-layout.css">
+    <link rel="stylesheet" href="css/page-link.css">
 </head>
 
 <body style="background:#f4f6f9;">
@@ -167,7 +205,7 @@ $listusers = getAllUsers($conn);
                                     <option value="hoat_dong" <?= ($update_mode && $edit_user['trang_thai'] === 'hoat_dong') ? 'selected' : '' ?>>Hoạt động</option>
                                     <option value="bi_khoa" <?= ($update_mode && $edit_user['trang_thai'] === 'bi_khoa') ? 'selected' : '' ?>>Bị khóa</option>
                                 </select>
-                            </div>          
+                            </div>
                             <div class="col-12 col-lg-2 d-flex align-items-end">
                                 <?php if ($update_mode): ?>
                                     <div class="w-100">
@@ -178,11 +216,21 @@ $listusers = getAllUsers($conn);
                                     <button type="submit" name="save_user" class="btn btn-success w-100"><i class="fas fa-plus me-1"></i> Thêm mới</button>
                                 <?php endif; ?>
                             </div>
-                             <div class="col-md-10 text-end d-flex align-items-end justify-content-end">
+                            <div class="col-md-10 text-end d-flex align-items-end justify-content-end">
                                 <span class="badge bg-secondary">Tổng cộng: <?= count($listusers) ?> người dùng</span>
                             </div>
                         </form>
-
+                        <div class="filter-group mb-3">
+                            <h4 class="filter-title"><i class="fas fa-search"></i> Tìm kiếm</h4>
+                            <form method="GET" action="CRUDuser.php" class="search-box d-flex gap-2">
+                                <input type="text" name="search" id="searchInput" class="form-control"
+                                    placeholder="Nhập ID hoặc ten khách..." value="<?= htmlspecialchars($search) ?>">
+                                <button type="submit" class="btn btn-primary">Tìm</button>
+                                <?php if (!empty($search)): ?>
+                                    <a href="CRUDuser.php" class="btn btn-outline-secondary">Xóa</a>
+                                <?php endif; ?>
+                            </form>
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
                                 <thead class="table-light">
@@ -229,6 +277,32 @@ $listusers = getAllUsers($conn);
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="pagination-section">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>">
+                                            <i class="fas fa-chevron-left"></i> Trước
+                                        </a>
+                                    </li>
+
+                                    <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                                        <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                                            <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+
+                                    <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>">
+                                            <span>Tiếp</span> <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <div class="text-center mt-2 small text-muted">
+                                Hiển thị trang <?= $page ?> / <?= $total_pages ?> (Tổng <?= $total_rows ?> Người dùng)
+                            </div>
                         </div>
                     </div>
                 </div>

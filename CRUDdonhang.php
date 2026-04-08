@@ -165,21 +165,8 @@ $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/admin-layout.css">
+    <link rel="stylesheet" href="css/page-link.css">
     <style>
-        .page-link {
-            display: flex;
-            align-items: center;
-            /* Căn giữa chữ và icon theo chiều dọc */
-            gap: 5px;
-            /* Tạo khoảng cách nhỏ giữa chữ và icon */
-            font-size: 0.9rem;
-            /* Ép kích thước chữ nhỏ lại cho đồng bộ */
-        }
-
-        .page-link i {
-            font-size: 0.8rem;
-            /* Cho icon nhỏ hơn chữ một chút sẽ đẹp hơn */
-        }
     </style>
 </head>
 
