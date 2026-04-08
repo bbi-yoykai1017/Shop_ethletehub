@@ -99,7 +99,45 @@ if (isset($_GET['delete'])) {
     }
     exit;
 }
-$listorders = getAllOrders($conn);
+// ================= 4. XỬ LÝ TÌM KIẾM & PHÂN TRANG =================
+
+// Cấu hình phân trang
+$limit = 10; // Số dòng trên mỗi trang
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
+// Xử lý từ khóa tìm kiếm
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$params = [];
+$where_sql = "";
+
+if (!empty($search)) {
+    // Nếu nội dung tìm kiếm là số, ưu tiên tìm chính xác ID người dùng
+    if (is_numeric($search)) {
+        $where_sql = " WHERE nguoi_dung_id = ? OR ma_don_hang LIKE ? ";
+        $params[] = $search; // Tìm chính xác số ID
+        $params[] = "%$search%"; // Hoặc mã đơn hàng chứa số đó
+    } else {
+        // Nếu là chữ, tìm gần đúng theo mã đơn hàng
+        $where_sql = " WHERE ma_don_hang LIKE ? ";
+        $params[] = "%$search%";
+    }
+}
+
+// Đếm tổng số dòng để tính số trang
+$total_sql = "SELECT COUNT(*) FROM don_hang" . $where_sql;
+$total_stmt = $conn->prepare($total_sql);
+$total_stmt->execute($params);
+$total_rows = $total_stmt->fetchColumn();
+$total_pages = ceil($total_rows / $limit);
+
+// Lấy dữ liệu theo trang và tìm kiếm
+$sql_list = "SELECT * FROM don_hang" . $where_sql . " ORDER BY id DESC LIMIT $limit OFFSET $offset";
+$stmt_list = $conn->prepare($sql_list);
+$stmt_list->execute($params);
+$listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
+//$listorders = getAllOrders($conn);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -127,6 +165,22 @@ $listorders = getAllOrders($conn);
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/admin-layout.css">
+    <style>
+        .page-link {
+            display: flex;
+            align-items: center;
+            /* Căn giữa chữ và icon theo chiều dọc */
+            gap: 5px;
+            /* Tạo khoảng cách nhỏ giữa chữ và icon */
+            font-size: 0.9rem;
+            /* Ép kích thước chữ nhỏ lại cho đồng bộ */
+        }
+
+        .page-link i {
+            font-size: 0.8rem;
+            /* Cho icon nhỏ hơn chữ một chút sẽ đẹp hơn */
+        }
+    </style>
 </head>
 
 <body style="background:#f4f6f9;">
@@ -231,6 +285,17 @@ $listorders = getAllOrders($conn);
                     </form>
                 </div>
             </div>
+            <div class="filter-group mb-3">
+                <h4 class="filter-title"><i class="fas fa-search"></i> Tìm kiếm</h4>
+                <form method="GET" action="CRUDdonhang.php" class="search-box d-flex gap-2">
+                    <input type="text" name="search" id="searchInput" class="form-control"
+                        placeholder="Nhập mã đơn hoặc ID khách..." value="<?= htmlspecialchars($search) ?>">
+                    <button type="submit" class="btn btn-primary">Tìm</button>
+                    <?php if (!empty($search)): ?>
+                        <a href="CRUDdonhang.php" class="btn btn-outline-secondary">Xóa</a>
+                    <?php endif; ?>
+                </form>
+            </div>
             <div class="table-responsive">
 
                 <table class="table table-hover align-middle text-center">
@@ -306,12 +371,35 @@ $listorders = getAllOrders($conn);
                 </table>
 
             </div>
+            <div class="pagination-section">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>">
+                                <i class="fas fa-chevron-left"></i> Trước
+                            </a>
+                        </li>
+
+                        <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                            <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                                <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+
+                        <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>">
+                                <span>Tiếp</span> <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="text-center mt-2 small text-muted">
+                    Hiển thị trang <?= $page ?> / <?= $total_pages ?> (Tổng <?= $total_rows ?> đơn hàng)
+                </div>
+            </div>
 
         </div>
 
-    </div>
-
-    </div>
 
     </div>
 
