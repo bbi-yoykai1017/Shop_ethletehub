@@ -304,8 +304,8 @@ $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                     <tbody>
                         <?php foreach ($listorders as $donhang) { ?>
                             <tr>
-                                <td><?= $donhang['id'] ?></a></td>
-                                <td><a href="orders.php?id=<?= $donhang['nguoi_dung_id'] ?>" style="color: #0d6efd; text-decoration: underline;"><?= $donhang['nguoi_dung_id'] ?></td>
+                                <td><a href="orders.php?id=<?= $donhang['id'] ?>" style="color: #0d6efd; text-decoration: underline;"><?= $donhang['id'] ?></a></td>
+                                <td><?= $donhang['nguoi_dung_id'] ?></td>
                                 <td><?= $donhang['ma_don_hang'] ?></td>
                                 <td><?= $donhang['tong_tien'] ?></td>
                                 <td><?= $donhang['tien_giam'] ?></td>

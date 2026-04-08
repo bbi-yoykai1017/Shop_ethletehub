@@ -15,9 +15,19 @@ $order = null;
 $items = [];
 $all_orders = [];
 
+$order_id = $_GET['id'] ?? null;
+// CẬP NHẬT TẠI ĐÂY: Ưu tiên lấy user_id từ URL nếu là admin xem, 
+// nếu không thì lấy từ session của người dùng đang đăng nhập.
+$user_id = $_GET['user_id'] ?? ($_SESSION['user_id'] ?? null);
+
+$order = null;
+$items = [];
+$all_orders = [];
+
 try {
     if ($order_id) {
         // TRƯỜNG HỢP 1: XEM CHI TIẾT 1 ĐƠN HÀNG
+        // Bỏ điều kiện lọc theo user_id trong SQL để Admin có thể xem được
         $sql_order = "SELECT dh.*, nd.ten as ten_khach_hang 
                       FROM don_hang dh 
                       JOIN nguoi_dung nd ON dh.nguoi_dung_id = nd.id 
@@ -37,25 +47,33 @@ try {
             $items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
         }
     } else {
-        // TRƯỜNG HỢP 2: XEM DANH SÁCH TẤT CẢ ĐƠN HÀNG (Khi vào orders.php mà không có ID)
-        $sql_all = "SELECT dh.id, dh.ma_don_hang, dh.ngay_dat, dh.thanh_tien, dh.trang_thai, 
-                   GROUP_CONCAT(DISTINCT ms.ten SEPARATOR ', ') as ten_mau
-            FROM don_hang dh 
-            LEFT JOIN chi_tiet_don_hang ct ON dh.id = ct.don_hang_id
-            LEFT JOIN mau_sac ms ON ct.mau_sac_id = ms.id
-            WHERE dh.nguoi_dung_id = :user_id 
-            GROUP BY dh.id, dh.ma_don_hang, dh.ngay_dat, dh.thanh_tien, dh.trang_thai
-            ORDER BY dh.ngay_dat DESC"; // Đã thêm dấu ; ở đây
+        // TRƯỜNG HỢP 2: XEM DANH SÁCH ĐƠN HÀNG CỦA MỘT USER CỤ THỂ
+        if ($user_id) {
+            // Lấy thêm tên người dùng để hiển thị tiêu đề cho rõ ràng
+            $sql_user_info = "SELECT ten FROM nguoi_dung WHERE id = :user_id";
+            $stmt_user = $conn->prepare($sql_user_info);
+            $stmt_user->execute(['user_id' => $user_id]);
+            $customer_name = $stmt_user->fetchColumn();
 
-        $stmt_all = $conn->prepare($sql_all);
-        $stmt_all->execute(['user_id' => $user_id]);
-        $all_orders = $stmt_all->fetchAll(PDO::FETCH_ASSOC);
+            $sql_all = "SELECT dh.id, dh.ma_don_hang, dh.ngay_dat, dh.thanh_tien, dh.trang_thai, 
+                           GROUP_CONCAT(DISTINCT ms.ten SEPARATOR ', ') as ten_mau
+                    FROM don_hang dh 
+                    LEFT JOIN chi_tiet_don_hang ct ON dh.id = ct.don_hang_id
+                    LEFT JOIN mau_sac ms ON ct.mau_sac_id = ms.id
+                    WHERE dh.nguoi_dung_id = :user_id 
+                    GROUP BY dh.id
+                    ORDER BY dh.ngay_dat DESC";
+
+            $stmt_all = $conn->prepare($sql_all);
+            $stmt_all->execute(['user_id' => $user_id]);
+            $all_orders = $stmt_all->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 } catch (PDOException $e) {
     error_log($e->getMessage());
-}
-function formatPrice($price)
-{
+} // <--- QUAN TRỌNG: Phải có dấu này để đóng khối try
+
+function formatPrice($price) {
     return number_format($price ?? 0, 0, ',', '.') . '₫';
 }
 ?>
@@ -191,8 +209,8 @@ function formatPrice($price)
 
                             // 2. Chỉ cho phép hủy nếu thời gian < 24h và trạng thái là 'dang_xu_ly' hoặc 'cho_xac_nhan'
                             // (Đạt nên kiểm tra thêm trạng thái để tránh trường hợp đang giao hàng vẫn bấm hủy được)
-                            if ($diff_hours < 24 && ($order['trang_thai']=='cho_xu_ly')):
-                            ?>  
+                            if ($diff_hours < 24 && ($order['trang_thai'] == 'cho_xu_ly')):
+                            ?>
                                 <button onclick="confirmCancel(<?= $order['id'] ?>)" class="btn btn-danger w-100 mt-2">
                                     <i class="fas fa-times-circle"></i> Hủy đơn hàng
                                 </button>
@@ -269,13 +287,13 @@ function formatPrice($price)
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
-function confirmCancel(orderId) {
-    if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.')) {
-        // Chuyển hướng đến file xử lý hủy đơn (Bạn cần tạo file này)
-        window.location.href = 'cancel_order.php?id=' + orderId;
-    }
-}
-</script>
+        function confirmCancel(orderId) {
+            if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.')) {
+                // Chuyển hướng đến file xử lý hủy đơn (Bạn cần tạo file này)
+                window.location.href = 'cancel_order.php?id=' + orderId;
+            }
+        }
+    </script>
 </body>
 
 </html>
