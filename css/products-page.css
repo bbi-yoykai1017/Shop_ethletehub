@@ -620,7 +620,7 @@
     }
 
     .products-grid-page {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: 1fr;
         gap: var(--spacing-md);
     }
 

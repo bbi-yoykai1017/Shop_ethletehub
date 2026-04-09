@@ -81,9 +81,6 @@ $displayProducts = array_slice($products, 0, 6);
                             <li class="nav-item">
                                 <a class="nav-link" href="#about">Về chúng tôi</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#contact">Liên hệ</a>
-                            </li>
                         </ul>
 
                         <!-- Search Bar (Centered) -->
