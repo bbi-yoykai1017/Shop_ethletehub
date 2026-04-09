@@ -3,10 +3,7 @@ session_start();
 require_once 'Database.php';
 require_once 'model/CRUD.php';
 require_once 'auth.php';
-if ($_SESSION['role'] !== 'admin') {
-    header("Location: index.php");
-    exit();
-}
+
 $db = new Database();
 $conn = $db->connect();
 
@@ -75,25 +72,72 @@ if (isset($_POST['save_order'])) {
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
 
-    // 1. Kiểm tra xem đơn hàng này có chi tiết sản phẩm không
-    $check_sql = "SELECT COUNT(*) FROM chi_tiet_don_hang WHERE don_hang_id = ?";
-    $check_stmt = $conn->prepare($check_sql);
-    $check_stmt->execute([$id]);
-    $count = $check_stmt->fetchColumn();
+    try {
+        // Bắt đầu một Transaction để đảm bảo an toàn dữ liệu
+        // Nếu xóa bảng 1 lỗi thì bảng 2 sẽ không bị xóa theo
+        $conn->beginTransaction();
 
-    if ($count > 0) {
-        // Nếu có dữ liệu liên quan, không cho xóa
-        header("Location: CRUDdonhang.php?error=cannot_delete");
-    } else {
-        // Nếu trống trải, tiến hành xóa
-        $sql = "DELETE FROM don_hang WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$id]);
+        // 1. Xóa tất cả chi tiết của đơn hàng này trước (Bảng con)
+        $sql_delete_items = "DELETE FROM chi_tiet_don_hang WHERE don_hang_id = ?";
+        $stmt_items = $conn->prepare($sql_delete_items);
+        $stmt_items->execute([$id]);
+
+        // 2. Sau đó mới xóa đơn hàng (Bảng cha)
+        $sql_delete_order = "DELETE FROM don_hang WHERE id = ?";
+        $stmt_order = $conn->prepare($sql_delete_order);
+        $stmt_order->execute([$id]);
+
+        // Hoàn tất giao dịch
+        $conn->commit();
+
         header("Location: CRUDdonhang.php?success=deleted");
+    } catch (Exception $e) {
+        // Nếu có lỗi xảy ra, hoàn tác lại toàn bộ
+        $conn->rollBack();
+        error_log($e->getMessage());
+        header("Location: CRUDdonhang.php?error=delete_failed");
     }
     exit;
 }
-$listorders = getAllOrders($conn);
+// ================= 4. XỬ LÝ TÌM KIẾM & PHÂN TRANG =================
+
+// Cấu hình phân trang
+$limit = 10; // Số dòng trên mỗi trang
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
+// Xử lý từ khóa tìm kiếm
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$params = [];
+$where_sql = "";
+
+if (!empty($search)) {
+    // Nếu nội dung tìm kiếm là số, ưu tiên tìm chính xác ID người dùng
+    if (is_numeric($search)) {
+        $where_sql = " WHERE id = ?  ";
+        $params[] = $search; // Tìm chính xác số ID
+       // $params[] = "%$search%"; // Hoặc tiong doi mã đơn hàng chứa số đó
+    } else {
+        // Nếu là chữ, tìm gần đúng theo mã đơn hàng
+        $where_sql = " WHERE ma_don_hang LIKE ? ";
+        $params[] = "%$search%";
+    }
+}
+
+// Đếm tổng số dòng để tính số trang
+$total_sql = "SELECT COUNT(*) FROM don_hang" . $where_sql;
+$total_stmt = $conn->prepare($total_sql);
+$total_stmt->execute($params);
+$total_rows = $total_stmt->fetchColumn();
+$total_pages = ceil($total_rows / $limit);
+
+// Lấy dữ liệu theo trang và tìm kiếm
+$sql_list = "SELECT * FROM don_hang" . $where_sql . " ORDER BY id ASC LIMIT $limit OFFSET $offset";
+$stmt_list = $conn->prepare($sql_list);
+$stmt_list->execute($params);
+$listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
+//$listorders = getAllOrders($conn);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -121,6 +165,9 @@ $listorders = getAllOrders($conn);
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/admin-layout.css">
+    <link rel="stylesheet" href="css/page-link.css">
+    <style>
+    </style>
 </head>
 
 <body style="background:#f4f6f9;">
@@ -161,12 +208,11 @@ $listorders = getAllOrders($conn);
             <div class="card shadow border-0 mb-4">
                 <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0">
-                        <?php if ($update_mode): ?>
-                            <i class="fas fa-file-invoice me-2"></i> Chỉnh sửa đơn hàng <span
-                                class="badge bg-light text-primary"></span>
-                        <?php else: ?>
-                            <i class="fas fa-cart-plus me-2"></i> Thêm đơn hàng mới
-                        <?php endif; ?>
+                        <?php ($update_mode) ?>
+                        <i class="fas fa-file-invoice me-2"></i> Chỉnh sửa đơn hàng <span
+                            class="badge bg-light text-primary"></span>
+                        <?php ?>
+
                     </h5>
                 </div>
                 <div class="card-body">
@@ -201,16 +247,7 @@ $listorders = getAllOrders($conn);
                             <input type="number" id="thanh_tien" name="thanh_tien" class="form-control"
                                 value="<?= $edit_order['thanh_tien'] ?>" required readonly style="background-color: #e9ecef;">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">Thanh toán</label>
-                            <select name="phuong_thuc_thanh_toan" class="form-select">
-                                <option value="tien_mat" <?= $edit_order['phuong_thuc_thanh_toan'] == 'tien_mat' ? 'selected' : '' ?>>COD (Tiền mặt)</option>
-                                <option value="credit_card" <?= $edit_order['phuong_thuc_thanh_toan'] == 'credit_card' ? 'selected' : '' ?>>Thẻ tín dụng</option>
-                                <option value="bank_transfer" <?= $edit_order['phuong_thuc_thanh_toan'] == 'bank_transfer' ? 'selected' : '' ?>>Chuyển khoản</option>
-                                <option value="e_wallet" <?= $edit_order['phuong_thuc_thanh_toan'] == 'e_wallet' ? 'selected' : '' ?>>Ví điện tử</option>
 
-                            </select>
-                        </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Trạng thái</label>
                             <select name="trang_thai" class="form-select">
@@ -227,15 +264,25 @@ $listorders = getAllOrders($conn);
                         </div>
 
                         <div class="col-md-10 d-flex align-items-end justify-content-end">
-                            <?php if ($update_mode): ?>
-                                <button name="save_order" class="btn btn-warning me-2">Cập nhật đơn hàng</button>
-                                <a href="CRUDdonhang.php" class="btn btn-secondary">Hủy</a>
-                            <?php else: ?>
-                                <button name="save_order" class="btn btn-success">Thêm đơn hàng</button>
-                            <?php endif; ?>
+                            <?php ($update_mode) ?>
+                            <button name="save_order" class="btn btn-warning me-2">Cập nhật đơn hàng</button>
+                            <a href="CRUDdonhang.php" class="btn btn-secondary">Hủy</a>
+                            <?php ?>
                         </div>
                     </form>
                 </div>
+            </div>
+               <!-- Tim kiem -->
+            <div class="filter-group mb-3">
+                <h4 class="filter-title"><i class="fas fa-search"></i> Tìm kiếm</h4>
+                <form method="GET" action="CRUDdonhang.php" class="search-box d-flex gap-2">
+                    <input type="text" name="search" id="searchInput" class="form-control"
+                        placeholder="Nhập mã đơn hoặc ID khách..." value="<?= htmlspecialchars($search) ?>">
+                    <button type="submit" class="btn btn-primary">Tìm</button>
+                    <?php if (!empty($search)): ?>
+                        <a href="CRUDdonhang.php" class="btn btn-outline-secondary">Xóa</a>
+                    <?php endif; ?>
+                </form>
             </div>
             <div class="table-responsive">
 
@@ -312,12 +359,35 @@ $listorders = getAllOrders($conn);
                 </table>
 
             </div>
+            <div class="pagination-section">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>">
+                                <i class="fas fa-chevron-left"></i> Trước
+                            </a>
+                        </li>
+
+                        <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                            <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                                <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+
+                        <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>">
+                                <span>Tiếp</span> <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="text-center mt-2 small text-muted">
+                    Hiển thị trang <?= $page ?> / <?= $total_pages ?> (Tổng <?= $total_rows ?> Đơn hàng)
+                </div>
+            </div>
 
         </div>
 
-    </div>
-
-    </div>
 
     </div>
 
@@ -328,68 +398,68 @@ $listorders = getAllOrders($conn);
 
     <script src="bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const userIdInput = document.getElementById('nguoi_dung_id');
-        const tongTienInput = document.getElementById('tong_tien');
-        const tienGiamInput = document.getElementById('tien_giam');
-        const thanhTienInput = document.getElementById('thanh_tien');
-        const btnSave = document.querySelector('button[name="save_order"]');
-        const form = document.querySelector('form');
+        document.addEventListener('DOMContentLoaded', function() {
+            const userIdInput = document.getElementById('nguoi_dung_id');
+            const tongTienInput = document.getElementById('tong_tien');
+            const tienGiamInput = document.getElementById('tien_giam');
+            const thanhTienInput = document.getElementById('thanh_tien');
+            const btnSave = document.querySelector('button[name="save_order"]');
+            const form = document.querySelector('form');
 
-        function calculateAndValidate() {
-            // LẤY GIÁ TRỊ MỚI NHẤT TẠI ĐÂY (Phải nằm trong hàm)
-            let userId = parseInt(userIdInput.value); 
-            let tongTien = parseFloat(tongTienInput.value) || 0;
-            let tienGiam = parseFloat(tienGiamInput.value) || 0;
+            function calculateAndValidate() {
+                // LẤY GIÁ TRỊ MỚI NHẤT TẠI ĐÂY (Phải nằm trong hàm)
+                let userId = parseInt(userIdInput.value);
+                let tongTien = parseFloat(tongTienInput.value) || 0;
+                let tienGiam = parseFloat(tienGiamInput.value) || 0;
 
-            // 1. Tự động tính Thành tiền
-            let thanhTien = tongTien - tienGiam;
-            thanhTienInput.value = thanhTien > 0 ? thanhTien : 0;
+                // 1. Tự động tính Thành tiền
+                let thanhTien = tongTien - tienGiam;
+                thanhTienInput.value = thanhTien > 0 ? thanhTien : 0;
 
-            // 2. Kiểm tra logic ràng buộc
-            let isValid = true;
+                // 2. Kiểm tra logic ràng buộc
+                let isValid = true;
 
-            // Ràng buộc ID Người dùng (Phải là số và > 0)
-            if (isNaN(userId) || userId <= 0) {
-                userIdInput.classList.add('is-invalid');
-                isValid = false;
-            } else {
-                userIdInput.classList.remove('is-invalid');
+                // Ràng buộc ID Người dùng (Phải là số và > 0)
+                if (isNaN(userId) || userId <= 0) {
+                    userIdInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    userIdInput.classList.remove('is-invalid');
+                }
+
+                // Ràng buộc Tiền giảm
+                if (tienGiam > tongTien) {
+                    tienGiamInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    tienGiamInput.classList.remove('is-invalid');
+                }
+
+                // Ràng buộc Tổng tiền
+                if (tongTien <= 0) {
+                    tongTienInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    tongTienInput.classList.remove('is-invalid');
+                }
+
+                if (btnSave) btnSave.disabled = !isValid;
+
+                return isValid;
             }
+            tongTienInput.addEventListener('input', calculateAndValidate);
+            tienGiamInput.addEventListener('input', calculateAndValidate);
+            userIdInput.addEventListener('input', calculateAndValidate);
 
-            // Ràng buộc Tiền giảm
-            if (tienGiam > tongTien) {
-                tienGiamInput.classList.add('is-invalid');
-                isValid = false;
-            } else {
-                tienGiamInput.classList.remove('is-invalid');
-            }
-
-            // Ràng buộc Tổng tiền
-            if (tongTien <= 0) {
-                tongTienInput.classList.add('is-invalid');
-                isValid = false;
-            } else {
-                tongTienInput.classList.remove('is-invalid');
-            }
-
-            if (btnSave) btnSave.disabled = !isValid;
-
-            return isValid;
-        }
-        tongTienInput.addEventListener('input', calculateAndValidate);
-        tienGiamInput.addEventListener('input', calculateAndValidate);
-        userIdInput.addEventListener('input', calculateAndValidate);
-
-        form.addEventListener('submit', function(e) {
-            if (!calculateAndValidate()) {
-                e.preventDefault();
-                alert('Vui lòng kiểm tra lại dữ liệu nhập vào!');
-            }
+            form.addEventListener('submit', function(e) {
+                if (!calculateAndValidate()) {
+                    e.preventDefault();
+                    alert('Vui lòng kiểm tra lại dữ liệu nhập vào!');
+                }
+            });
+            calculateAndValidate();
         });
-        calculateAndValidate();
-    });
-</script>
+    </script>
 </body>
 
 </html>

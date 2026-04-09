@@ -3,6 +3,7 @@ session_start();
 require_once "Database.php";
 require_once "auth.php";
 
+
 // 1. Khởi tạo kết nối
 $db = new Database();
 $conn = $db->connect();
@@ -14,9 +15,19 @@ $order = null;
 $items = [];
 $all_orders = [];
 
+$order_id = $_GET['id'] ?? null;
+// CẬP NHẬT TẠI ĐÂY: Ưu tiên lấy user_id từ URL nếu là admin xem, 
+// nếu không thì lấy từ session của người dùng đang đăng nhập.
+$user_id = $_GET['user_id'] ?? ($_SESSION['user_id'] ?? null);
+
+$order = null;
+$items = [];
+$all_orders = [];
+
 try {
     if ($order_id) {
         // TRƯỜNG HỢP 1: XEM CHI TIẾT 1 ĐƠN HÀNG
+        // Bỏ điều kiện lọc theo user_id trong SQL để Admin có thể xem được
         $sql_order = "SELECT dh.*, nd.ten as ten_khach_hang 
                       FROM don_hang dh 
                       JOIN nguoi_dung nd ON dh.nguoi_dung_id = nd.id 
@@ -26,26 +37,43 @@ try {
         $order = $stmt_order->fetch(PDO::FETCH_ASSOC);
 
         if ($order) {
-            $sql_items = "SELECT ct.*, sp.ten as ten_sp, sp.hinh_anh_chinh 
+            $sql_items = "SELECT ct.*, sp.ten as ten_sp, sp.hinh_anh_chinh , ms.ten as ten_mau
                           FROM chi_tiet_don_hang ct 
-                          JOIN san_pham sp ON ct.san_pham_id = sp.id 
-                          WHERE ct.don_hang_id = :id";
+                          JOIN san_pham sp ON ct.san_pham_id = sp.id
+                          JOIN mau_sac ms on ct.mau_sac_id = ms.id
+                          WHERE ct.don_hang_id =:id";
             $stmt_items = $conn->prepare($sql_items);
             $stmt_items->execute(['id' => $order_id]);
             $items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
         }
     } else {
-        // TRƯỜNG HỢP 2: XEM DANH SÁCH TẤT CẢ ĐƠN HÀNG (Khi vào orders.php mà không có ID)
-        $sql_all = "SELECT * FROM don_hang WHERE nguoi_dung_id = :user_id ORDER BY ngay_dat DESC";
-        $stmt_all = $conn->prepare($sql_all);
-        $stmt_all->execute(['user_id' => $user_id]);
-        $all_orders = $stmt_all->fetchAll(PDO::FETCH_ASSOC);
+        // TRƯỜNG HỢP 2: XEM DANH SÁCH ĐƠN HÀNG CỦA MỘT USER CỤ THỂ
+        if ($user_id) {
+            // Lấy thêm tên người dùng để hiển thị tiêu đề cho rõ ràng
+            $sql_user_info = "SELECT ten FROM nguoi_dung WHERE id = :user_id";
+            $stmt_user = $conn->prepare($sql_user_info);
+            $stmt_user->execute(['user_id' => $user_id]);
+            $customer_name = $stmt_user->fetchColumn();
+
+            $sql_all = "SELECT dh.id, dh.ma_don_hang, dh.ngay_dat, dh.thanh_tien, dh.trang_thai, 
+                           GROUP_CONCAT(DISTINCT ms.ten SEPARATOR ', ') as ten_mau
+                    FROM don_hang dh 
+                    LEFT JOIN chi_tiet_don_hang ct ON dh.id = ct.don_hang_id
+                    LEFT JOIN mau_sac ms ON ct.mau_sac_id = ms.id
+                    WHERE dh.nguoi_dung_id = :user_id 
+                    GROUP BY dh.id
+                    ORDER BY dh.ngay_dat DESC";
+
+            $stmt_all = $conn->prepare($sql_all);
+            $stmt_all->execute(['user_id' => $user_id]);
+            $all_orders = $stmt_all->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 } catch (PDOException $e) {
     error_log($e->getMessage());
-}
-function formatPrice($price)
-{
+} // <--- QUAN TRỌNG: Phải có dấu này để đóng khối try
+
+function formatPrice($price) {
     return number_format($price ?? 0, 0, ',', '.') . '₫';
 }
 ?>
@@ -124,6 +152,7 @@ function formatPrice($price)
                                             <h4><?= htmlspecialchars($item['ten_sp']) ?></h4>
                                             <div class="cart-item-price"><?= formatPrice($item['gia']) ?></div>
                                         </div>
+                                        <span>Màu sắc : <?= htmlspecialchars($item['ten_mau'] ?? 'N/A')  ?> </span>
                                         <div class="cart-item-details text-center">
                                             <span class="text-muted">Số lượng:</span>
                                             <strong><?= $item['so_luong'] ?></strong>
@@ -142,7 +171,7 @@ function formatPrice($price)
                             <h2>Thông tin đơn hàng</h2>
                             <div class="summary-item">
                                 <span>Trạng thái:</span>
-                                <span class="status-badge status-<?= $order['trang_thai'] ?>"><?= $order['trang_thai'] ?></span>
+                                <span class="status-badge status-"><?= $order['trang_thai'] ?></span>
                             </div>
                             <div class="summary-item">
                                 <span>Ngày đặt:</span>
@@ -150,18 +179,18 @@ function formatPrice($price)
                             </div>
                             <div class="summary-item">
                                 <span>Tên người nhận:</span>
-                                <span class="status-badge status-<?= $order['trang_thai'] ?>"><?= $order['ten_nguoi_nhan'] ?></span>
+                                <span class="status-badge status-"><?= $order['ten_nguoi_nhan'] ?></span>
                             </div>
                             <div class="summary-item">
                                 <span>SDT:</span>
-                                <span class="status-badge status-<?= $order['trang_thai'] ?>"><?= $order['so_dien_thoai_nhan'] ?></span>
+                                <span class="status-badge status-"><?= $order['so_dien_thoai_nhan'] ?></span>
                             </div>
                             <div class="summary-item">
                                 <span>Địa chỉ nhận hàng:</span>
-                                <span class="status-badge status-<?= $order['trang_thai'] ?>"><?= $order['dia_chi_giao_hang'] ?></span>
+                                <span class="status-badge status-"><?= $order['dia_chi_giao_hang'] ?></span>
                             </div>
                             <div class="summary-divider"></div>
-                             <div class="summary-total">
+                            <div class="summary-total">
                                 <span>Tiền giảm:</span>
                                 <span style="color:var(--primary-color);"><?= formatPrice($order['tien_giam']) ?></span>
                             </div>
@@ -172,6 +201,27 @@ function formatPrice($price)
                             <a href="orders.php" class="btn btn-outline-primary w-100 mt-3">
                                 <i class="fas fa-arrow-left"></i> Quay lại danh sách
                             </a>
+                            <?php
+                            // 1. Tính toán khoảng cách thời gian
+                            $ngay_dat = strtotime($order['ngay_dat']);
+                            $bay_gio = time();
+                            $diff_hours = ($bay_gio - $ngay_dat) / 3600; // Đổi giây sang giờ
+
+                            // 2. Chỉ cho phép hủy nếu thời gian < 24h và trạng thái là 'dang_xu_ly' hoặc 'cho_xac_nhan'
+                            // (Đạt nên kiểm tra thêm trạng thái để tránh trường hợp đang giao hàng vẫn bấm hủy được)
+                            if ($diff_hours < 24 && ($order['trang_thai'] == 'cho_xu_ly')):
+                            ?>
+                                <button onclick="confirmCancel(<?= $order['id'] ?>)" class="btn btn-danger w-100 mt-2">
+                                    <i class="fas fa-times-circle"></i> Hủy đơn hàng
+                                </button>
+                                <small class="text-muted d-block text-center mt-1">
+                                    (Bạn có thể hủy đơn trong vòng 24h kể từ khi đặt)
+                                </small>
+                            <?php else: ?>
+                                <button class="btn btn-secondary w-100 mt-2" disabled title="Quá 24h hoặc đơn hàng đã được xử lý">
+                                    <i class="fas fa-ban"></i> Không thể hủy đơn
+                                </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -193,6 +243,7 @@ function formatPrice($price)
                                         <th>Mã đơn</th>
                                         <th>Ngày đặt</th>
                                         <th>Tổng tiền</th>
+                                        <th>Màu sắc</th>
                                         <th>Trạng thái</th>
                                         <th class="text-center">Hành động</th>
                                     </tr>
@@ -203,6 +254,7 @@ function formatPrice($price)
                                             <td><strong>#<?= $o['ma_don_hang'] ?></strong></td>
                                             <td><?= date('d/m/Y', strtotime($o['ngay_dat'])) ?></td>
                                             <td><span class="text-primary fw-bold"><?= formatPrice($o['thanh_tien']) ?></span></td>
+                                            <td><span class="text-primary fw-bold"><?= htmlspecialchars($o['ten_mau'] ?? 'N/A') ?></span></td>
                                             <td><span class="status-badge status-<?= $o['trang_thai'] ?>"><?= $o['trang_thai'] ?></span></td>
                                             <td class="text-center">
                                                 <a href="orders.php?id=<?= $o['id'] ?>" class="btn btn-sm btn-primary">
@@ -234,6 +286,14 @@ function formatPrice($price)
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmCancel(orderId) {
+            if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.')) {
+                // Chuyển hướng đến file xử lý hủy đơn (Bạn cần tạo file này)
+                window.location.href = 'cancel_order.php?id=' + orderId;
+            }
+        }
+    </script>
 </body>
 
 </html>

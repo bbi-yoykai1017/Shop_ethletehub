@@ -1,0 +1,14 @@
+.page-link {
+            display: flex;
+            align-items: center;
+            /* Căn giữa chữ và icon theo chiều dọc */
+            gap: 5px;
+            /* Tạo khoảng cách nhỏ giữa chữ và icon */
+            font-size: 0.9rem;
+            /* Ép kích thước chữ nhỏ lại cho đồng bộ */
+        }
+
+        .page-link i {
+            font-size: 0.8rem;
+            /* Cho icon nhỏ hơn chữ một chút sẽ đẹp hơn */
+        }
