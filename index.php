@@ -12,7 +12,7 @@ $products = getallproduct($conn);
 $products = processProducts($products);
 
 // Giới hạn hiển thị 6 sản phẩm
-$displayProducts = array_slice($products, 0, 6);
+$displayProducts = array_slice($products, 0, 8);
 ?>
 
 
