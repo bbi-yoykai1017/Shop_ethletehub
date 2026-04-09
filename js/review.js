@@ -239,8 +239,8 @@ function loadAllReviews() {
                             </div>
                             <p class="review-content">${escapeHtml(review.binh_luan).replace(/\n/g, '<br>')}</p>
                             <div class="review-actions">
-                                <button class="helpful-btn" style="border: none; background: none; color: #666; cursor: pointer;">
-                                    <i class="fas fa-thumbs-up"></i> Hữu ích (0)
+                                <button class="helpful-btn" data-review-id="${review.id}" data-liked="${review.user_liked || 0}" style="border: none; background: none; color: ${review.user_liked ? '#ff6b35' : '#666'}; cursor: pointer; padding: 0; font-size: 14px;">
+                                    <i class="fas ${review.user_liked ? 'fa-thumbs-up' : 'fa-thumbs-up'}" style="opacity: ${review.user_liked ? '1' : '0.5'};"></i> Hữu ích (${review.like_count || 0})
                                 </button>
                                 ${currentUserId ? `
                                     <button class="reply-btn" onclick="toggleReplyForm(${review.id})"
@@ -280,6 +280,16 @@ function loadAllReviews() {
                     }).join('');
 
                     reviewsList.innerHTML = '<h4>Đánh giá từ khách hàng (' + data.total + ')</h4>' + reviewsContent;
+                    
+                    // Attach click handlers to like buttons
+                    const likeButtons = reviewsList.querySelectorAll('.helpful-btn');
+                    likeButtons.forEach(btn => {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const reviewId = this.getAttribute('data-review-id');
+                            toggleLikeReview(reviewId);
+                        });
+                    });
                 } else {
                     console.log('Reviews list container not found');
                 }
@@ -526,6 +536,54 @@ function deleteReply(replyId, reviewId) {
             }
         } else {
             showNotification(data.message || 'Lỗi xóa trả lời', 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Lỗi:', error);
+        showNotification('Lỗi kết nối server', 'danger');
+    });
+}
+
+// ===========================
+// HÀM LIKE/UNLIKE BÌNH LUẬN
+// ===========================
+
+function toggleLikeReview(reviewId) {
+    // Kiểm tra user đã đăng nhập
+    if (!window.currentUserId) {
+        showNotification('Vui lòng đăng nhập để thích bình luận', 'warning');
+        window.location.href = 'login.php';
+        return;
+    }
+
+    fetch('api/review.php?action=toggleLike', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            review_id: reviewId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Like response:', data);
+        if (data.success) {
+            // Update button appearance
+            const btn = document.querySelector(`[data-review-id="${reviewId}"].helpful-btn`);
+            if (btn) {
+                const newLikesCount = data.like_count;
+                const isLiked = data.liked;
+                
+                // Update button text and styling
+                btn.innerHTML = `<i class="fas fa-thumbs-up" style="opacity: ${isLiked ? '1' : '0.5'};"></i> Hữu ích (${newLikesCount})`;
+                btn.setAttribute('data-liked', isLiked ? '1' : '0');
+                btn.style.color = isLiked ? '#ff6b35' : '#666';
+                
+                showNotification(data.message, 'success');
+            }
+        } else {
+            showNotification(data.message || 'Lỗi khi cập nhật', 'danger');
         }
     })
     .catch(error => {

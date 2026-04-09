@@ -306,6 +306,7 @@ try {
             $sanPhamId = (int)($_GET['san_pham_id'] ?? 0);
             $limit = (int)($_GET['limit'] ?? 10);
             $offset = (int)($_GET['offset'] ?? 0);
+            $currentUserId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
 
             if ($sanPhamId <= 0) {
                 echo json_encode(['success' => false, 'message' => 'ID sản phẩm không hợp lệ', 'san_pham_id' => $sanPhamId]);
@@ -329,7 +330,9 @@ try {
                     dg.ngay_danh_gia,
                     dg.nguoi_dung_id,
                     nd.ten as ten_nguoi_dung,
-                    nd.anh_dai_dien
+                    nd.anh_dai_dien,
+                    (SELECT COUNT(*) FROM like_danh_gia WHERE danh_gia_id = dg.id AND trang_thai = 1) as like_count,
+                    (SELECT COUNT(*) FROM like_danh_gia WHERE danh_gia_id = dg.id AND nguoi_dung_id = :current_user AND trang_thai = 1) as user_liked
                 FROM danh_gia dg
                 JOIN nguoi_dung nd ON dg.nguoi_dung_id = nd.id
                 WHERE dg.san_pham_id = :san_pham_id AND dg.trang_thai = 1
@@ -337,6 +340,7 @@ try {
                 LIMIT :limit OFFSET :offset
             ");
             $stmt->bindParam(':san_pham_id', $sanPhamId, PDO::PARAM_INT);
+            $stmt->bindParam(':current_user', $currentUserId, PDO::PARAM_INT);
             $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
             $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
@@ -458,6 +462,87 @@ try {
                 'success' => true,
                 'summary' => $summary
             ]);
+            exit;
+
+        // ========== LIKE/UNLIKE BÌNH LUẬN ==========
+        case 'toggleLike':
+            if (!isset($_SESSION['user_id'])) {
+                http_response_code(401);
+                echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập']);
+                exit;
+            }
+
+            $userId = (int)$_SESSION['user_id'];
+            $reviewId = (int)($data['review_id'] ?? 0);
+
+            if ($reviewId <= 0) {
+                echo json_encode(['success' => false, 'message' => 'ID bình luận không hợp lệ']);
+                exit;
+            }
+
+            // Kiểm tra bình luận tồn tại
+            $stmt = $conn->prepare("SELECT id FROM danh_gia WHERE id = :id AND trang_thai = 1");
+            $stmt->bindParam(':id', $reviewId, PDO::PARAM_INT);
+            $stmt->execute();
+            if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
+                echo json_encode(['success' => false, 'message' => 'Bình luận không tồn tại']);
+                exit;
+            }
+
+            // Kiểm tra user đã like chưa
+            $stmt = $conn->prepare("
+                SELECT id FROM like_danh_gia 
+                WHERE danh_gia_id = :review_id AND nguoi_dung_id = :user_id
+            ");
+            $stmt->bindParam(':review_id', $reviewId, PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            $existingLike = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            try {
+                if ($existingLike) {
+                    // Unlike (xóa like)
+                    $stmt = $conn->prepare("
+                        DELETE FROM like_danh_gia 
+                        WHERE danh_gia_id = :review_id AND nguoi_dung_id = :user_id
+                    ");
+                    $stmt->bindParam(':review_id', $reviewId, PDO::PARAM_INT);
+                    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+                    $stmt->execute();
+                    $liked = false;
+                } else {
+                    // Like (thêm like)
+                    $stmt = $conn->prepare("
+                        INSERT INTO like_danh_gia (danh_gia_id, nguoi_dung_id, trang_thai, ngay_tao)
+                        VALUES (:review_id, :user_id, 1, NOW())
+                    ");
+                    $stmt->bindParam(':review_id', $reviewId, PDO::PARAM_INT);
+                    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+                    $stmt->execute();
+                    $liked = true;
+                }
+
+                // Lấy số like hiện tại
+                $stmt = $conn->prepare("
+                    SELECT COUNT(*) as like_count FROM like_danh_gia 
+                    WHERE danh_gia_id = :review_id AND trang_thai = 1
+                ");
+                $stmt->bindParam(':review_id', $reviewId, PDO::PARAM_INT);
+                $stmt->execute();
+                $likeCount = $stmt->fetch(PDO::FETCH_ASSOC)['like_count'];
+
+                echo json_encode([
+                    'success' => true,
+                    'liked' => $liked,
+                    'like_count' => $likeCount,
+                    'message' => $liked ? 'Đã thích bình luận' : 'Đã bỏ thích bình luận'
+                ]);
+            } catch (PDOException $e) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Lỗi: ' . $e->getMessage()
+                ]);
+            }
             exit;
 
         default:
