@@ -316,6 +316,27 @@ if (empty($cart)) {
                                 <label for="banking" class="ms-2 fw-bold">Chuyển khoản ngân hàng</label>
                                 <p class="text-muted ms-4 small">Chuyển tiền trước khi nhận hàng</p>
                             </div>
+
+                            <!-- Thông tin chuyển khoản ngân hàng -->
+                            <div id="bankTransferInfo" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px solid #ff6b35;">
+                                <h6 class="mb-3 text-center fw-bold"><i class="fas fa-piggy-bank"></i> Thông tin chuyển khoản</h6>
+                                
+                                <div class="text-center mb-3">
+                                    <img id="qrCodeImage" src="public/qr-bank-transfer.png" alt="QR Code" style="max-width: 250px; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                </div>
+
+                                <div class="border-bottom pb-2 mb-2">
+                                    <p class="small text-muted mb-1">Tên + sdt </p>
+                                </div>
+                                <div class="border-bottom pb-2 mb-2">
+                                    <p class="small text-muted mb-1">Tài khoản NAPAS 24/7:</p>
+                                    <p class="fw-bold">BIDV - CN DONG DAK LAK PGD TRONG BONG</p>
+                                </div>
+
+                                <div class="alert alert-warning small mt-3 mb-0">
+                                    <i class="fas fa-exclamation-triangle"></i> Vui lòng kiểm tra kỹ thông tin trước khi chuyển khoản
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!-- tóm tắt đơn hàng -->
@@ -398,6 +419,22 @@ if (empty($cart)) {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="js/map.js"></script>
     <script>
+        // Xử lý hiển thị thông tin chuyển khoản
+        const codRadio = document.getElementById('cod');
+        const bankingRadio = document.getElementById('banking');
+        const bankTransferInfo = document.getElementById('bankTransferInfo');
+
+        function toggleBankTransferInfo() {
+            if (bankingRadio.checked) {
+                bankTransferInfo.style.display = 'block';
+            } else {
+                bankTransferInfo.style.display = 'none';
+            }
+        }
+
+        codRadio.addEventListener('change', toggleBankTransferInfo);
+        bankingRadio.addEventListener('change', toggleBankTransferInfo);
+
         // ma giam gia
         function applyCoupon() {
             let code = document.getElementById('coupon_code').value;
