@@ -326,7 +326,7 @@ if (empty($cart)) {
                                 </div>
 
                                 <div class="border-bottom pb-2 mb-2">
-                                    <p class="small text-muted mb-1">Tên + sdt </p>
+                                    <p class="small text-muted mb-1">Với nội dung: Tên + Số điện thoại </p>
                                 </div>
                                 <div class="border-bottom pb-2 mb-2">
                                     <p class="small text-muted mb-1">Tài khoản NAPAS 24/7:</p>
