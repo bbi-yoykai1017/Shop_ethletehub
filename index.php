@@ -2,11 +2,14 @@
 session_start();
 require_once 'model/functions.php';
 require_once 'model/detail.php';
+require_once 'model/news.php';
 require_once 'Database.php';
 
 $db = new Database();
 $conn = $db->connect();
 $products = getallproduct($conn);
+$latestNews = getLatestNews($conn, 4);
+$newsCount = countNews($conn, null, 1); // Lấy tổng số tin tức công khai
 
 // Xử lý sản phẩm - thêm các trường tính toán
 $products = processProducts($products);
@@ -36,6 +39,7 @@ $displayProducts = array_slice($products, 0, 8);
     <link rel="stylesheet" href="css/hero.css">
     <link rel="stylesheet" href="css/categories.css">
     <link rel="stylesheet" href="css/products.css">
+    <link rel="stylesheet" href="css/news.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
 </head>
@@ -95,7 +99,7 @@ $displayProducts = array_slice($products, 0, 8);
 
                         <!-- Right Icons -->
                         <div class="navbar-right">
-                            <div class="nav-notification">
+                             <div class="nav-notification" onclick="window.location.href='news.php'">
                                 <i class="fas fa-bell"></i>
                                 <span class="notification-badge">2</span>
                             </div>
@@ -398,6 +402,53 @@ $displayProducts = array_slice($products, 0, 8);
     </section>
 
     <!-- ========================
+         NEWS SECTION
+         ======================== -->
+    <section class="news" id="news">
+        <div class="container-custom">
+            <div class="news-section-title">
+                <h2><i class="fas fa-newspaper"></i> Tin tức & Thông báo</h2>
+                <p>Cập nhật những sản phẩm mới, khuyến mãi, và sự kiện hấp dẫn từ AthleteHub</p>
+            </div>
+
+            <div class="news-cards-grid">
+                <?php if (!empty($latestNews)): ?>
+                    <?php foreach ($latestNews as $news_item): ?>
+                        <div class="news-card" onclick="window.location.href='news-detail.php?id=<?= $news_item['id'] ?>'">
+                            <div class="news-card-image">
+                                <?php if ($news_item['hinh_anh']): ?>
+                                    <img src="<?= htmlspecialchars($news_item['hinh_anh']) ?>" alt="<?= htmlspecialchars($news_item['tieu_de']) ?>">
+                                <?php else: ?>
+                                    <i class="fas fa-newspaper"></i>
+                                <?php endif; ?>
+                                <span class="news-card-badge">
+                                    <?= getNewsTypeLabel($news_item['loai_tin']) ?>
+                                </span>
+                            </div>
+
+                            <div class="news-card-body">
+                                <h3 class="news-card-title"><?= htmlspecialchars($news_item['tieu_de']) ?></h3>
+                                <p class="news-card-excerpt"><?= htmlspecialchars(truncateText($news_item['noi_dung'], 80)) ?></p>
+
+                                <div class="news-card-footer">
+                                    <span><i class="fas fa-calendar"></i> <?= date('d/m/Y', strtotime($news_item['ngay_tao'])) ?></span>
+                                    <span><i class="fas fa-eye"></i> <?= $news_item['luot_xem'] ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+
+            <div class="news-cta">
+                <a href="news.php" class="btn-news-all">
+                    <i class="fas fa-arrow-right"></i> Xem tất cả tin tức
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================
          FOOTER
          ======================== -->
     <footer class="footer">
@@ -514,6 +565,96 @@ $displayProducts = array_slice($products, 0, 8);
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="js/cart.js"></script>
+    
+    <!-- Notification Script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const notificationBell = document.getElementById('notificationBell');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        const notificationList = document.getElementById('notificationList');
+        
+        if (!notificationBell) return;
+        
+        // Toggle dropdown khi click chuông
+        notificationBell.addEventListener('click', function(e) {
+            e.stopPropagation();
+            notificationDropdown.classList.toggle('active');
+            
+            // Nếu mở dropdown, load tin tức
+            if (notificationDropdown.classList.contains('active')) {
+                loadNotifications();
+            }
+        });
+        
+        // Đóng dropdown khi click ngoài
+        document.addEventListener('click', function(e) {
+            if (!notificationDropdown.parentElement.contains(e.target)) {
+                notificationDropdown.classList.remove('active');
+            }
+        });
+        
+        // Load tin tức từ API
+        function loadNotifications() {
+            fetch('api/news.php?action=get_latest_news&limit=5')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data.length > 0) {
+                        let html = '';
+                        data.data.forEach(news => {
+                            const date = new Date(news.ngay_tao);
+                            const formattedDate = date.toLocaleDateString('vi-VN');
+                            const typeLabel = getNewsTypeLabel(news.loai_tin);
+                            
+                            html += `
+                                <a href="news-detail.php?id=${news.id}" class="notification-item">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 10px;">
+                                        <div style="flex: 1;">
+                                            <div class="notification-item-title">${escapeHtml(news.tieu_de)}</div>
+                                            <span class="notification-item-type">${typeLabel}</span>
+                                        </div>
+                                    </div>
+                                    <div class="notification-item-date">
+                                        <i class="fas fa-calendar"></i> ${formattedDate} 
+                                        <i class="fas fa-eye"></i> ${news.luot_xem}
+                                    </div>
+                                </a>
+                            `;
+                        });
+                        notificationList.innerHTML = html;
+                    } else {
+                        notificationList.innerHTML = '<div class="notification-loading">Chưa có tin tức nào</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi tải tin tức:', error);
+                    notificationList.innerHTML = '<div class="notification-loading">Lỗi tải dữ liệu</div>';
+                });
+        }
+        
+        // Hàm escape HTML
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+        
+        // Hàm format loại tin
+        function getNewsTypeLabel(loai_tin) {
+            const labels = {
+                'san-pham-moi': '🎉 Sản phẩm mới',
+                'khuyen-mai': '💰 Khuyến mãi',
+                'su-kien': '🏃 Sự kiện',
+                'other': '⭐ Khác'
+            };
+            return labels[loai_tin] || 'Tin tức';
+        }
+    });
+    </script>
     <script src="js/script.js"></script>
     <script src="js/categories.js"></script>
     

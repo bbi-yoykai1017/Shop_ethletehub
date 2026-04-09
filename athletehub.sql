@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th4 02, 2026 lúc 11:38 AM
+-- Thời gian đã tạo: Th4 09, 2026 lúc 06:23 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.2.12
+-- Phiên bản PHP: 8.3.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,9 +20,12 @@ SET time_zone = "+00:00";
 --
 -- Cơ sở dữ liệu: `athletehub`
 --
+CREATE DATABASE IF NOT EXISTS `athletehub` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `athletehub`;
 
 -- --------------------------------------------------------
 
+--
 -- Cấu trúc bảng cho bảng `bien_the_san_pham`
 --
 
@@ -239,6 +242,40 @@ CREATE TABLE `chi_tiet_don_hang` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng chi tiết đơn hàng';
 
 --
+-- Đang đổ dữ liệu cho bảng `chi_tiet_don_hang`
+--
+
+INSERT INTO `chi_tiet_don_hang` (`id`, `don_hang_id`, `san_pham_id`, `bien_the_san_pham_id`, `kich_thuoc_id`, `mau_sac_id`, `so_luong`, `gia`, `thanh_tien`) VALUES
+(23, 17, 1, NULL, NULL, NULL, 2, 149000.00, 298000.00),
+(24, 17, 1, NULL, 4, 5, 2, 149000.00, 298000.00),
+(29, 20, 5, NULL, NULL, NULL, 2, 399000.00, 798000.00),
+(30, 20, 5, NULL, 5, 3, 2, 399000.00, 798000.00),
+(31, 21, 1, NULL, NULL, NULL, 1, 149000.00, 149000.00),
+(32, 21, 1, NULL, 4, 5, 1, 149000.00, 149000.00),
+(33, 22, 6, NULL, NULL, NULL, 1, 379000.00, 379000.00),
+(34, 22, 6, NULL, 5, 10, 1, 379000.00, 379000.00),
+(35, 23, 5, NULL, NULL, NULL, 1, 399000.00, 399000.00),
+(36, 23, 5, NULL, 5, 3, 1, 399000.00, 399000.00),
+(37, 24, 8, NULL, 5, 10, 1, 129000.00, 129000.00),
+(38, 24, 8, NULL, NULL, NULL, 1, 129000.00, 129000.00),
+(39, 25, 2, NULL, NULL, NULL, 1, 159000.00, 159000.00),
+(40, 25, 2, NULL, 4, 3, 1, 159000.00, 159000.00),
+(41, 26, 2, NULL, 4, 5, 1, 159000.00, 159000.00),
+(42, 26, 2, NULL, NULL, NULL, 1, 159000.00, 159000.00),
+(43, 27, 5, NULL, NULL, NULL, 2, 399000.00, 798000.00),
+(44, 27, 5, NULL, 5, 3, 2, 399000.00, 798000.00),
+(45, 28, 2, NULL, NULL, NULL, 1, 159000.00, 159000.00),
+(46, 28, 2, NULL, 4, 5, 1, 159000.00, 159000.00),
+(47, 29, 5, NULL, NULL, NULL, 1, 399000.00, 399000.00),
+(48, 29, 5, NULL, 5, 3, 1, 399000.00, 399000.00),
+(49, 30, 1, NULL, NULL, NULL, 1, 149000.00, 149000.00),
+(50, 30, 1, NULL, 4, 5, 1, 149000.00, 149000.00),
+(51, 31, 2, NULL, NULL, NULL, 1, 159000.00, 159000.00),
+(52, 31, 2, NULL, 4, 5, 1, 159000.00, 159000.00);
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `chi_tiet_gio_hang`
 --
 
@@ -253,6 +290,13 @@ CREATE TABLE `chi_tiet_gio_hang` (
   `gia` decimal(15,2) DEFAULT NULL COMMENT 'Giá lúc thêm',
   `ngay_them` datetime DEFAULT current_timestamp() COMMENT 'Ngày thêm'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng chi tiết giỏ hàng';
+
+--
+-- Đang đổ dữ liệu cho bảng `chi_tiet_gio_hang`
+--
+
+INSERT INTO `chi_tiet_gio_hang` (`id`, `gio_hang_id`, `san_pham_id`, `bien_the_san_pham_id`, `kich_thuoc_id`, `mau_sac_id`, `so_luong`, `gia`, `ngay_them`) VALUES
+(26, 14, 1, NULL, 4, 3, 2, 149000.00, '2026-04-05 16:33:05');
 
 -- --------------------------------------------------------
 
@@ -271,7 +315,17 @@ CREATE TABLE `danh_gia` (
   `ngay_cap_nhat` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng đánh giá sản phẩm';
 
+--
+-- Đang đổ dữ liệu cho bảng `danh_gia`
+--
+
+INSERT INTO `danh_gia` (`id`, `san_pham_id`, `nguoi_dung_id`, `so_sao`, `binh_luan`, `trang_thai`, `ngay_danh_gia`, `ngay_cap_nhat`) VALUES
+(23, 5, 1, 5, 'asdasdas\n\nsafasdfasfsadf', 1, '2026-04-02 15:04:18', '2026-04-02 15:04:18'),
+(37, 1, 12, 5, 'asdasd\n\nasdasdas', 1, '2026-04-09 14:00:17', '2026-04-09 14:00:17'),
+(38, 1, 38, 5, 'adsad\n\nádasd', 1, '2026-04-05 16:48:42', '2026-04-05 16:48:42');
+
 -- --------------------------------------------------------
+
 --
 -- Cấu trúc bảng cho bảng `danh_muc`
 --
@@ -316,7 +370,7 @@ CREATE TABLE `don_hang` (
   `ma_phieu_giam` varchar(50) DEFAULT NULL COMMENT 'Mã phiếu giảm',
   `ma_giam_gia_id` int(11) DEFAULT NULL COMMENT 'FK → ma_giam_gia.id',
   `phuong_thuc_thanh_toan` enum('tien_mat','credit_card','bank_transfer','e_wallet') DEFAULT 'tien_mat' COMMENT 'Phương thức thanh toán',
-  `trang_thai` enum('cho_xu_ly','da_thanh_toan','dang_giao','hoan_thanh','da_huy','da_giao') DEFAULT 'cho_xu_ly' COMMENT 'Trạng thái đơn hàng',
+  `trang_thai` enum('cho_thanh_toan','cho_xac_nhan','dang_chuan_bi','dang_giao','da_giao','da_huy') DEFAULT 'cho_xac_nhan',
   `ghi_chu` text DEFAULT NULL COMMENT 'Ghi chú đơn hàng',
   `ngay_dat` datetime DEFAULT current_timestamp() COMMENT 'Ngày đặt',
   `ngay_cap_nhat` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -325,7 +379,31 @@ CREATE TABLE `don_hang` (
   `lng` decimal(11,8) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng đơn hàng';
 
+--
+-- Đang đổ dữ liệu cho bảng `don_hang`
+--
+
+INSERT INTO `don_hang` (`id`, `nguoi_dung_id`, `ten_nguoi_nhan`, `so_dien_thoai_nhan`, `dia_chi_giao_hang`, `ma_don_hang`, `tong_tien`, `tien_giam`, `thanh_tien`, `ma_phieu_giam`, `ma_giam_gia_id`, `phuong_thuc_thanh_toan`, `trang_thai`, `ghi_chu`, `ngay_dat`, `ngay_cap_nhat`, `ngay_giao_hang`, `lat`, `lng`) VALUES
+(17, 38, 'khanh huyen', '0912345678', 'Hẻm 606 Đường 3 Tháng 2, Khu phố 7, Phường Diên Hồng, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72415, Việt Nam', 'ATH-69D2346FAC58A', 596000.00, 0.00, 596000.00, NULL, NULL, 'tien_mat', '', NULL, '2026-04-05 17:07:43', '2026-04-05 17:07:43', NULL, 10.76262200, 106.66017200),
+(20, 12, 'nguyễn văn a', '0901234567', 'Hẻm 450 Hòa Hảo, Khu phố 28, Phường Diên Hồng, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72415, Việt Nam', 'ATH-69D32C623E850', 1596000.00, 0.00, 1596000.00, NULL, NULL, 'tien_mat', '', NULL, '2026-04-06 10:45:38', '2026-04-06 10:45:38', NULL, 10.76189790, 106.66611320),
+(21, 12, 'nguyễn văn a', '0901234567', 'Hẻm 327 Sư Vạn Hạnh, Khu phố 18, Phường Vườn Lài, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72712, Việt Nam', 'ATH-69D618A6A7B2B', 298000.00, 0.00, 298000.00, NULL, NULL, 'bank_transfer', 'cho_xac_nhan', NULL, '2026-04-08 15:58:14', '2026-04-08 15:58:14', NULL, 10.76715180, 106.67085190),
+(22, 12, 'nguyễn văn a', '0901234567', 'Hẻm 289 Nguyễn Tiểu La, Khu phố 20, Phường Diên Hồng, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72415, Việt Nam', 'ATH-69D618F5EC7BA', 758000.00, 0.00, 758000.00, NULL, NULL, 'bank_transfer', 'cho_thanh_toan', NULL, '2026-04-08 15:59:33', '2026-04-08 15:59:33', NULL, 10.76579070, 106.66541340),
+(23, 12, 'nguyễn văn a', '0901234567', 'Hẻm 327 Sư Vạn Hạnh, Khu phố 18, Phường Vườn Lài, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72712, Việt Nam', 'ATH-69D619684A248', 798000.00, 0.00, 798000.00, NULL, NULL, 'bank_transfer', 'cho_thanh_toan', NULL, '2026-04-08 16:01:28', '2026-04-08 16:01:28', NULL, 10.76262200, 106.66017200),
+(24, 12, 'nguyễn văn a', '0901234567', 'Hẻm 289 Nguyễn Tiểu La, Khu phố 20, Phường Diên Hồng, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72415, Việt Nam', 'ATH-69D619CC5FB5A', 258000.00, 0.00, 258000.00, NULL, NULL, 'bank_transfer', 'cho_thanh_toan', NULL, '2026-04-08 16:03:08', '2026-04-08 16:03:08', NULL, 10.76262200, 106.66017200),
+(25, 12, 'nguyễn văn a', '0901234567', 'Hẻm 327 Sư Vạn Hạnh, Khu phố 18, Phường Vườn Lài, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72712, Việt Nam', 'ATH-69D61A03E0623', 318000.00, 0.00, 318000.00, NULL, NULL, 'bank_transfer', 'cho_thanh_toan', NULL, '2026-04-08 16:04:03', '2026-04-08 16:04:03', NULL, 10.76262200, 106.66017200),
+(26, 12, 'nguyễn văn a', '0901234567', 'Hẻm 327 Sư Vạn Hạnh, Khu phố 18, Phường Vườn Lài, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72712, Việt Nam', 'ATH-69D61A3D6F1B1', 318000.00, 0.00, 318000.00, NULL, NULL, 'bank_transfer', 'cho_thanh_toan', NULL, '2026-04-08 16:05:01', '2026-04-08 16:05:01', NULL, 10.76262200, 106.66017200),
+(27, 12, 'nguyễn văn a', '0901234567', 'Hẻm 327 Sư Vạn Hạnh, Khu phố 18, Phường Vườn Lài, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72712, Việt Nam', 'ATH-69D61AC46381C', 1596000.00, 0.00, 1596000.00, NULL, NULL, 'bank_transfer', 'cho_thanh_toan', NULL, '2026-04-08 16:07:16', '2026-04-08 16:07:16', NULL, 10.76262200, 106.66017200),
+(28, 12, 'nguyễn văn a', '0901234567', 'Hẻm 480 Nguyễn Tri Phương, Khu phố 17, Phường Vườn Lài, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72712, Việt Nam', 'ATH-69D61B5ED0E59', 318000.00, 0.00, 318000.00, NULL, NULL, 'bank_transfer', 'cho_thanh_toan', NULL, '2026-04-08 16:09:50', '2026-04-08 16:09:50', NULL, 10.76703806, 106.66780095),
+(29, 12, 'nguyễn văn a', '0901234567', 'Hẻm 327 Sư Vạn Hạnh, Khu phố 18, Phường Vườn Lài, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72712, Việt Nam', 'ATH-69D61BB015F45', 798000.00, 0.00, 798000.00, NULL, NULL, 'bank_transfer', 'cho_xac_nhan', NULL, '2026-04-08 16:11:12', '2026-04-08 16:11:18', NULL, 10.76262200, 106.66017200),
+(30, 12, 'nguyễn văn a', '0901234567', 'Hẻm 282 Nguyễn Duy Dương, Khu phố 13, Phường Vườn Lài, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72712, Việt Nam', 'ATH-69D61CC680F32', 298000.00, 0.00, 298000.00, NULL, NULL, 'bank_transfer', 'cho_thanh_toan', NULL, '2026-04-08 16:15:50', '2026-04-08 16:15:50', NULL, 10.76400254, 106.67054616),
+(31, 12, 'nguyễn văn a', '0901234567', 'Hẻm 606 Đường 3 Tháng 2, Khu phố 7, Phường Diên Hồng, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72415, Việt Nam', 'ATH-69D74D697690E', 318000.00, 0.00, 318000.00, NULL, NULL, 'bank_transfer', 'cho_xac_nhan', NULL, '2026-04-09 13:55:37', '2026-04-09 13:55:37', NULL, 10.76262200, 106.66017200);
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `gia_tri_thong_so`
+--
+
 CREATE TABLE `gia_tri_thong_so` (
   `id` int(11) NOT NULL COMMENT 'ID giá trị thông số',
   `san_pham_id` int(11) NOT NULL COMMENT 'ID sản phẩm',
@@ -333,7 +411,10 @@ CREATE TABLE `gia_tri_thong_so` (
   `gia_tri` varchar(255) NOT NULL COMMENT 'Giá trị thông số'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng giá trị thông số sản phẩm';
 
+--
 -- Đang đổ dữ liệu cho bảng `gia_tri_thong_so`
+--
+
 INSERT INTO `gia_tri_thong_so` (`id`, `san_pham_id`, `thong_so_id`, `gia_tri`) VALUES
 (1, 1, 1, '100% Cotton'),
 (2, 1, 2, 'XS, S, M, L, XL, XXL'),
@@ -375,7 +456,19 @@ CREATE TABLE `gio_hang` (
   `ngay_cap_nhat` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng giỏ hàng';
 
+--
+-- Đang đổ dữ liệu cho bảng `gio_hang`
+--
+
+INSERT INTO `gio_hang` (`id`, `nguoi_dung_id`, `id_phien_lam_viec`, `ngay_tao`, `ngay_cap_nhat`) VALUES
+(14, 40, NULL, '2026-04-05 16:19:28', '2026-04-05 16:19:28');
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `hinh_anh_san_pham`
+--
+
 CREATE TABLE `hinh_anh_san_pham` (
   `id` int(11) NOT NULL COMMENT 'ID hình ảnh',
   `san_pham_id` int(11) NOT NULL COMMENT 'ID sản phẩm',
@@ -431,6 +524,15 @@ CREATE TABLE `like_danh_gia` (
   `trang_thai` int(11) DEFAULT 1,
   `ngay_tao` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `like_danh_gia`
+--
+
+INSERT INTO `like_danh_gia` (`id`, `danh_gia_id`, `nguoi_dung_id`, `trang_thai`, `ngay_tao`) VALUES
+(152, 37, 12, 1, '2026-04-09 07:04:34'),
+(153, 38, 12, 1, '2026-04-09 07:04:38'),
+(154, 38, 38, 1, '2026-04-09 07:05:07');
 
 -- --------------------------------------------------------
 
@@ -512,6 +614,37 @@ INSERT INTO `ma_giam_gia` (`id`, `ma_code`, `mo_ta`, `phan_tram_giam`, `so_tien_
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `momo_payments`
+--
+
+CREATE TABLE `momo_payments` (
+  `id` int(11) NOT NULL,
+  `don_hang_id` int(11) NOT NULL,
+  `momo_order_id` varchar(100) NOT NULL,
+  `trans_id` varchar(100) DEFAULT NULL,
+  `amount` int(11) NOT NULL,
+  `status` enum('pending','completed','failed') DEFAULT 'pending',
+  `message` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `momo_payments`
+--
+
+INSERT INTO `momo_payments` (`id`, `don_hang_id`, `momo_order_id`, `trans_id`, `amount`, `status`, `message`, `created_at`, `updated_at`) VALUES
+(1, 22, '221775638773', NULL, 758000, 'pending', NULL, '2026-04-08 08:59:33', '2026-04-08 08:59:33'),
+(2, 23, '231775638888', NULL, 798000, 'pending', NULL, '2026-04-08 09:01:28', '2026-04-08 09:01:28'),
+(3, 24, '241775638988', NULL, 258000, 'pending', NULL, '2026-04-08 09:03:08', '2026-04-08 09:03:08'),
+(4, 25, '251775639043', NULL, 318000, 'pending', NULL, '2026-04-08 09:04:03', '2026-04-08 09:04:03'),
+(5, 26, '261775639101', NULL, 318000, 'pending', NULL, '2026-04-08 09:05:01', '2026-04-08 09:05:01'),
+(6, 27, '271775639236', NULL, 1596000, 'pending', NULL, '2026-04-08 09:07:16', '2026-04-08 09:07:16'),
+(7, 29, 'SIM-1775639478-29', 'TRANS-69d61bb6a9760', 798000, 'completed', NULL, '2026-04-08 09:11:18', '2026-04-08 09:11:18');
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `nguoi_dung`
 --
 
@@ -535,7 +668,7 @@ CREATE TABLE `nguoi_dung` (
 --
 
 INSERT INTO `nguoi_dung` (`id`, `ten`, `email`, `mat_khau`, `so_dien_thoai`, `dia_chi`, `anh_dai_dien`, `vai_tro`, `trang_thai`, `ngay_tao`, `ngay_cap_nhat`, `lan_dang_nhap_cuoi`) VALUES
-(1, 'Admin AthleteHub', 'admin@email.com', '$2y$10$kzLAZfIXGu.Oz8Sd.dYvzujJhIJSkkTmxUV8W9t/XLa4BGOem3soC', '0912345678', '123 Đường Thể Thao, TP.HCM', 'admin-avatar.jpg', 'admin', 'hoat_dong', '2026-01-15 08:30:00', '2026-04-02 16:15:07', '2026-04-02 16:15:07'),
+(1, 'Admin AthleteHub', 'admin@email.com', '$2y$10$kzLAZfIXGu.Oz8Sd.dYvzujJhIJSkkTmxUV8W9t/XLa4BGOem3soC', '0912345678', '123 Đường Thể Thao, TP.HCM', 'admin-avatar.jpg', 'admin', 'hoat_dong', '2026-01-15 08:30:00', '2026-04-05 17:10:45', '2026-04-05 17:10:45'),
 (2, 'Nguyễn Văn A', 'khach1@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0987654321', '456 Đường Lê Lợi, Q1, TP.HCM', 'avatar-1.jpg', 'khach_hang', 'hoat_dong', '2026-01-20 10:15:00', '2026-03-04 14:30:54', '2026-03-03 09:45:00'),
 (3, 'Trần Thị B', 'khach2@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0912123456', '789 Đường Nguyễn Huệ, Q1, TP.HCM', 'avatar-2.jpg', 'khach_hang', 'hoat_dong', '2026-01-25 14:30:00', '2026-03-04 14:30:54', '2026-03-02 16:20:00'),
 (4, 'Lê Văn C', 'khach3@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0923456789', '321 Đường Trần Hưng Đạo, Q5, TP.HCM', 'avatar-3.jpg', 'khach_hang', 'hoat_dong', '2026-02-01 11:00:00', '2026-03-04 14:30:54', '2026-03-01 13:15:00'),
@@ -546,10 +679,10 @@ INSERT INTO `nguoi_dung` (`id`, `ten`, `email`, `mat_khau`, `so_dien_thoai`, `di
 (9, 'Đặng Thị H', 'khach8@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0978901234', '753 Đường Hai Bà Trưng, Q1, TP.HCM', 'avatar-8.jpg', 'khach_hang', 'hoat_dong', '2026-02-25 13:35:00', '2026-03-04 14:30:54', '2026-03-01 17:40:00'),
 (10, 'Trương Văn I', 'khach9@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0989012345', '159 Đường Pasteur, Q1, TP.HCM', 'avatar-9.jpg', 'khach_hang', 'hoat_dong', '2026-02-28 10:20:00', '2026-03-04 14:30:54', '2026-03-03 12:00:00'),
 (11, 'Phan Văn J', 'khach10@example.com', '$2y$10$5v5l7bY9nZ9d8k7j6h5g4f3e2d1c0b9a8f7e6d5c4b3a2z1y0x9w8v', '0912345679', '852 Đường Ngô Tất Tố, Q1, TP.HCM', 'avatar-10.jpg', 'khach_hang', 'hoat_dong', '2026-03-01 07:50:00', '2026-03-04 14:30:54', '2026-03-03 15:30:00'),
-(12, 'nguyễn văn a', 'a@gmail.com', '$2y$10$pq0gtiU5VfzluOJC3aEdkOH4U6iy0qdRr3zF13yRhRaJd8o8TVGbi', '0901234567', '65a đường 102 lã xuân oai', 'hinh1.jpg', 'khach_hang', 'hoat_dong', '2026-03-18 14:07:03', '2026-04-02 15:57:41', '2026-04-02 15:57:41'),
-(38, 'khanh huyen', 'khanhhuyen@gmail.com', '$2y$10$nSK8agNkOcrWN4mQM0PcQehJ/JLBwk3pyeo7a.Ofd1.z5njCYapyS', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-21 16:21:43', '2026-03-21 16:21:43', NULL),
+(12, 'nguyễn văn a', 'a@gmail.com', '$2y$10$pq0gtiU5VfzluOJC3aEdkOH4U6iy0qdRr3zF13yRhRaJd8o8TVGbi', '0901234567', '65a đường 102 lã xuân oai', 'hinh1.jpg', 'khach_hang', 'hoat_dong', '2026-03-18 14:07:03', '2026-04-09 17:49:43', '2026-04-09 17:49:43'),
+(38, 'khanh huyen', 'khanhhuyen@gmail.com', '$2y$10$nSK8agNkOcrWN4mQM0PcQehJ/JLBwk3pyeo7a.Ofd1.z5njCYapyS', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-21 16:21:43', '2026-04-09 14:04:58', '2026-04-09 14:04:58'),
 (39, 'abc', 'abc@gmail.com', '$2y$10$3yxEcgOvMZL606V6su0Ccuq/w2189lH2UQCoZBoFFtOqZey7KYVFS', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-21 16:34:24', '2026-03-21 16:34:24', NULL),
-(40, 'duong', 'duong@gmail.com', '$2y$10$nvFan.kSaJ5nIw7GttOV6OjyL.5/h.ZaQzGeDuaPDXmSbPzdVG2Be', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-23 22:47:24', '2026-04-02 15:08:55', '2026-04-02 15:08:55');
+(40, 'duong', 'duong@gmail.com', '$2y$10$nvFan.kSaJ5nIw7GttOV6OjyL.5/h.ZaQzGeDuaPDXmSbPzdVG2Be', NULL, NULL, NULL, 'khach_hang', 'hoat_dong', '2026-03-23 22:47:24', '2026-04-06 08:37:17', '2026-04-06 08:37:17');
 
 -- --------------------------------------------------------
 
@@ -640,6 +773,17 @@ CREATE TABLE `su_dung_ma_giam_gia` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng lịch sử sử dụng mã giảm giá';
 
 --
+-- Đang đổ dữ liệu cho bảng `su_dung_ma_giam_gia`
+--
+
+INSERT INTO `su_dung_ma_giam_gia` (`id`, `nguoi_dung_id`, `ma_giam_gia_id`, `don_hang_id`, `ngay_su_dung`) VALUES
+(1, 3, 1, NULL, '2026-02-26 14:15:00'),
+(2, 5, 4, NULL, '2026-03-01 11:00:00'),
+(3, 2, 4, NULL, '2026-03-02 08:20:00');
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `thong_so`
 --
 
@@ -663,6 +807,36 @@ INSERT INTO `thong_so` (`id`, `ten_thong_so`, `mo_ta`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `tin_tuc`
+--
+
+CREATE TABLE `tin_tuc` (
+  `id` int(11) NOT NULL COMMENT 'ID tin tức',
+  `tieu_de` varchar(255) NOT NULL COMMENT 'Tiêu đề',
+  `noi_dung` longtext NOT NULL COMMENT 'Nội dung',
+  `hinh_anh` varchar(255) DEFAULT NULL COMMENT 'Hình ảnh',
+  `loai_tin` enum('san-pham-moi','khuyen-mai','su-kien','other') DEFAULT 'san-pham-moi' COMMENT 'Loại tin tức',
+  `trang_thai` tinyint(4) DEFAULT 1 COMMENT '1: Công khai, 0: Lưu nháp',
+  `luot_xem` int(11) DEFAULT 0 COMMENT 'Số lượt xem',
+  `admin_id` int(11) DEFAULT NULL COMMENT 'ID admin đăng tin',
+  `ngay_tao` datetime DEFAULT current_timestamp() COMMENT 'Ngày tạo',
+  `ngay_cap_nhat` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'Ngày cập nhật'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng tin tức và thông báo';
+
+--
+-- Đang đổ dữ liệu cho bảng `tin_tuc`
+--
+
+INSERT INTO `tin_tuc` (`id`, `tieu_de`, `noi_dung`, `hinh_anh`, `loai_tin`, `trang_thai`, `luot_xem`, `admin_id`, `ngay_tao`, `ngay_cap_nhat`) VALUES
+(1, '🎉 Sản phẩm mới: Áo thun Nam cao cấp chính hãng', 'AthleteHub vui mừng giới thiệu bộ sưu tập áo thun nam cao cấp hoàn toàn mới. Được sản xuất từ chất liệu cotton 100% thoáng khí, thấm hút mồ hôi tốt. Thiết kế hiện đại, tôn dáng, phù hợp cho các hoạt động thể dục, đi chơi hàng ngày.\n\nĐặc điểm nổi bật:\n- Chất liệu cotton 100% cao cấp\n- Thoáng khí, thấm hút mồ hôi\n- Thiết kế hiện đại, sang trọng\n- Nhiều màu sắc lựa chọn\n- Hỗ trợ size XS - 5XL\n\nGiá khuyến mãi: Chỉ từ 199.000đ (giảm 30% so với giá gốc)', NULL, 'san-pham-moi', 1, 254, 1, '2026-04-05 10:30:00', '2026-04-09 18:17:20'),
+(2, '💰 Khuyến mãi lớn mùa Hè - Giảm tới 50% toàn bộ quần áo', 'Mùa Hè này, AthleteHub mang đến chương trình khuyến mãi lớn nhất trong năm. Giảm giá tới 50% cho toàn bộ sản phẩm quần áo, giày thể thao.\n\nKhuyến mãi áp dụng:\n- Áo thun, áo tank: Giảm 40-50%\n- Quần short, legging: Giảm 35-45%\n- Giày chạy, giày thể dục: Giảm 30-40%\n- Phụ kiện: Giảm 25-35%\n\nThời gian: 01/04 - 30/04/2026\nĐiều kiện: Áp dụng cho tất cả sản phẩm, mỗi hoá đơn từ 500.000đ trở lên được tặng thêm voucher 100.000đ', NULL, 'khuyen-mai', 1, 512, 1, '2026-04-02 09:15:00', '2026-04-09 13:45:00'),
+(3, '🏃 Sự kiện Marathon Đặng Diêu năm 2026 - Tham gia cùng AthleteHub', 'AthleteHub cùng bạn tham gia Sự kiện Marathon Đặng Diêu 2026 - Giải chạy lớn nhất năm. Nếu bạn là khách hàng của chúng tôi, hayđặt ngay bộ trang phục chạy bộ chuyên nghiệp từ AthleteHub.\n\nThông tin sự kiện:\n- Tên: Marathon Đặng Diêu 2026\n- Ngày: 15/05/2026\n- Địa điểm: Công viên Tao Đàn, TP. HCM\n- Quãng đường: 21km (nửa marathon) và 42km (full marathon)\n- Hạn đăng ký: 10/05/2026\n\nAthleteHub cung cấp:\n- Áo, quần chạy bộ chuyên dụng\n- Giày chạy cao cấp\n- Phụ kiện bảo vệ (túi chạy, dây đeo, v.v.)\n- Tặng áo ghi đăng ký cho khách hàng mua combo', NULL, 'su-kien', 1, 192, 1, '2026-04-01 11:00:00', '2026-04-09 18:17:25'),
+(4, '⭐ Top 5 sản phẩm bán chạy nhất tháng 3/2026', 'Tháng 3 vừa qua, AthleteHub đã phục vụ hàng chục nghìn khách hàng. Dưới đây là top 5 sản phẩm bán chạy nhất được yêu thích bởi cộng đồng:\n\n1. Áo thun nam cao cấp Cotton 100% - 5,420 bộ bán ra\n2. Quần short nam thoáng khí - 3,890 cái bán ra\n3. Giày chạy bộ Air Runner Pro - 2,567 đôi bán ra\n4. Áo tập nữ co giãn cao cấp - 2,340 cái bán ra\n5. Legging nữ chất lượng cao - 1,980 cái bán ra\n\nCảm ơn các bạn đã tin tưởng và chọn các sản phẩm từ AthleteHub. Chúng tôi sẽ tiếp tục mang đến những sản phẩm chất lượng nhất với giá cả hợp lý nhất.', NULL, 'other', 1, 369, 1, '2026-03-31 15:45:00', '2026-04-09 18:22:45'),
+(5, '🎁 Chương trình khách hàng thân thiết - Tích lũy điểm mua hàng', 'AthleteHub mất vui giới thiệu chương trình khách hàng thân thiết hoàn toàn mới. Mỗi lần mua hàng, bạn sẽ tích lũy điểm.\n\nCách hoạt động:\n- Mỗi 100.000đ chi tiêu = 1 điểm\n- 50 điểm = Voucher 500.000đ\n- 100 điểm = Voucher 1.000.000đ + quà tặng\n- 200 điểm = Áo thun limited edition + voucher 2.000.000đ\n\nUu đãi thêm:\n- Khách VIP nhận 15% tất cả đơn hàng\n- Miễn phí vận chuyển cho đơn từ 300.000đ\n- Hỗ trợ ưu tiên 24/7\n\nĐăng ký ngay tại: www.athletehub.com/loyalty', NULL, 'san-pham-moi', 1, 421, 1, '2026-03-28 08:00:00', '2026-04-09 10:15:00');
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `yeu_thich`
 --
 
@@ -672,6 +846,10 @@ CREATE TABLE `yeu_thich` (
   `san_pham_id` int(11) NOT NULL COMMENT 'ID sản phẩm',
   `ngay_them` datetime DEFAULT current_timestamp() COMMENT 'Ngày thêm'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng danh sách yêu thích';
+
+--
+-- Chỉ mục cho các bảng đã đổ
+--
 
 --
 -- Chỉ mục cho bảng `bien_the_san_pham`
@@ -816,6 +994,17 @@ ALTER TABLE `ma_giam_gia`
   ADD KEY `idx_trang_thai` (`trang_thai`);
 
 --
+-- Chỉ mục cho bảng `momo_payments`
+--
+ALTER TABLE `momo_payments`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `don_hang_id` (`don_hang_id`),
+  ADD UNIQUE KEY `momo_order_id` (`momo_order_id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_momo_order_id` (`momo_order_id`),
+  ADD KEY `idx_trans_id` (`trans_id`);
+
+--
 -- Chỉ mục cho bảng `nguoi_dung`
 --
 ALTER TABLE `nguoi_dung`
@@ -863,6 +1052,15 @@ ALTER TABLE `thong_so`
   ADD KEY `idx_ten_thong_so` (`ten_thong_so`);
 
 --
+-- Chỉ mục cho bảng `tin_tuc`
+--
+ALTER TABLE `tin_tuc`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `trang_thai` (`trang_thai`),
+  ADD KEY `loai_tin` (`loai_tin`),
+  ADD KEY `ngay_tao` (`ngay_tao`);
+
+--
 -- Chỉ mục cho bảng `yeu_thich`
 --
 ALTER TABLE `yeu_thich`
@@ -891,19 +1089,19 @@ ALTER TABLE `cai_dat`
 -- AUTO_INCREMENT cho bảng `chi_tiet_don_hang`
 --
 ALTER TABLE `chi_tiet_don_hang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi tiết', AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi tiết', AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT cho bảng `chi_tiet_gio_hang`
 --
 ALTER TABLE `chi_tiet_gio_hang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi tiết', AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi tiết', AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT cho bảng `danh_gia`
 --
 ALTER TABLE `danh_gia`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID đánh giá', AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID đánh giá', AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT cho bảng `danh_muc`
@@ -915,7 +1113,7 @@ ALTER TABLE `danh_muc`
 -- AUTO_INCREMENT cho bảng `don_hang`
 --
 ALTER TABLE `don_hang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID đơn hàng', AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID đơn hàng', AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT cho bảng `gia_tri_thong_so`
@@ -927,7 +1125,7 @@ ALTER TABLE `gia_tri_thong_so`
 -- AUTO_INCREMENT cho bảng `gio_hang`
 --
 ALTER TABLE `gio_hang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID giỏ hàng', AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID giỏ hàng', AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT cho bảng `hinh_anh_san_pham`
@@ -945,7 +1143,7 @@ ALTER TABLE `kich_thuoc`
 -- AUTO_INCREMENT cho bảng `like_danh_gia`
 --
 ALTER TABLE `like_danh_gia`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=150;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=157;
 
 --
 -- AUTO_INCREMENT cho bảng `like_phan_hoi`
@@ -966,6 +1164,12 @@ ALTER TABLE `ma_giam_gia`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID mã giảm', AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT cho bảng `momo_payments`
+--
+ALTER TABLE `momo_payments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
 -- AUTO_INCREMENT cho bảng `nguoi_dung`
 --
 ALTER TABLE `nguoi_dung`
@@ -975,7 +1179,7 @@ ALTER TABLE `nguoi_dung`
 -- AUTO_INCREMENT cho bảng `phan_hoi_danh_gia`
 --
 ALTER TABLE `phan_hoi_danh_gia`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT cho bảng `san_pham`
@@ -994,6 +1198,12 @@ ALTER TABLE `su_dung_ma_giam_gia`
 --
 ALTER TABLE `thong_so`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID thông số', AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT cho bảng `tin_tuc`
+--
+ALTER TABLE `tin_tuc`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID tin tức', AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT cho bảng `yeu_thich`
@@ -1079,6 +1289,12 @@ ALTER TABLE `like_danh_gia`
 ALTER TABLE `like_phan_hoi`
   ADD CONSTRAINT `like_phan_hoi_ibfk_1` FOREIGN KEY (`phan_hoi_id`) REFERENCES `phan_hoi_danh_gia` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `like_phan_hoi_ibfk_2` FOREIGN KEY (`nguoi_dung_id`) REFERENCES `nguoi_dung` (`id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `momo_payments`
+--
+ALTER TABLE `momo_payments`
+  ADD CONSTRAINT `momo_payments_ibfk_1` FOREIGN KEY (`don_hang_id`) REFERENCES `don_hang` (`id`) ON DELETE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `phan_hoi_danh_gia`
