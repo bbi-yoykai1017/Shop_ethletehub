@@ -1,10 +1,10 @@
 <?php
 class Database
 {
-    // private $host = "localhost";
-    // private $dbname = "jwbspmbk_athletehub";
-    // private $user = "jwbspmbk_athlete";
-    // private $pass = "XzIUV#to3UTP";
+//     private $host = "localhost";
+//     private $dbname = "jwbspmbk_athletehub";
+//     private $user = "jwbspmbk_athlete";
+//     private $pass = "XzIUV#to3UTP";
     private $host = "localhost";
     private $dbname = "athletehub";
     private $user = "root";

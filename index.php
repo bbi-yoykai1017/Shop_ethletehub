@@ -400,54 +400,6 @@ $displayProducts = array_slice($products, 0, 8);
             </div>
         </div>
     </section>
-
-    <!-- ========================
-         NEWS SECTION
-         ======================== -->
-    <section class="news" id="news">
-        <div class="container-custom">
-            <div class="news-section-title">
-                <h2><i class="fas fa-newspaper"></i> Tin tức & Thông báo</h2>
-                <p>Cập nhật những sản phẩm mới, khuyến mãi, và sự kiện hấp dẫn từ AthleteHub</p>
-            </div>
-
-            <div class="news-cards-grid">
-                <?php if (!empty($latestNews)): ?>
-                    <?php foreach ($latestNews as $news_item): ?>
-                        <div class="news-card" onclick="window.location.href='news-detail.php?id=<?= $news_item['id'] ?>'">
-                            <div class="news-card-image">
-                                <?php if ($news_item['hinh_anh']): ?>
-                                    <img src="<?= htmlspecialchars($news_item['hinh_anh']) ?>" alt="<?= htmlspecialchars($news_item['tieu_de']) ?>">
-                                <?php else: ?>
-                                    <i class="fas fa-newspaper"></i>
-                                <?php endif; ?>
-                                <span class="news-card-badge">
-                                    <?= getNewsTypeLabel($news_item['loai_tin']) ?>
-                                </span>
-                            </div>
-
-                            <div class="news-card-body">
-                                <h3 class="news-card-title"><?= htmlspecialchars($news_item['tieu_de']) ?></h3>
-                                <p class="news-card-excerpt"><?= htmlspecialchars(truncateText($news_item['noi_dung'], 80)) ?></p>
-
-                                <div class="news-card-footer">
-                                    <span><i class="fas fa-calendar"></i> <?= date('d/m/Y', strtotime($news_item['ngay_tao'])) ?></span>
-                                    <span><i class="fas fa-eye"></i> <?= $news_item['luot_xem'] ?></span>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-
-            <div class="news-cta">
-                <a href="news.php" class="btn-news-all">
-                    <i class="fas fa-arrow-right"></i> Xem tất cả tin tức
-                </a>
-            </div>
-        </div>
-    </section>
-
     <!-- ========================
          FOOTER
          ======================== -->
