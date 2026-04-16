@@ -83,7 +83,7 @@ $displayProducts = array_slice($products, 0, 8);
                                 </li>
                             <?php endif; ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="#about">Về chúng tôi</a>
+                                <a class="nav-link" href="about.php">Về chúng tôi</a>
                             </li>
                         </ul>
 
