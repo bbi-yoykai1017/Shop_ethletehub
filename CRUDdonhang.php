@@ -117,7 +117,7 @@ if (!empty($search)) {
     if (is_numeric($search)) {
         $where_sql = " WHERE id = ?  ";
         $params[] = $search; // Tìm chính xác số ID
-       // $params[] = "%$search%"; // Hoặc tiong doi mã đơn hàng chứa số đó
+        // $params[] = "%$search%"; // Hoặc tiong doi mã đơn hàng chứa số đó
     } else {
         // Nếu là chữ, tìm gần đúng theo mã đơn hàng
         $where_sql = " WHERE ma_don_hang LIKE ? ";
@@ -133,7 +133,7 @@ $total_rows = $total_stmt->fetchColumn();
 $total_pages = ceil($total_rows / $limit);
 
 // Lấy dữ liệu theo trang và tìm kiếm
-$sql_list = "SELECT * FROM don_hang" . $where_sql . " ORDER BY id ASC LIMIT $limit OFFSET $offset";
+$sql_list = "SELECT * FROM don_hang" . $where_sql . " ORDER BY id DESC LIMIT $limit OFFSET $offset";
 $stmt_list = $conn->prepare($sql_list);
 $stmt_list->execute($params);
 $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
@@ -273,7 +273,7 @@ $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                     </form>
                 </div>
             </div>
-               <!-- Tim kiem -->
+            <!-- Tim kiem -->
             <div class="filter-group mb-3">
                 <h4 class="filter-title"><i class="fas fa-search"></i> Tìm kiếm</h4>
                 <form method="GET" action="CRUDdonhang.php" class="search-box d-flex gap-2">
@@ -299,6 +299,7 @@ $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                             <th>Thành tiền</th>
                             <th>Phương thức thanh toán</th>
                             <th>Trạng thái</th>
+                            <th>Ngày đặt</th>
                             <th width="180">Hành động</th>
                         </tr>
                     </thead>
@@ -312,6 +313,7 @@ $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                                 <td><?= $donhang['tien_giam'] ?></td>
                                 <td><?= $donhang['thanh_tien'] ?></td>
                                 <td><?= $donhang['phuong_thuc_thanh_toan'] ?></td>
+
                                 <td>
                                     <?php
                                     $status_label = '';
@@ -346,7 +348,7 @@ $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                                     <span class="badge <?= $status_class ?>"><?= $status_label ?></span>
                                 </td>
 
-
+                                <td><?= $donhang['ngay_dat'] ?></td>
                                 <td>
                                     <a href="?edit=<?= $donhang['id'] ?>" class="btn btn-sm btn-outline-warning">Sửa</a>
                                     <a href="?delete=<?= $donhang['id'] ?>" class="btn btn-sm btn-outline-danger"
