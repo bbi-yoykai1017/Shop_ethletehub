@@ -4,6 +4,7 @@ require_once 'model/functions.php';
 require_once 'model/detail.php';
 require_once 'model/news.php';
 require_once 'Database.php';
+require_once 'chattudong.php';
 
 $db = new Database();
 $conn = $db->connect();
@@ -400,6 +401,8 @@ $displayProducts = array_slice($products, 0, 8);
             </div>
         </div>
     </section>
+
+
     <!-- ========================
          FOOTER
          ======================== -->
@@ -609,7 +612,14 @@ $displayProducts = array_slice($products, 0, 8);
     </script>
     <script src="js/script.js"></script>
     <script src="js/categories.js"></script>
-    
+    <script>
+    // Dùng kỹ thuật fetch để "nhúng" nội dung vào trang chính
+    fetch('chat-widget.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('chat-container').innerHTML = data;
+        });
+</script>
     <script>
         // Back to Top Button
         const backToTopBtn = document.getElementById('backToTop');
@@ -629,6 +639,7 @@ $displayProducts = array_slice($products, 0, 8);
             });
         });
     </script>
+   
 </body>
 
 </html>

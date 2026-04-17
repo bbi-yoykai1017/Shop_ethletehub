@@ -306,38 +306,32 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container px-4">
-            <div class="row">
-                <div class="col-12">
-                    <!-- Logo & Brand -->
-                    <a class="navbar-brand" href="index.php">
-                        <i class="fas fa-dumbbell"></i>
-                        AthleteHub
-                    </a>
-                </div>
-                <div class="col-12">
-                    <!-- Mobile Menu Toggle -->
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.php">
+                <i class="fas fa-dumbbell me-2"></i>
+                <span class="fw-bold">AthleteHub</span>
+            </a>
 
-                    <!-- Navbar Content -->
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <!-- Left Navigation Links -->
-                        <ul class="navbar-nav ms-auto">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="index.php">Trang chủ</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="products.php">Sản phẩm</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#categories">Danh mục</a>
-                        </ul>                        
-                    </div>
-                </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.php">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="products.php">Sản phẩm</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Về chúng tôi</a>
+                    </li>
+                </ul>
             </div>
+        </div>
     </nav>
     <section class="hero">
         <div class="container">
@@ -349,7 +343,6 @@
     <section class="container">
         <div class="flex-row">
             <div class="content-box">
-                <h1 style="color:var(--primary); font-weight:bold;">Về Chúng Tôi</h1>
                 <h2>Không chỉ là trang phục, đó là động lực</h2>
                 <p>Tại <strong>Athlete Hub</strong>, chúng tôi tin rằng mỗi bộ đồ tập không đơn thuần là vật dụng hỗ trợ. Chúng là "ngôn ngữ" khẳng định kỷ luật bản thân. Chúng tôi không chạy theo doanh số ngắn hạn, chúng tôi xây dựng một cộng đồng bền vững, nơi mọi người truyền cảm hứng tập luyện cho nhau.</p>
             </div>
@@ -405,31 +398,53 @@
         </div>
     </section>
 
-    <section class="container">
-        <div class="section-title">
-            <h2>Đội ngũ nòng cốt</h2>
+    <section class="container py-5">
+        <div class="section-title text-center mb-5">
+            <h2 class="fw-bold">Đội ngũ nòng cốt</h2>
         </div>
-        <div class="team-grid">
-            <div class="team-item">
-                <img src="public/Quan.png" alt="CEO">
-                <h3>Minh Quân</h3>
-                <p>Founder & CEO</p>
+
+        <div class="row g-4 justify-content-center">
+
+            <div class="col-6 col-md-3">
+                <div class="team-item d-flex flex-column align-items-center text-center">
+                    <div class="image-wrapper mb-3">
+                        <img src="public/Quan.png" alt="CEO" class="img-fluid">
+                    </div>
+                    <h3 class="h5 fw-bold mb-1">Minh Quân</h3>
+                    <p class="text-muted small">Founder & CEO</p>
+                </div>
             </div>
-            <div class="team-item">
-                <img src="public/Tu.png" alt="Manager">
-                <h3>Anh Tú</h3>
-                <p>Trưởng phòng Sản phẩm</p>
+
+            <div class="col-6 col-md-3">
+                <div class="team-item d-flex flex-column align-items-center text-center">
+                    <div class="image-wrapper mb-3">
+                        <img src="public/Tu.png" alt="Manager" class="img-fluid">
+                    </div>
+                    <h3 class="h5 fw-bold mb-1">Anh Tú</h3>
+                    <p class="text-muted small">Trưởng phòng Sản phẩm</p>
+                </div>
             </div>
-            <div class="team-item">
-                <img src="public/tuan.png" alt="Designer">
-                <h3>Anh Tuấn</h3>
-                <p>Nhà thiết kế chính</p>
+
+            <div class="col-6 col-md-3">
+                <div class="team-item d-flex flex-column align-items-center text-center">
+                    <div class="image-wrapper mb-3">
+                        <img src="public/tuan.png" alt="Designer" class="img-fluid">
+                    </div>
+                    <h3 class="h5 fw-bold mb-1">Anh Tuấn</h3>
+                    <p class="text-muted small">Nhà thiết kế chính</p>
+                </div>
             </div>
-            <div class="team-item">
-                <img src="public/Dat.png" alt="Support">
-                <h3>Thành Đạt</h3>
-                <p>Trưởng nhóm CSKH</p>
+
+            <div class="col-6 col-md-3">
+                <div class="team-item d-flex flex-column align-items-center text-center">
+                    <div class="image-wrapper mb-3">
+                        <img src="public/Dat.png" alt="Support" class="img-fluid">
+                    </div>
+                    <h3 class="h5 fw-bold mb-1">Thành Đạt</h3>
+                    <p class="text-muted small">Trưởng nhóm CSKH</p>
+                </div>
             </div>
+
         </div>
     </section>
 
@@ -441,8 +456,110 @@
         </div>
     </section>
 
-    <footer style="text-align: center; padding: 30px; color: var(--gray);">
-        <p>&copy; 2026 Athlete Hub. Build with passion for Athletes.</p>
+    <footer class="footer">
+        <div class="container-custom">
+            <div class="footer-top">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-section">
+                            <h4 class="footer-title">AthleteHub</h4>
+                            <p style="color: #c0c0c0; margin-bottom: 20px;">Chúng tôi cung cấp sản phẩm thể thao chất
+                                lượng cao với giá cạnh tranh tốt nhất trên thị trường.</p>
+                            <div class="footer-socials">
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-youtube"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-section">
+                            <h4 class="footer-title">Liên kết nhanh</h4>
+                            <ul class="footer-links">
+                                <li><a href="index.php"><i class="fas fa-angle-right"></i>Trang chủ</a></li>
+                                <li><a href="products.php"><i class="fas fa-angle-right"></i>Sản phẩm</a></li>
+                                <li><a href="#categories"><i class="fas fa-angle-right"></i>Danh mục</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Về chúng tôi</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-section">
+                            <h4 class="footer-title">Hỗ trợ khách hàng</h4>
+                            <ul class="footer-links">
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Liên hệ chúng tôi</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Chính sách giao hàng</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Chính sách hoàn trả</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Câu hỏi thường gặp</a></li>
+                                <li><a href="#"><i class="fas fa-angle-right"></i>Theo dõi đơn hàng</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-section">
+                            <h4 class="footer-title">Liên lạc</h4>
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <p>123 Đường Thể Thao, TP. Hồ Chí Minh, Việt Nam</p>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <p>+84 (0) 123 456 789</p>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <p>support@athletehub.vn</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="row mt-5">
+                <div class="col-lg-6 mx-auto">
+                    <div class="footer-newsletter">
+                        <h3>Đăng ký nhận tin</h3>
+                        <p>Nhận ưu đãi độc quyền, cập nhật sản phẩm mới và nhiều hơn nữa trực tiếp vào hộp thư của bạn.
+                        </p>
+                        <form class="newsletter-form">
+                            <input type="email" class="newsletter-input" placeholder="Nhập email của bạn" required>
+                            <button type="submit" class="newsletter-btn">
+                                <i class="fas fa-paper-plane"></i>
+                                Đăng ký
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <div class="footer-copyright">
+                        &copy;
+                        <?php echo date("Y"); ?> <strong>AthleteHub</strong>. Bảo lưu mọi quyền.
+                    </div>
+                    <ul class="footer-bottom-links">
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">Điều khoản dịch vụ</a></li>
+                        <li><a href="#">Sitemap</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </footer>
 
 </body>
