@@ -6,55 +6,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Widget Interface</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-        }
-
-        /* Nút Icon Chat nổi */
+        /* 1. CẤU HÌNH CỐ ĐỊNH (KHÔNG THAY ĐỔI DÙ LÀ MOBILE HAY PC) */
+        /* Giả sử nút mũi tên của bạn có class là .back-to-top */
+        .back-to-top,
         .chat-launcher {
             position: fixed;
-            bottom: 80px;
-            /* Tăng từ 20px lên 80px để tránh bị đè */
-            right: 20px;
-            /* Đổi từ right sang left */
-            width: 60px;
-            height: 60px;
-            background-color: #ff4d4f;
-            border-radius: 50%;
+            /* Giữ nguyên vị trí và kích thước trên mọi màn hình */
+            right: 20px !important;
+            width: 45px !important;
+            height: 45px !important;
+
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 50%;
+            z-index: 1000;
+            transition: transform 0.2s ease;
+        }
+
+        /* Vị trí đứng của nút Mũi tên (Dưới cùng) */
+        .back-to-top {
+            bottom: 20px !important;
+        }
+
+        /* Vị trí đứng của nút Chat (Ở trên mũi tên) */
+        .chat-launcher {
+            bottom: 85px !important;
+            /* Khoảng cách cố định để luôn thẳng hàng dọc */
+            background-color: #ff4d4f;
             color: white;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
+            border: none;
         }
 
-        /* Khung cửa sổ Chat */
+        /* 2. KHUNG CỬA SỔ CHAT */
         .chat-box {
             position: fixed;
-            bottom: 150px;
-            /* Phải cao hơn bottom của chat-launcher (80 + 60 + một khoảng hở) */
+            bottom: 145px;
+            /* Luôn cách Launcher một khoảng cố định */
             right: 20px;
-            /* Đổi sang left để đồng bộ với nút bấm */
-            width: 350px;
+            width: 320px;
             background: white;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             display: none;
             flex-direction: column;
             overflow: hidden;
-            z-index: 1000;
+            z-index: 1001;
         }
 
         .chat-box.active {
             display: flex;
         }
 
-        /* Header */
+        /* 3. TỐI ƯU RESPONSIVE (CHỈ THAY ĐỔI ĐỘ RỘNG KHUNG CHAT) */
+        @media (max-width: 480px) {
+            /* Nút vẫn giữ nguyên vị trí right: 20px và size: 45px nhờ !important ở trên */
+
+            .chat-box {
+                /* Trên mobile cực nhỏ, khung chat sẽ mở rộng ra để dễ nhìn hơn */
+                width: calc(100% - 40px);
+                right: 20px;
+            }
+        }
+
+        /* --- CÁC STYLE PHỤ CHO NỘI DUNG CHAT --- */
         .chat-header {
-            background: white;
+            background: #fff;
             padding: 15px;
             border-bottom: 1px solid #eee;
             font-weight: bold;
@@ -62,48 +81,32 @@
             justify-content: space-between;
         }
 
-        /* Nội dung tin nhắn */
         .chat-content {
             padding: 15px;
-            max-height: 400px;
+            max-height: 350px;
             overflow-y: auto;
-            background: #fff;
         }
 
         .bot-msg {
             background: #f1f0f0;
-            padding: 10px 15px;
-            border-radius: 15px;
+            padding: 10px;
+            border-radius: 12px;
             margin-bottom: 10px;
             font-size: 14px;
-            max-width: 85%;
-        }
-
-        /* Khu vực câu hỏi gợi ý (Quan trọng nhất) */
-        .quick-replies {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
         }
 
         .reply-btn {
             background: white;
             border: 1px solid #0084ff;
             color: #0084ff;
-            padding: 8px 12px;
-            border-radius: 18px;
-            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 15px;
+            margin-bottom: 5px;
             cursor: pointer;
-            text-align: left;
-            transition: 0.3s;
+            display: block;
+            width: fit-content;
         }
 
-        .reply-btn:hover {
-            background: #e6f4ff;
-        }
-
-        /* Input bên dưới */
         .chat-footer {
             padding: 10px;
             border-top: 1px solid #eee;
@@ -112,7 +115,6 @@
         .chat-footer input {
             width: 100%;
             border: none;
-            padding: 8px;
             outline: none;
         }
     </style>
