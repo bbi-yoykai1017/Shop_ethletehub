@@ -4,52 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Widget Interface</title>
+    <title>AthleteHub Chat Support</title>
     <style>
-        /* ============================= */
-        /* 1. NÚT CỐ ĐỊNH (KHÔNG RESPONSIVE) */
-        /* ============================= */
-
+        /* GIỮ NGUYÊN CSS GỐC VÀ CẢI TIẾN NHẸ */
         .back-to-top,
         .chat-launcher {
             position: fixed;
             right: 20px !important;
-            width: 45px !important;
-            height: 45px !important;
-
+            width: 50px !important;
+            height: 50px !important;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
             z-index: 1000;
-            transition: transform 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* Nút mũi tên */
-        .back-to-top {
-            bottom: 20px !important;
-        }
-
-        /* Nút chat */
         .chat-launcher {
             bottom: 85px !important;
-            background-color: #ff4d4f;
+            background: linear-gradient(135deg, #ff4d4f, #ff7a45);
             color: white;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 15px rgba(255, 77, 79, 0.4);
             border: none;
+            font-size: 24px;
         }
 
-        /* ============================= */
-        /* 2. KHUNG CHAT */
-        /* ============================= */
+        .chat-launcher:hover {
+            transform: scale(1.1);
+        }
 
         .chat-box {
             position: fixed;
-            bottom: 145px;
+            /* Căn chỉnh lại khoảng cách so với đáy màn hình */
+            bottom: 70px;
             right: 20px;
-            width: 320px;
-            height: 420px;
+
+            /* Sử dụng max-width/height để linh hoạt */
+            width: 350px;
+            max-height: calc(100% - 110px);
+            /* Đảm bảo không bao giờ vượt quá chiều cao màn hình */
+            height: 500px;
 
             background: #fff;
             border-radius: 12px;
@@ -59,212 +55,79 @@
             flex-direction: column;
             overflow: hidden;
             z-index: 1001;
-        }
 
-        .chat-box.active {
-            display: flex;
-        }
-
-        /* ============================= */
-        /* 3. HEADER */
-        /* ============================= */
-
-        .chat-header {
-            background: #fff;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* ============================= */
-        /* 4. CONTENT */
-        /* ============================= */
-
-        .chat-content {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            background: #f9f9f9;
-        }
-
-        /* ============================= */
-        /* 5. TIN NHẮN */
-        /* ============================= */
-
-        .bot-msg,
-        .user-msg {
-            max-width: 75%;
-            padding: 10px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        /* Bot */
-        .bot-msg {
-            background: #f1f0f0;
-            align-self: flex-start;
-        }
-
-        /* User */
-        .user-msg {
-            background: #0084ff;
-            color: white;
-            align-self: flex-end;
-            text-align: right;
-        }
-
-        /* ============================= */
-        /* 6. FAQ BUTTON */
-        /* ============================= */
-
-        .reply-btn {
-            background: white;
-            border: 1px solid #0084ff;
-            color: #0084ff;
-            padding: 6px 12px;
-            border-radius: 15px;
-            margin-bottom: 6px;
-            cursor: pointer;
-            display: inline-block;
-            font-size: 13px;
-            transition: 0.2s;
-        }
-
-        .reply-btn:hover {
-            background: #0084ff;
-            color: white;
-        }
-
-        .quick-replies {
-            max-height: 90px;
-            overflow-y: auto;
-        }
-
-        .chat-content::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .chat-content::-webkit-scrollbar-thumb {
-            background: #ddd;
-            border-radius: 10px;
-        }
-
-        .chat-box {
-            transform: scale(0.8);
+            /* Hiệu ứng mượt mà */
+            transform: translateY(20px);
             opacity: 0;
-            transition: 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .chat-box.active {
-            transform: scale(1);
+            display: flex;
+            transform: translateY(0);
             opacity: 1;
         }
 
-        /* ============================= */
-        /* 7. FOOTER */
-        /* ============================= */
-
-        .chat-footer {
-            padding: 10px;
-            border-top: 1px solid #eee;
-        }
-
-        .chat-footer input {
-            width: 100%;
-            border: none;
-            outline: none;
-            font-size: 14px;
-        }
-
-        /* ============================= */
-        /* 8. RESPONSIVE (CHỈ THU NHỎ) */
-        /* ============================= */
-
-        @media (max-width: 480px) {
-
-            .chat-box {
-                width: 260px;
-                height: 360px;
-                right: 15px;
-                bottom: 140px;
-                border-radius: 10px;
-            }
-
-            .chat-header {
-                padding: 10px;
-                font-size: 13px;
-            }
-
-            .chat-content {
-                padding: 10px;
-            }
-
-            .bot-msg,
-            .user-msg {
-                font-size: 12px;
-                padding: 7px 9px;
-                margin-bottom: 6px;
-            }
-
-            /* FAQ gọn lại */
-            .quick-replies {
-                gap: 4px;
-            }
-
-            .reply-btn {
-                font-size: 11px;
-                padding: 4px 8px;
-                border-radius: 14px;
-            }
-
-            /* Input + nút gửi */
-            .chat-footer {
-                padding: 6px;
-            }
-
-            .chat-footer input {
-                font-size: 12px;
-                padding: 6px 8px;
-            }
-
-            .chat-footer button {
-                padding: 6px 9px;
-                font-size: 12px;
-            }
-        }
-
-        /* Header nổi bật hơn */
+        /* Căn chỉnh lại Header */
         .chat-header {
             background: linear-gradient(135deg, #ff4d4f, #ff7a45);
             color: white;
-            padding: 12px;
+            padding: 10px 15px;
+            font-size: 15px;
             font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            /* Ngăn header bị co lại */
         }
 
-        /* Content nền nhẹ */
+        /* Căn chỉnh lại Content để tự động co giãn */
         .chat-content {
+            flex: 1 1 auto;
+            padding: 15px;
+            overflow-y: auto;
             background: #f9fafb;
         }
 
-        /* Bot message */
-        .bot-msg {
-            background: #ffffff;
-            border: 1px solid #eee;
+
+
+        /* Tối ưu tin nhắn để tiết kiệm diện tích */
+        .bot-msg,
+        .user-msg {
+            max-width: 85%;
+            font-size: 13px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
         }
 
-        /* User message */
+        .bot-msg {
+            background: #ffffff;
+            align-self: flex-start;
+            border: 1px solid #eee;
+            color: #333;
+            border-bottom-left-radius: 2px;
+        }
+
         .user-msg {
             background: #ff4d4f;
             color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
         }
 
-        /* FAQ dạng grid đẹp hơn */
+        .typing {
+            font-style: italic;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+
         .quick-replies {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 6px;
         }
 
@@ -272,150 +135,236 @@
             background: #fff;
             border: 1px solid #ff4d4f;
             color: #ff4d4f;
-            padding: 6px 10px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 150px;
             cursor: pointer;
             font-size: 12px;
             transition: 0.2s;
         }
 
         .reply-btn:hover {
-            background: #ff4d4f;
+         
             color: white;
         }
 
-        /* Footer đẹp hơn */
+        /* Căn chỉnh lại Footer */
         .chat-footer {
+            padding: 8px;
+            border-top: 1px solid #eee;
+            background: #fff;
+            flex-shrink: 0;
+            /* Ngăn footer bị co lại */
             display: flex;
-            gap: 5px;
+            gap: 8px;
         }
 
         .chat-footer input {
             flex: 1;
-            padding: 8px;
-            border-radius: 20px;
+            border: none;
+            outline: none;
+            font-size: 13px;
             background: #f1f1f1;
+            padding: 6px 12px;
+            border-radius: 20px;
         }
 
         .chat-footer button {
             background: #ff4d4f;
             border: none;
             color: white;
-            padding: 8px 12px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
         }
+
+        .chat-footer button:hover {
+            background: #d4380d;
+        }
+
+        /* ============================= */
+        /* RESPONSIVE CHO ĐIỆN THOẠI */
+        /* ============================= */
+
+       @media (max-width: 480px) {
+    /* Thu nhỏ vùng chứa câu hỏi nhanh */
+    .quick-replies {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Chia 2 cột đều nhau */
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+
+    /* Thu nhỏ nút bấm */
+    .reply-btn {
+        font-size: 11px !important; /* Giảm cỡ chữ */
+        padding: 5px 8px !important; /* Giảm khoảng cách đệm */
+        border-radius: 12px !important;
+        line-height: 1.2;
+        min-height: 32px; /* Đảm bảo nút vẫn dễ bấm nhưng không quá to */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    /* Điều chỉnh khung chat để không bị quá thô */
+    .chat-box {
+        width: 85vw;
+        right: 15px;
+        bottom: 80px;
+        height: 65vh;
+    }
+}
     </style>
 </head>
 
 <body>
 
-    <!-- NÚT CHAT -->
-    <div class="chat-launcher" onclick="toggleChat()">
-        <span>💬</span>
-    </div>
-    <!-- KHUNG CHAT -->
+    <div class="chat-launcher" onclick="toggleChat()">💬</div>
+
     <div class="chat-box" id="chatBox">
-
-        <!-- HEADER -->
         <div class="chat-header">
-            Shop_Athletehub
-            <span onclick="toggleChat()" style="cursor:pointer;">✕</span>
+            <span>🔥 AthleteHub Support</span>
+            <span onclick="toggleChat()" style="cursor:pointer; font-size: 20px;">×</span>
         </div>
 
-        <!-- CONTENT -->
         <div class="chat-content" id="chatContent">
-
-            <div class="bot-msg">
-                👋 Xin chào! Bạn cần hỗ trợ gì?
+            <div class="bot-msg">👋 Chào bạn! AthleteHub có thể giúp gì cho hành trình tập luyện của bạn hôm nay?</div>
+            <div class="quick-replies" id="quickReplies">
             </div>
-
-            <p style="font-size:12px;color:#888;">Chọn nhanh câu hỏi:</p>
-
-            <div class="quick-replies">
-                <button class="reply-btn" onclick="sendFAQ(this)">Còn hàng không?</button>
-                <button class="reply-btn" onclick="sendFAQ(this)">Có COD không?</button>
-                <button class="reply-btn" onclick="sendFAQ(this)">Giao hàng bao lâu?</button>
-                <button class="reply-btn" onclick="sendFAQ(this)">Đổi trả thế nào?</button>
-                <button class="reply-btn" onclick="sendFAQ(this)">Có giảm giá không?</button>
-                <button class="reply-btn" onclick="sendFAQ(this)">Có tư vấn chọn size không?</button>
-                <button class="reply-btn" onclick="sendFAQ(this)">Shop bán những gì?</button>
-            </div>
-
+            <div id="typingIndicator" class="typing">Bot đang nhập...</div>
         </div>
 
-        <!-- FOOTER -->
         <div class="chat-footer">
-            <input type="text" id="chatInput" placeholder="Nhập câu hỏi...">
-            <button onclick="sendMessage()">➤</button>
+            <input type="text" id="chatInput" placeholder="Hỏi Shop về sản phẩm, size..." autocomplete="off">
+            <button onclick="handleUserInput()">➤</button>
         </div>
-
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        const chatBox = document.getElementById('chatBox');
+        const chatContent = document.getElementById('chatContent');
+        const chatInput = document.getElementById('chatInput');
+        const typingIndicator = document.getElementById('typingIndicator');
 
-            function toggleChat() {
-                document.getElementById('chatBox').classList.toggle('active');
+        // BỘ DỮ LIỆU FAQ MỞ RỘNG
+        const faqData = [{
+                q: "Còn hàng không?",
+                keywords: ["còn hàng", "có sẵn", "item"],
+                a: "✅ Hầu hết sản phẩm trên website đều sẵn hàng. Bạn cho Shop xin tên sản phẩm bạn đang quan tâm nhé!"
+            },
+            {
+                q: "Có COD không?",
+                keywords: ["cod", "thanh toán khi nhận", "nhận hàng trả tiền"],
+                a: "💰 AthleteHub có ship COD toàn quốc. Bạn được kiểm tra hàng trước khi thanh toán nhé!"
+            },
+            {
+                q: "Giao hàng bao lâu?",
+                keywords: ["bao lâu", "thời gian ship", "giao hàng"],
+                a: "🚚 Nội thành HCM nhận trong 1-2 ngày, tỉnh thành khác khoảng 3-5 ngày làm việc ạ."
+            },
+            {
+                q: "Phí ship bao nhiêu?",
+                keywords: ["phí ship", "tiền ship", "vận chuyển"],
+                a: "📦 Phí ship đồng giá 30k toàn quốc. Đơn hàng trên 500k sẽ được Miễn Phí Giao Hàng!"
+            },
+            {
+                q: "Đổi trả thế nào?",
+                keywords: ["đổi trả", "trả hàng", "lỗi"],
+                a: "🔄 Shop hỗ trợ đổi trả trong vòng 7 ngày nếu có lỗi sản xuất hoặc không vừa size (yêu cầu còn tem mác)."
+            },
+            {
+                q: "Tư vấn chọn size",
+                keywords: ["size", "kích cỡ", "vừa không"],
+                a: "📏 Bạn vui lòng để lại Chiều cao & Cân nặng, nhân viên sẽ tư vấn size chuẩn nhất cho bạn ngay!"
+            },
+            {
+                q: "Địa chỉ shop?",
+                keywords: ["địa chỉ", "cửa hàng", "ở đâu"],
+                a: "📍 Shop có chi nhánh tại Quận Thủ Đức, TP.HCM. Mời bạn ghé chơi để trải nghiệm sản phẩm trực tiếp!"
+            },
+            {
+                q: "Có giảm giá không?",
+                keywords: ["giảm giá", "khuyến mãi", "voucher"],
+                a: "🎁 Bạn có thể sử dụng mã 'HLV2026' để được giảm 10% cho đơn hàng đầu tiên đấy!"
             }
+        ];
 
-            window.toggleChat = toggleChat;
-
-            function sendFAQ(el) {
-                const text = el.innerText;
-                addMessage(text, 'user');
-
-                setTimeout(() => {
-                    addMessage(getReply(text), 'bot');
-                }, 500);
+        function toggleChat() {
+            chatBox.classList.toggle('active');
+            if (chatBox.classList.contains('active') && chatContent.children.length <= 3) {
+                renderQuickReplies();
             }
+        }
 
-            window.sendFAQ = sendFAQ;
-
-            function sendMessage() {
-                const input = document.getElementById("chatInput");
-                const text = input.value.trim();
-                if (!text) return;
-
-                addMessage(text, 'user');
-                input.value = "";
-
-                setTimeout(() => {
-                    addMessage("⏳ Vui lòng chờ trong giây lát...", "bot");
-                }, 500);
-            }
-
-            window.sendMessage = sendMessage;
-
-            document.getElementById("chatInput").addEventListener("keypress", function(e) {
-                if (e.key === "Enter") sendMessage();
+        function renderQuickReplies() {
+            const container = document.getElementById('quickReplies');
+            container.innerHTML = "";
+            faqData.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'reply-btn';
+                btn.innerText = item.q;
+                btn.onclick = () => sendMsg(item.q, item.a);
+                container.appendChild(btn);
             });
+        }
 
-            function addMessage(text, type) {
-                const chat = document.getElementById("chatContent");
+        function sendMsg(userText, botReply) {
+            addMessage(userText, 'user');
+            showTyping(true);
 
-                const msg = document.createElement("div");
-                msg.className = type === "bot" ? "bot-msg" : "user-msg";
-                msg.innerText = text;
+            setTimeout(() => {
+                showTyping(false);
+                addMessage(botReply, 'bot');
+            }, 800);
+        }
 
-                chat.appendChild(msg);
-                chat.scrollTop = chat.scrollHeight;
-            }
+        function handleUserInput() {
+            const text = chatInput.value.trim();
+            if (!text) return;
 
-            function getReply(q) {
-                const faq = {
-                    "Còn hàng không?": "✅ Sản phẩm vẫn còn hàng.",
-                    "Có COD không?": "💰 Có hỗ trợ COD.",
-                    "Giao hàng bao lâu?": "🚚 2-5 ngày.",
-                    "Đổi trả thế nào?": "🔄 Đổi trong 7 ngày.",
-                    "Có giảm giá không?": "🎁 Giảm đến 15%.",
-                    "Có tư vấn chọn size không?": "📏 Shop hỗ trợ chọn size miễn phí.",
-                    "Shop bán những gì?": "🏋️ Shop bán dụng cụ gym, giày, phụ kiện thể thao."
-                };
+            addMessage(text, 'user');
+            chatInput.value = "";
+            showTyping(true);
 
-                return faq[q] || "🤖 Shop sẽ phản hồi bạn sớm!";
-            }
+            setTimeout(() => {
+                showTyping(false);
+                let response = "🤖 Hiện tại các tư vấn viên đang bận một chút, bạn để lại SĐT để Shop gọi lại hỗ trợ ngay nhé!";
 
+                // Logic tìm kiếm thông minh hơn
+                const lowerText = text.toLowerCase();
+                for (let item of faqData) {
+                    if (item.keywords.some(key => lowerText.includes(key))) {
+                        response = item.a;
+                        break;
+                    }
+                }
+                addMessage(response, 'bot');
+            }, 1000);
+        }
+
+        function addMessage(text, type) {
+            const msg = document.createElement("div");
+            msg.className = type === "bot" ? "bot-msg" : "user-msg";
+            msg.innerText = text;
+
+            // Chèn tin nhắn vào trước typing indicator
+            chatContent.insertBefore(msg, typingIndicator);
+            chatContent.scrollTop = chatContent.scrollHeight;
+        }
+
+        function showTyping(status) {
+            typingIndicator.style.display = status ? "block" : "none";
+            chatContent.scrollTop = chatContent.scrollHeight;
+        }
+
+        chatInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") handleUserInput();
         });
     </script>
 </body>

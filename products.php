@@ -3,6 +3,7 @@ session_start();
 require_once "Database.php";
 require_once 'model/functions.php';
 require_once 'model/detail.php';
+require_once 'chattudong.php';
 
 $db = new Database();
 $conn = $db->connect();
