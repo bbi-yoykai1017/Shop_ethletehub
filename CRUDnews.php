@@ -268,6 +268,21 @@ if ($action === 'delete' && isset($_GET['id'])) {
                                 <i class="fas fa-plus me-2"></i> Thêm mới
                             </a>
                         </div>
+                        <!-- Form tìm kiếm -->
+                        <div class="card-body border-bottom">
+                            <form method="GET" class="d-flex gap-2">
+                                <input type="text" name="search" class="form-control" placeholder="Tìm kiếm theo tiêu đề hoặc nội dung..." 
+                                    value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i> Tìm kiếm
+                                </button>
+                                <?php if (!empty($_GET['search'])): ?>
+                                    <a href="CRUDnews.php" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i> Xóa bộ lọc
+                                    </a>
+                                <?php endif; ?>
+                            </form>
+                        </div>
                         <div class="card-body p-0">
                             <table class="table table-hover mb-0">
                                 <thead>
@@ -284,8 +299,16 @@ if ($action === 'delete' && isset($_GET['id'])) {
                                 <tbody>
                                     <?php
                                     $page = $_GET['page'] ?? 1;
-                                    $news_list = getAllNewsForAdmin($conn, $page, 10);
-                                    $total = countAllNews($conn);
+                                    $search = $_GET['search'] ?? '';
+                                    
+                                    if (!empty($search)) {
+                                        $news_list = searchNewsForAdmin($conn, $search, $page, 10);
+                                        $total = countSearchNews($conn, $search);
+                                    } else {
+                                        $news_list = getAllNewsForAdmin($conn, $page, 10);
+                                        $total = countAllNews($conn);
+                                    }
+                                    
                                     $total_pages = ceil($total / 10);
 
                                     if (empty($news_list)):
@@ -316,7 +339,7 @@ if ($action === 'delete' && isset($_GET['id'])) {
                                                 </td>
                                                 <td><?= date('d/m/Y', strtotime($item['ngay_tao'])) ?></td>
                                                 <td class="text-center">
-                                                    <a href="CRUDnews.php?action=edit&id=<?= $item['id'] ?>"
+                                                    <a href="CRUDnews.php?action=edit&id=<?= $item['id'] ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>"
                                                         class="btn btn-sm btn-warning me-1" title="Chỉnh sửa">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
@@ -342,11 +365,11 @@ if ($action === 'delete' && isset($_GET['id'])) {
                             <ul class="pagination justify-content-center">
                                 <?php if ($page > 1): ?>
                                     <li class="page-item">
-                                        <a class="page-link" href="CRUDnews.php?page=1"><i class="fas fa-chevron-left"></i> Đầu
+                                        <a class="page-link" href="CRUDnews.php?page=1<?= !empty($search) ? '&search=' . urlencode($search) : '' ?>"><i class="fas fa-chevron-left"></i> Đầu
                                             tiên</a>
                                     </li>
                                     <li class="page-item">
-                                        <a class="page-link" href="CRUDnews.php?page=<?= $page - 1 ?>">Trước</a>
+                                        <a class="page-link" href="CRUDnews.php?page=<?= $page - 1 ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>">Trước</a>
                                     </li>
                                 <?php endif; ?>
 
@@ -357,16 +380,16 @@ if ($action === 'delete' && isset($_GET['id'])) {
                                 for ($i = $start; $i <= $end; $i++):
                                     ?>
                                     <li class="page-item <?= $i === $page ? 'active' : '' ?>">
-                                        <a class="page-link" href="CRUDnews.php?page=<?= $i ?>"><?= $i ?></a>
+                                        <a class="page-link" href="CRUDnews.php?page=<?= $i ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>"><?= $i ?></a>
                                     </li>
                                 <?php endfor; ?>
 
                                 <?php if ($page < $total_pages): ?>
                                     <li class="page-item">
-                                        <a class="page-link" href="CRUDnews.php?page=<?= $page + 1 ?>">Sau</a>
+                                        <a class="page-link" href="CRUDnews.php?page=<?= $page + 1 ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>">Sau</a>
                                     </li>
                                     <li class="page-item">
-                                        <a class="page-link" href="CRUDnews.php?page=<?= $total_pages ?>">Cuối cùng <i
+                                        <a class="page-link" href="CRUDnews.php?page=<?= $total_pages ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>">Cuối cùng <i
                                                 class="fas fa-chevron-right"></i></a>
                                     </li>
                                 <?php endif; ?>

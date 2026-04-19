@@ -134,6 +134,33 @@ function getAllNewsForAdmin($conn, $page = 1, $limit = 10) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Tìm kiếm tin tức cho admin
+function searchNewsForAdmin($conn, $keyword, $page = 1, $limit = 10) {
+    $offset = ($page - 1) * $limit;
+    $search_term = '%' . $keyword . '%';
+    
+    $sql = "SELECT * FROM tin_tuc WHERE tieu_de LIKE :keyword OR noi_dung LIKE :keyword ORDER BY ngay_tao DESC LIMIT :limit OFFSET :offset";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bindValue(':keyword', $search_term, PDO::PARAM_STR);
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Đếm số tin tức tìm kiếm được
+function countSearchNews($conn, $keyword) {
+    $search_term = '%' . $keyword . '%';
+    $sql = "SELECT COUNT(*) as total FROM tin_tuc WHERE tieu_de LIKE :keyword OR noi_dung LIKE :keyword";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindValue(':keyword', $search_term, PDO::PARAM_STR);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result['total'];
+}
+
 // Lấy tổng số tin tức cho admin
 function countAllNews($conn) {
     $sql = "SELECT COUNT(*) as total FROM tin_tuc";
