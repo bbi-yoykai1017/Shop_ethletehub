@@ -334,7 +334,7 @@
 
             setTimeout(() => {
                 showTyping(false);
-                let response = "🤖 Hiện tại các tư vấn viên đang bận một chút, bạn để lại SĐT để Shop gọi lại hỗ trợ ngay nhé!";
+                let response = "🤖 Hiện tại các tư vấn viên đang gặp sự cố, Hãy kết bạn zalo 0764567781 để được hỗ trợ ngay nhé!";
 
                 // Logic tìm kiếm thông minh hơn
                 const lowerText = text.toLowerCase();

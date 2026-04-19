@@ -107,7 +107,7 @@ $total_stmt->execute($params);
 $total_rows = $total_stmt->fetchColumn();
 $total_pages = ceil($total_rows / $limit);
 
-$sql_list = "SELECT * FROM don_hang" . $where_sql . " ORDER BY id DESC LIMIT $limit OFFSET $offset";
+$sql_list = "SELECT * FROM don_hang" . $where_sql . " ORDER BY ngay_dat DESC LIMIT $limit OFFSET $offset";
 $stmt_list = $conn->prepare($sql_list);
 $stmt_list->execute($params);
 $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
