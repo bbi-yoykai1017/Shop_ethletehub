@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $hinh_anh = $old_news['hinh_anh'] ?? null;
                 }
 
-                if (updateNews($conn, $id, $tieu_de, $noi_dung, $loai_tin, $hinh_anh, $trang_thai)) {
+                if (updateNews($conn, $id, $tieu_de, $noi_dung, $loai_tin, $trang_thai, $hinh_anh)) {
                     $message = 'Cập nhật tin tức thành công!';
                     $action = 'list';
                 } else {

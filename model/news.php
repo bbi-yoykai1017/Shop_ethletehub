@@ -87,7 +87,7 @@ function addNews($conn, $tieu_de, $noi_dung, $loai_tin = 'san-pham-moi', $hinh_a
 }
 
 // Cập nhật tin tức (chỉ admin)
-function updateNews($conn, $id, $tieu_de, $noi_dung, $loai_tin, $hinh_anh = "", $trang_thai) {
+function updateNews($conn, $id, $tieu_de, $noi_dung, $loai_tin, $trang_thai, $hinh_anh = "") {
     $sql = "UPDATE tin_tuc SET tieu_de = :tieu_de, noi_dung = :noi_dung, 
             loai_tin = :loai_tin, trang_thai = :trang_thai";
     
