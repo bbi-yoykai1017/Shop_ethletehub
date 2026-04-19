@@ -23,27 +23,21 @@ if (isset($_GET['edit'])) {
     }
 }
 
-// ================= 2. XỬ LÝ THÊM HOẶC CẬP NHẬT =================
-if (isset($_POST['save_user'])) {
+// ================= 2. XỬ LÝ  CẬP NHẬT =================
+if (isset($_POST['save_user']) && isset($_POST['id']) && !empty($_POST['id'])) {
+    $id = $_POST['id'];
     $ten = $_POST['ten'];
     $email = $_POST['email'];
     $sdt = $_POST['so_dien_thoai'];
-    $vai_tro = $_POST['vai_tro']; // Lấy vai trò từ form
-    $trang_thai = $_POST['trang_thai']; // Lấy trạng thái từ form
+    $vai_tro = $_POST['vai_tro'];
+    $trang_thai = $_POST['trang_thai'];
 
+    $sql = "UPDATE nguoi_dung 
+            SET ten=?, email=?, so_dien_thoai=?, vai_tro=?, trang_thai=? 
+            WHERE id=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$ten, $email, $sdt, $vai_tro, $trang_thai, $id]);
 
-    if (isset($_POST['id']) && !empty($_POST['id'])) {
-        // CẬP NHẬT
-        $id = $_POST['id'];
-        $sql = "UPDATE nguoi_dung SET ten=?, email=?, so_dien_thoai=?, vai_tro=?, trang_thai=? WHERE id=?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$ten, $email, $sdt, $vai_tro, $trang_thai, $id]);
-    } else {
-        // THÊM MỚI
-        $sql = "INSERT INTO nguoi_dung (ten, email, so_dien_thoai, vai_tro, trang_thai) VALUES (?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$ten, $email, $sdt, $vai_tro, $trang_thai]);
-    }
     header("Location: CRUDuser.php");
     exit;
 }
@@ -82,7 +76,7 @@ if (!empty($search)) {
     if (is_numeric($search)) {
         $where_sql = " WHERE id = ? ";
         $params[] = $search; // Tìm chính xác số ID
-       // $params[] = "%$search%"; // tuong doi
+        // $params[] = "%$search%"; // tuong doi
     } else {
         // Nếu là chữ, tìm gần đúng theo ten
         $where_sql = " WHERE ten LIKE ? ";
@@ -167,148 +161,147 @@ $listusers = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
         <main class="main-content">
             <div class="container-fluid p-0">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header bg-primary text-white py-3">
-                        <h5 class="mb-0">
-                            <i class="fas <?= $update_mode ? 'fa-user-edit' : 'fa-user-plus' ?> me-2"></i>
-                            <?= $update_mode ? "Cập nhật người dùng" : "Thêm người dùng mới" ?>
-                        </h5>
-                    </div>
+
                     <div class="card-body p-4">
-                        <form method="POST" class="row g-3 mb-4">
-                            <input type="hidden" name="id" value="<?= $edit_user['id'] ?>">
+                        <?php if ($update_mode): ?>
+                            <h5 class="mb-3 text-warning"><i class="fas fa-edit"></i> Cập nhật thông tin khách hàng</h5>
+                            <form method="POST" class="row g-3 mb-4">
+                                <input type="hidden" name="id" value="<?= $edit_user['id'] ?>">
 
-                            <div class="col-12 col-sm-6 col-lg-3">
-                                <label class="form-label small fw-bold">Tên khách hàng</label>
-                                <input type="text" name="ten" class="form-control" placeholder="Nhập tên..." value="<?= $edit_user['ten'] ?>" minlength="2" maxlength="100" required>
-                                <div class="invalid-feedback">Tên khách hàng không được để trống và phải từ 2 đến 100 ký tự!</div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-lg-3">
-                                <label class="form-label small fw-bold">Email</label>
-                                <input type="email" name="email" class="form-control" placeholder="name@example.com" value="<?= $edit_user['email'] ?>" required>
-                                <div class="invalid-feedback">Email không hợp lệ!</div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-lg-2">
-                                <label class="form-label small fw-bold">Số điện thoại</label>
-                                <input type="text" id="so_dien_thoai" name="so_dien_thoai" class="form-control" placeholder="SĐT" value="<?= $edit_user['so_dien_thoai'] ?>" minlength="10" maxlength="10" required>
-                                <div class="invalid-feedback">Số điện thoại không hợp lệ!</div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-lg-2">
-                                <label class="form-label small fw-bold">Vai trò</label>
-                                <select class="form-select" name="vai_tro" required>
-                                    <option value="khach_hang" <?= ($update_mode && $edit_user['vai_tro'] === 'khach_hang') ? 'selected' : '' ?>>Khách Hàng</option>
-                                    <option value="admin" <?= ($update_mode && $edit_user['vai_tro'] === 'admin') ? 'selected' : '' ?>>Admin</option>
-                                </select>
-                            </div>
-                            <div class="col-12 col-sm-6 col-lg-2">
-                                <label class="form-label small fw-bold">Trạng thái</label>
-                                <select class="form-select" name="trang_thai" required>
-                                    <option value="hoat_dong" <?= ($update_mode && $edit_user['trang_thai'] === 'hoat_dong') ? 'selected' : '' ?>>Hoạt động</option>
-                                    <option value="bi_khoa" <?= ($update_mode && $edit_user['trang_thai'] === 'bi_khoa') ? 'selected' : '' ?>>Bị khóa</option>
-                                </select>
-                            </div>
-                            <div class="col-12 col-lg-2 d-flex align-items-end">
-                                <?php if ($update_mode): ?>
-                                    <div class="w-100">
-                                        <button type="submit" name="save_user" class="btn btn-warning w-100 mb-1">Cập nhật</button>
-                                        <a href="CRUDuser.php" class="btn btn-light btn-sm w-100 border">Hủy</a>
-                                    </div>
-                                <?php else: ?>
-                                    <button type="submit" name="save_user" class="btn btn-success w-100"><i class="fas fa-plus me-1"></i> Thêm mới</button>
-                                <?php endif; ?>
-                            </div>
-                            <div class="col-md-10 text-end d-flex align-items-end justify-content-end">
-                                <span class="badge bg-secondary">Tổng cộng: <?= count($listusers) ?> người dùng</span>
-                            </div>
-                        </form>
-                           <!-- Tim kiem -->
-                        <div class="filter-group mb-3">
-                            <h4 class="filter-title"><i class="fas fa-search"></i> Tìm kiếm</h4>
-                            <form method="GET" action="CRUDuser.php" class="search-box d-flex gap-2">
-                                <input type="text" name="search" id="searchInput" class="form-control"
-                                    placeholder="Nhập ID hoặc ten khách..." value="<?= htmlspecialchars($search) ?>">
-                                <button type="submit" class="btn btn-primary">Tìm</button>
-                                <?php if (!empty($search)): ?>
-                                    <a href="CRUDuser.php" class="btn btn-outline-secondary">Xóa</a>
-                                <?php endif; ?>
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <label class="form-label small fw-bold">Tên khách hàng</label>
+                                    <input type="text" name="ten" class="form-control" placeholder="Nhập tên..." value="<?= $edit_user['ten'] ?>" minlength="2" maxlength="100" required>
+                                    <div class="invalid-feedback">Tên khách hàng không được để trống!</div>
+                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <label class="form-label small fw-bold">Email</label>
+                                    <input type="email" name="email" class="form-control" placeholder="name@example.com" value="<?= $edit_user['email'] ?>" required>
+                                    <div class="invalid-feedback">Email không hợp lệ!</div>
+                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-2">
+                                    <label class="form-label small fw-bold">Số điện thoại</label>
+                                    <input type="text" id="so_dien_thoai" name="so_dien_thoai" class="form-control" placeholder="SĐT" value="<?= $edit_user['so_dien_thoai'] ?>" minlength="10" maxlength="10" required>
+                                    <div class="invalid-feedback">SĐT không hợp lệ!</div>
+                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-2">
+                                    <label class="form-label small fw-bold">Vai trò</label>
+                                    <select class="form-select" name="vai_tro" required>
+                                        <option value="khach_hang" <?= ($edit_user['vai_tro'] === 'khach_hang') ? 'selected' : '' ?>>Khách Hàng</option>
+                                        <option value="admin" <?= ($edit_user['vai_tro'] === 'admin') ? 'selected' : '' ?>>Admin</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-2">
+                                    <label class="form-label small fw-bold">Trạng thái</label>
+                                    <select class="form-select" name="trang_thai" required>
+                                        <option value="hoat_dong" <?= ($edit_user['trang_thai'] === 'hoat_dong') ? 'selected' : '' ?>>Hoạt động</option>
+                                        <option value="bi_khoa" <?= ($edit_user['trang_thai'] === 'bi_khoa') ? 'selected' : '' ?>>Bị khóa</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+                                    <a href="CRUDuser.php" class="btn btn-light border">Hủy bỏ</a>
+                                    <button type="submit" name="save_user" class="btn btn-warning px-4">Xác nhận cập nhật</button>
+                                </div>
                             </form>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
+                            <hr> <?php endif; ?>
+                    </div>
+                    </form>
+                    <!-- Tim kiem -->
+                    <div class="filter-group mb-3">
+                        <h4 class="filter-title"><i class="fas fa-search"></i> Tìm kiếm</h4>
+                        <form method="GET" action="CRUDuser.php" class="search-box d-flex gap-2">
+                            <input type="text" name="search" id="searchInput" class="form-control"
+                                placeholder="Nhập ID hoặc ten khách..." value="<?= htmlspecialchars($search) ?>">
+                            <button type="submit" class="btn btn-primary">Tìm</button>
+                            <?php if (!empty($search)): ?>
+                                <a href="CRUDuser.php" class="btn btn-outline-secondary">Xóa</a>
+                            <?php endif; ?>
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <div class="col-md-10 text-end d-flex align-items-end justify-content-start">
+                                    <span class="badge bg-secondary">Tổng cộng: <?= count($listusers) ?> người dùng</span>
+                                </div>
+                                <tr>
+                                    <th class="text-center">ID</th>
+                                    <th>Thông tin khách hàng</th>
+                                    <th class="text-center d-none d-md-table-cell">SĐT</th>
+                                    <th class="text-center">Vai trò</th>
+                                    <th class="text-center">Trạng thái</th>
+                                    <th class="text-end">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($listusers as $user): ?>
                                     <tr>
-                                        <th class="text-center">ID</th>
-                                        <th>Thông tin khách hàng</th>
-                                        <th class="text-center d-none d-md-table-cell">SĐT</th>
-                                        <th class="text-center">Vai trò</th>
-                                        <th class="text-center">Trạng thái</th>
-                                        <th class="text-end">Hành động</th>
+                                        <td class="text-center fw-bold text-muted"><?= $user['id'] ?></td>
+                                        <td>
+                                            <div class="fw-bold"><?= htmlspecialchars($user['ten'] ?? 0) ?></div>
+                                            <div class="small text-muted"><?= htmlspecialchars($user['email'] ?? 0) ?></div>
+                                        </td>
+                                        <td class="text-center d-none d-md-table-cell"><?= htmlspecialchars($user['so_dien_thoai'] ?? 0) ?></td>
+                                        <td class="text-center">
+                                            <span class="badge rounded-pill bg-light text-dark border"><?= $user['vai_tro'] ?></span>
+                                        </td>
+                                        <td class="text-center">
+                                            <?php if ($user['trang_thai'] === 'hoat_dong'): ?>
+                                                <span class="badge bg-success">Hoạt động</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-danger">Bị khóa</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="btn-group">
+                                                <a href="?edit=<?= $user['id'] ?>" class="btn btn-sm btn-outline-warning" title="Sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="?delete=<?= $user['id'] ?>" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Bạn có chắc chắn muốn KHÓA người dùng này không?')" title="Khóa tài khoản">
+                                                    <i class="fas fa-user-slash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($listusers as $user): ?>
-                                        <tr>
-                                            <td class="text-center fw-bold text-muted"><?= $user['id'] ?></td>
-                                            <td>
-                                                <div class="fw-bold"><?= htmlspecialchars($user['ten'] ?? 0) ?></div>
-                                                <div class="small text-muted"><?= htmlspecialchars($user['email'] ?? 0) ?></div>
-                                            </td>
-                                            <td class="text-center d-none d-md-table-cell"><?= htmlspecialchars($user['so_dien_thoai'] ?? 0) ?></td>
-                                            <td class="text-center">
-                                                <span class="badge rounded-pill bg-light text-dark border"><?= $user['vai_tro'] ?></span>
-                                            </td>
-                                            <td class="text-center">
-                                                <?php if ($user['trang_thai'] === 'hoat_dong'): ?>
-                                                    <span class="badge bg-success">Hoạt động</span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-danger">Bị khóa</span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td class="text-end">
-                                                <div class="btn-group">
-                                                    <a href="?edit=<?= $user['id'] ?>" class="btn btn-sm btn-outline-warning" title="Sửa">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <a href="?delete=<?= $user['id'] ?>" class="btn btn-sm btn-outline-danger"
-                                                        onclick="return confirm('Bạn có chắc chắn muốn KHÓA người dùng này không?')" title="Khóa tài khoản">
-                                                        <i class="fas fa-user-slash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="pagination-section">
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination justify-content-center">
-                                    <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                                        <a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>">
-                                            <i class="fas fa-chevron-left"></i> Trước
-                                        </a>
-                                    </li>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-section">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>">
+                                        <i class="fas fa-chevron-left"></i> Trước
+                                    </a>
+                                </li>
 
-                                    <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
-                                        <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
-                                            <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
-                                        </li>
-                                    <?php endfor; ?>
-
-                                    <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
-                                        <a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>">
-                                            <span>Tiếp</span> <i class="fas fa-chevron-right"></i>
-                                        </a>
+                                <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                                    <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
                                     </li>
-                                </ul>
-                            </nav>
-                            <div class="text-center mt-2 small text-muted">
-                                Hiển thị trang <?= $page ?> / <?= $total_pages ?> (Tổng <?= $total_rows ?> Người dùng)
-                            </div>
+                                <?php endfor; ?>
+
+                                <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>">
+                                        <span>Tiếp</span> <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                        <div class="text-center mt-2 small text-muted">
+                            Hiển thị trang <?= $page ?> / <?= $total_pages ?> (Tổng <?= $total_rows ?> Người dùng)
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
+    </div>
+    </main>
     </div>
 
     <!-- FOOTER -->

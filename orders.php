@@ -175,7 +175,7 @@ function formatPrice($price) {
                             </div>
                             <div class="summary-item">
                                 <span>Ngày đặt:</span>
-                                <span><?= date('d/m/Y', strtotime($order['ngay_dat'])) ?></span>
+                                <span><?= ($order['ngay_dat']) ?></span>
                             </div>
                             <div class="summary-item">
                                 <span>Tên người nhận:</span>
@@ -209,14 +209,14 @@ function formatPrice($price) {
 
                             // 2. Chỉ cho phép hủy nếu thời gian < 24h và trạng thái là 'dang_xu_ly' hoặc 'cho_xac_nhan'
                             // (Đạt nên kiểm tra thêm trạng thái để tránh trường hợp đang giao hàng vẫn bấm hủy được)
-                            if ($diff_hours < 24 && ($order['trang_thai'] == 'cho_xu_ly')):
+                            if ($diff_hours < 24 && ($order['trang_thai'] == 'cho_xac_nhan')):
                             ?>
                                 <button onclick="confirmCancel(<?= $order['id'] ?>)" class="btn btn-danger w-100 mt-2">
                                     <i class="fas fa-times-circle"></i> Hủy đơn hàng
                                 </button>
                                 <small class="text-muted d-block text-center mt-1">
-                                    (Bạn có thể hủy đơn trong vòng 24h kể từ khi đặt)
-                                </small>
+                                    (Bạn có thể hủy đơn trong 24h kể từ khi đặt)
+                                </small>    
                             <?php else: ?>
                                 <button class="btn btn-secondary w-100 mt-2" disabled title="Quá 24h hoặc đơn hàng đã được xử lý">
                                     <i class="fas fa-ban"></i> Không thể hủy đơn

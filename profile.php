@@ -399,7 +399,7 @@ $initials = mb_strtoupper($initials);
                     </p>
                     <div class="role-pill">
                         <span class="role-dot"></span>
-                        <?= $user['vai_tro'] == 'admin' ? 'Quản trị viên' : 'Thành viên' ?>
+                        <?= $user['vai_tro'] == 'admin' ? 'Quản trị viên' : 'Khách hàng' ?>
                     </div>
                 </div>
             </div>
@@ -439,7 +439,7 @@ $initials = mb_strtoupper($initials);
                     <div class="field-cell">
                         <span class="field-label">Vai trò</span>
                         <span class="field-value">
-                            <?= $user['vai_tro'] == 'admin' ? 'Quản trị viên' : 'Thành viên' ?>
+                            <?= $user['vai_tro'] == 'admin' ? 'Quản trị viên' : 'Khách hàng' ?>
                         </span>
                     </div>
                 </div>

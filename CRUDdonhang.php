@@ -32,8 +32,9 @@ if (isset($_GET['edit'])) {
     }
 }
 
-// ================= 2. XỬ LÝ THÊM HOẶC CẬP NHẬT =================
-if (isset($_POST['save_order'])) {
+// ================= 2. XỬ LÝ CẬP NHẬT (CHỈ UPDATE) =================
+if (isset($_POST['save_order']) && !empty($_POST['id'])) {
+    $id = $_POST['id'];
     $user_id = $_POST['nguoi_dung_id'];
     $ma_don = $_POST['ma_don_hang'];
     $tong = $_POST['tong_tien'];
@@ -43,101 +44,73 @@ if (isset($_POST['save_order'])) {
     $trang_thai = $_POST['trang_thai'];
 
     if ($user_id <= 0) {
-        // Nếu ID <= 0, hiện thông báo và dừng thực thi, quay lại trang trước
-        echo "<script>
-                alert('Lỗi: ID Người dùng phải là số dương (lớn hơn 0)!');
-                window.history.back();
-              </script>";
-        exit; // Dừng chương trình tại đây không cho lưu vào DB
+        echo "<script>alert('Lỗi: ID Người dùng phải là số dương!'); window.history.back();</script>";
+        exit;
     }
-    // --- KẾT THÚC PHẦN KIỂM TRA ---
 
-    if (isset($_POST['id']) && !empty($_POST['id'])) {
-        // CẬP NHẬT
-        $id = $_POST['id'];
-        $sql = "UPDATE don_hang SET nguoi_dung_id=?, ma_don_hang=?, tong_tien=?, tien_giam=?, thanh_tien=?, phuong_thuc_thanh_toan=?, trang_thai=? WHERE id=?";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$user_id, $ma_don, $tong, $giam, $thanh_tien, $pttt, $trang_thai, $id]);
-    } else {
-        // THÊM MỚI
-        $sql = "INSERT INTO don_hang (nguoi_dung_id, ma_don_hang, tong_tien, tien_giam, thanh_tien, phuong_thuc_thanh_toan, trang_thai) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([$user_id, $ma_don, $tong, $giam, $thanh_tien, $pttt, $trang_thai]);
-    }
-    header("Location: CRUDdonhang.php");
+    // Thực hiện CẬP NHẬT
+    $sql = "UPDATE don_hang SET nguoi_dung_id=?, ma_don_hang=?, tong_tien=?, tien_giam=?, thanh_tien=?, phuong_thuc_thanh_toan=?, trang_thai=? WHERE id=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$user_id, $ma_don, $tong, $giam, $thanh_tien, $pttt, $trang_thai, $id]);
+
+    header("Location: CRUDdonhang.php?success=updated");
     exit;
 }
 
 // ================= 3. XỬ LÝ XÓA =================
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
-
     try {
-        // Bắt đầu một Transaction để đảm bảo an toàn dữ liệu
-        // Nếu xóa bảng 1 lỗi thì bảng 2 sẽ không bị xóa theo
         $conn->beginTransaction();
-
-        // 1. Xóa tất cả chi tiết của đơn hàng này trước (Bảng con)
+        // Xóa bảng con trước
         $sql_delete_items = "DELETE FROM chi_tiet_don_hang WHERE don_hang_id = ?";
         $stmt_items = $conn->prepare($sql_delete_items);
         $stmt_items->execute([$id]);
 
-        // 2. Sau đó mới xóa đơn hàng (Bảng cha)
+        // Xóa bảng cha
         $sql_delete_order = "DELETE FROM don_hang WHERE id = ?";
         $stmt_order = $conn->prepare($sql_delete_order);
         $stmt_order->execute([$id]);
 
-        // Hoàn tất giao dịch
         $conn->commit();
-
         header("Location: CRUDdonhang.php?success=deleted");
     } catch (Exception $e) {
-        // Nếu có lỗi xảy ra, hoàn tác lại toàn bộ
         $conn->rollBack();
-        error_log($e->getMessage());
         header("Location: CRUDdonhang.php?error=delete_failed");
     }
     exit;
 }
-// ================= 4. XỬ LÝ TÌM KIẾM & PHÂN TRANG =================
 
-// Cấu hình phân trang
-$limit = 10; // Số dòng trên mỗi trang
+// ================= 4. TÌM KIẾM & PHÂN TRANG (Giữ nguyên) =================
+$limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) $page = 1;
 $offset = ($page - 1) * $limit;
 
-// Xử lý từ khóa tìm kiếm
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $params = [];
 $where_sql = "";
 
 if (!empty($search)) {
-    // Nếu nội dung tìm kiếm là số, ưu tiên tìm chính xác ID người dùng
     if (is_numeric($search)) {
-        $where_sql = " WHERE id = ?  ";
-        $params[] = $search; // Tìm chính xác số ID
-        // $params[] = "%$search%"; // Hoặc tiong doi mã đơn hàng chứa số đó
+        $where_sql = " WHERE id = ? ";
+        $params[] = $search;
     } else {
-        // Nếu là chữ, tìm gần đúng theo mã đơn hàng
         $where_sql = " WHERE ma_don_hang LIKE ? ";
         $params[] = "%$search%";
     }
 }
 
-// Đếm tổng số dòng để tính số trang
 $total_sql = "SELECT COUNT(*) FROM don_hang" . $where_sql;
 $total_stmt = $conn->prepare($total_sql);
 $total_stmt->execute($params);
 $total_rows = $total_stmt->fetchColumn();
 $total_pages = ceil($total_rows / $limit);
 
-// Lấy dữ liệu theo trang và tìm kiếm
 $sql_list = "SELECT * FROM don_hang" . $where_sql . " ORDER BY id DESC LIMIT $limit OFFSET $offset";
 $stmt_list = $conn->prepare($sql_list);
 $stmt_list->execute($params);
 $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
-//$listorders = getAllOrders($conn);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -206,73 +179,81 @@ $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
         <!-- NỘI DUNG -->
         <div class="main-content">
 
-            <div class="card shadow border-0 mb-4">
-                <div class="card-header bg-primary text-white py-3">
-                    <h5 class="mb-0">
-                        <?php ($update_mode) ?>
-                        <i class="fas fa-file-invoice me-2"></i> Chỉnh sửa đơn hàng <span
-                            class="badge bg-light text-primary"></span>
-                        <?php ?>
+            <?php if ($update_mode): ?>
+                <div class="card shadow border-0 mb-4">
+                    <div class="card-header bg-warning text-dark py-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-edit me-2"></i> Chỉnh sửa đơn hàng:
+                            <span class="badge bg-dark text-white"><?= htmlspecialchars($edit_order['ma_don_hang']) ?></span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" class="row g-3">
+                            <input type="hidden" name="id" value="<?= $edit_order['id'] ?>">
 
-                    </h5>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">ID Người dùng</label>
+                                <input type="number" id="nguoi_dung_id" name="nguoi_dung_id" class="form-control"
+                                    value="<?= $edit_order['nguoi_dung_id'] ?>" required min="1">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Mã đơn hàng</label>
+                                <input type="text" name="ma_don_hang" class="form-control"
+                                    value="<?= $edit_order['ma_don_hang'] ?>" required>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Tổng tiền</label>
+                                <input type="number" id="tong_tien" name="tong_tien" class="form-control"
+                                    value="<?= $edit_order['tong_tien'] ?>" required min="1">
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Tiền giảm</label>
+                                <input type="number" id="tien_giam" name="tien_giam" class="form-control"
+                                    value="<?= $edit_order['tien_giam'] ?>" min="0">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Thành tiền</label>
+                                <input type="number" id="thanh_tien" name="thanh_tien" class="form-control"
+                                    value="<?= $edit_order['thanh_tien'] ?>" required readonly style="background-color: #e9ecef;">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Phương thức thanh toán</label>
+                                <select name="phuong_thuc_thanh_toan" class="form-select">
+                                    <option value="tien_mat" <?= $edit_order['phuong_thuc_thanh_toan'] == 'tien_mat' ? 'selected' : '' ?>>Tiền mặt</option>
+                                    <option value="bank_transfer" <?= $edit_order['phuong_thuc_thanh_toan'] == 'bank_transfer' ? 'selected' : '' ?>>Chuyển khoản</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Trạng thái</label>
+                                <select name="trang_thai" class="form-select">
+                                    <option value="cho_thanh_toan" <?= $edit_order['trang_thai'] == 'cho_thanh_toan' ? 'selected' : '' ?>>Chờ thanh toán</option>
+                                    <option value="cho_xac_nhan" <?= $edit_order['trang_thai'] == 'cho_xac_nhan' ? 'selected' : '' ?>>Chờ xác nhận</option>
+                                    <option value="dang_chuan_bi" <?= $edit_order['trang_thai'] == 'dang_chuan_bi' ? 'selected' : '' ?>>Đang chuẩn bị</option>
+                                    <option value="dang_giao" <?= $edit_order['trang_thai'] == 'dang_giao' ? 'selected' : '' ?>>Đang giao</option>
+                                    <option value="da_giao" <?= $edit_order['trang_thai'] == 'da_giao' ? 'selected' : '' ?>>Đã giao</option>
+                                    <option value="da_huy" <?= $edit_order['trang_thai'] == 'da_huy' ? 'selected' : '' ?>>Đã hủy</option>
+                                </select>
+                            </div>
+
+
+                            <div class="col-md-9 d-flex align-items-end justify-content-end">
+                                <button name="save_order" class="btn btn-primary me-2">Lưu cập nhật</button>
+                                <a href="CRUDdonhang.php" class="btn btn-secondary">Hủy bỏ</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form method="POST" class="row g-3">
-                        <input type="hidden" name="id" value="<?= $edit_order['id'] ?>">
-
-                        <div class="col-md-2">
-                            <label class="form-label fw-bold">ID Người dùng</label>
-                            <input type="number" id="nguoi_dung_id" name="nguoi_dung_id" class="form-control"
-                                value="<?= $edit_order['nguoi_dung_id'] ?>" required min="1">
-                            <div class="invalid-feedback">ID người dùng phải là số dương!</div>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">Mã đơn hàng</label>
-                            <input type="text" name="ma_don_hang" class="form-control"
-                                value="<?= $edit_order['ma_don_hang'] ?>" required>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-bold">Tổng tiền</label>
-                            <input type="number" id="tong_tien" name="tong_tien" class="form-control"
-                                value="<?= $edit_order['tong_tien'] ?>" required min="1">
-                            <div class="invalid-feedback">Tổng tiền phải lớn hơn 0!</div>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-bold">Tiền giảm</label>
-                            <input type="number" id="tien_giam" name="tien_giam" class="form-control"
-                                value="<?= $edit_order['tien_giam'] ?>" min="0">
-                            <div class="invalid-feedback">Tiền giảm không được lớn hơn tổng tiền!</div>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-bold">Thành tiền</label>
-                            <input type="number" id="thanh_tien" name="thanh_tien" class="form-control"
-                                value="<?= $edit_order['thanh_tien'] ?>" required readonly style="background-color: #e9ecef;">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">Trạng thái</label>
-                            <select name="trang_thai" class="form-select">
-                                <option value="cho_xu_ly" <?= $edit_order['trang_thai'] == 'cho_xu_ly' ? 'selected' : '' ?>>Chờ xử lý</option>
-                                <option value="dang_giao" <?= $edit_order['trang_thai'] == 'dang_giao' ? 'selected' : '' ?>>Đang giao</option>
-                                <option value="da_thanh_toan" <?= $edit_order['trang_thai'] == 'da_thanh_toan' ? 'selected' : '' ?>>Đã thanh toán</option>
-                                <option value="da_giao" <?= $edit_order['trang_thai'] == 'da_giao' ? 'selected' : '' ?>>Đã
-                                    giao</option>
-                                <option value="hoan_thanh" <?= $edit_order['trang_thai'] == 'hoan_thanh' ? 'selected' : '' ?>>Đã hoàn thành</option>
-                                <option value="da_huy" <?= $edit_order['trang_thai'] == 'da_huy' ? 'selected' : '' ?>>Đã
-                                    hủy</option>
-
-                            </select>
-                        </div>
-
-                        <div class="col-md-10 d-flex align-items-end justify-content-end">
-                            <?php ($update_mode) ?>
-                            <button name="save_order" class="btn btn-warning me-2">Cập nhật đơn hàng</button>
-                            <a href="CRUDdonhang.php" class="btn btn-secondary">Hủy</a>
-                            <?php ?>
-                        </div>
-                    </form>
+            <?php else: ?>
+                <div class="alert alert-light border shadow-sm mb-4">
+                    <i class="fas fa-info-circle text-primary me-2"></i>
+                    Vui lòng chọn <strong>"Sửa"</strong> trong danh sách đơn hàng bên dưới để thực hiện thay đổi thông tin.
                 </div>
-            </div>
+            <?php endif; ?>
             <!-- Tim kiem -->
             <div class="filter-group mb-3">
                 <h4 class="filter-title"><i class="fas fa-search"></i> Tìm kiếm</h4>
