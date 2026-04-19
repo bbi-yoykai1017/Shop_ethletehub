@@ -73,8 +73,40 @@ try {
     error_log($e->getMessage());
 } // <--- QUAN TRỌNG: Phải có dấu này để đóng khối try
 
-function formatPrice($price) {
+function formatPrice($price)
+{
     return number_format($price ?? 0, 0, ',', '.') . '₫';
+}
+// 1. Khởi tạo giá trị mặc định để tránh lỗi "Undefined variable"
+$co_the_huy = false;
+$diff_hours = 0;
+$la_don_moi = false;
+$trong_24h = false;
+$da_huy = false;
+
+// 2. CHỈ TÍNH TOÁN KHI ĐANG XEM CHI TIẾT (Biến $order có dữ liệu)
+if (isset($order) && is_array($order)) {
+    // Thiết lập múi giờ để tính toán chính xác
+    date_default_timezone_set('Asia/Ho_Chi_Minh');
+
+    $ngay_dat_str = $order['ngay_dat'] ?? null;
+    
+    if ($ngay_dat_str) {
+        $ngay_dat_timestamp = strtotime($ngay_dat_str);
+        $bay_gio = time();
+        // Tính số giờ đã trôi qua
+        $diff_hours = ($bay_gio - $ngay_dat_timestamp) / 3600;
+
+        // Xác định các trạng thái logic
+        $la_don_moi = ($order['trang_thai'] == 'cho_xac_nhan');
+        $trong_24h = ($diff_hours < 24);
+        $da_huy = ($order['trang_thai'] == 'da_huy');
+
+        // Điều kiện để hiện nút hủy
+        if ($la_don_moi && $trong_24h) {
+            $co_the_huy = true;
+        }
+    }
 }
 ?>
 
@@ -175,7 +207,11 @@ function formatPrice($price) {
                             </div>
                             <div class="summary-item">
                                 <span>Ngày đặt:</span>
-                                <span><?= ($order['ngay_dat']) ?></span>
+                                <span><?= date("d/m/Y", strtotime($order['ngay_dat'])) ?></span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Giờ đặt:</span>
+                                <span><?= date("H:i:s", strtotime($order['ngay_dat'])) ?></span>
                             </div>
                             <div class="summary-item">
                                 <span>Tên người nhận:</span>
@@ -201,26 +237,33 @@ function formatPrice($price) {
                             <a href="orders.php" class="btn btn-outline-primary w-100 mt-3">
                                 <i class="fas fa-arrow-left"></i> Quay lại danh sách
                             </a>
-                            <?php
-                            // 1. Tính toán khoảng cách thời gian
-                            $ngay_dat = strtotime($order['ngay_dat']);
-                            $bay_gio = time();
-                            $diff_hours = ($bay_gio - $ngay_dat) / 3600; // Đổi giây sang giờ
 
-                            // 2. Chỉ cho phép hủy nếu thời gian < 24h và trạng thái là 'dang_xu_ly' hoặc 'cho_xac_nhan'
-                            // (Đạt nên kiểm tra thêm trạng thái để tránh trường hợp đang giao hàng vẫn bấm hủy được)
-                            if ($diff_hours < 24 && ($order['trang_thai'] == 'cho_xac_nhan')):
-                            ?>
+                            <?php if ($co_the_huy): ?>
                                 <button onclick="confirmCancel(<?= $order['id'] ?>)" class="btn btn-danger w-100 mt-2">
                                     <i class="fas fa-times-circle"></i> Hủy đơn hàng
                                 </button>
                                 <small class="text-muted d-block text-center mt-1">
                                     (Bạn có thể hủy đơn trong 24h kể từ khi đặt)
-                                </small>    
+                                </small>
+
+                            <?php elseif ($order['trang_thai'] == 'da_huy'): ?>
+                                <button class="btn btn-outline-secondary w-100 mt-2" disabled>
+                                    <i class="fas fa-check-circle"></i> Đơn hàng đã hủy
+                                </button>
+                                <small class="text-muted d-block text-center mt-1">
+                                    Đơn hàng này đã được bạn yêu cầu hủy thành công.
+                                </small>
+
                             <?php else: ?>
-                                <button class="btn btn-secondary w-100 mt-2" disabled title="Quá 24h hoặc đơn hàng đã được xử lý">
+                                <button class="btn btn-secondary w-100 mt-2" disabled>
                                     <i class="fas fa-ban"></i> Không thể hủy đơn
                                 </button>
+                                <small class="text-danger d-block text-center mt-1">
+                                    <?php
+                                    if ($diff_hours >= 24) echo "Đã quá thời hạn 24h để hủy đơn.";
+                                    else echo "Đơn hàng đã được xử lý, vui lòng liên hệ hỗ trợ.";
+                                    ?>
+                                </small>
                             <?php endif; ?>
                         </div>
                     </div>
