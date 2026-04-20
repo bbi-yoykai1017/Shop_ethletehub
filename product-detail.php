@@ -64,165 +64,169 @@ $ratingSummary = $product['rating_summary'];
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/product-detail.css">
-    <style>/* ================= CHAT POPUP ================= */
-.chat-popup {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 340px;
-    height: 480px;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    z-index: 9999;
-    animation: fadeInUp 0.3s ease;
-}
+    <style>
+        /* ================= CHAT POPUP ================= */
+        .chat-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 340px;
+            height: 480px;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            z-index: 9999;
+            animation: fadeInUp 0.3s ease;
+        }
 
-/* Animation */
-@keyframes fadeInUp {
-    from {
-        transform: translateY(30px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
 
-/* ================= HEADER ================= */
-.chat-header {
-    background: linear-gradient(135deg, #0084ff, #00c6ff);
-    color: white;
-    padding: 12px 15px;
-    font-weight: 600;
-    font-size: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-.chat-header button {
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-}
+        /* ================= HEADER ================= */
+        .chat-header {
+            background: linear-gradient(135deg, #0084ff, #00c6ff);
+            color: white;
+            padding: 12px 15px;
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-/* ================= CHAT CONTENT ================= */
-.chat-content {
-    flex: 1;
-    padding: 10px;
-    overflow-y: auto;
-    background: #f5f7fb;
-}
+        .chat-header button {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
 
-/* Scroll đẹp */
-.chat-content::-webkit-scrollbar {
-    width: 6px;
-}
-.chat-content::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 10px;
-}
+        /* ================= CHAT CONTENT ================= */
+        .chat-content {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background: #f5f7fb;
+        }
 
-/* ================= MESSAGE ================= */
-.user-msg {
-    background: #ff4d4f;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 15px 15px 0 15px;
-    margin: 6px 0;
-    max-width: 75%;
-    margin-left: auto;
-    font-size: 13px;
-}
+        /* Scroll đẹp */
+        .chat-content::-webkit-scrollbar {
+            width: 6px;
+        }
 
-.bot-msg {
-    background: #fff;
-    padding: 8px 12px;
-    border-radius: 15px 15px 15px 0;
-    margin: 6px 0;
-    max-width: 75%;
-    border: 1px solid #eee;
-    font-size: 13px;
-}
+        .chat-content::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
 
-/* ================= PRODUCT CARD ================= */
-.product-card-chat {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    border-top: 1px solid #eee;
-    background: #fff;
-    align-items: center;
-}
+        /* ================= MESSAGE ================= */
+        .user-msg {
+            background: #ff4d4f;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 15px 15px 0 15px;
+            margin: 6px 0;
+            max-width: 75%;
+            margin-left: auto;
+            font-size: 13px;
+        }
 
-.product-card-chat img {
-    width: 55px;
-    height: 55px;
-    border-radius: 10px;
-    object-fit: cover;
-}
+        .bot-msg {
+            background: #fff;
+            padding: 8px 12px;
+            border-radius: 15px 15px 15px 0;
+            margin: 6px 0;
+            max-width: 75%;
+            border: 1px solid #eee;
+            font-size: 13px;
+        }
 
-.product-card-chat h6 {
-    font-size: 14px;
-    margin: 0;
-    font-weight: 500;
-}
+        /* ================= PRODUCT CARD ================= */
+        .product-card-chat {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            background: #fff;
+            align-items: center;
+        }
 
-.product-card-chat .price {
-    color: #ff2d55;
-    font-weight: bold;
-    font-size: 13px;
-}
+        .product-card-chat img {
+            width: 55px;
+            height: 55px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
 
-/* ================= FOOTER ================= */
-.chat-footer {
-    display: flex;
-    gap: 8px;
-    padding: 10px;
-    border-top: 1px solid #eee;
-    background: #fff;
-}
+        .product-card-chat h6 {
+            font-size: 14px;
+            margin: 0;
+            font-weight: 500;
+        }
 
-.chat-footer input {
-    flex: 1;
-    border: none;
-    background: #f1f1f1;
-    border-radius: 20px;
-    padding: 8px 14px;
-    font-size: 13px;
-    outline: none;
-}
+        .product-card-chat .price {
+            color: #ff2d55;
+            font-weight: bold;
+            font-size: 13px;
+        }
 
-.chat-footer button {
-    background: #ff2d55;
-    border: none;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: 0.2s;
-}
+        /* ================= FOOTER ================= */
+        .chat-footer {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            background: #fff;
+        }
 
-.chat-footer button:hover {
-    background: #e60023;
-}
+        .chat-footer input {
+            flex: 1;
+            border: none;
+            background: #f1f1f1;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 13px;
+            outline: none;
+        }
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 480px) {
-    .chat-popup {
-        width: 90%;
-        right: 5%;
-        height: 70vh;
-    }
-}</style>
+        .chat-footer button {
+            background: #ff2d55;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .chat-footer button:hover {
+            background: #e60023;
+        }
+
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 480px) {
+            .chat-popup {
+                width: 90%;
+                right: 5%;
+                height: 70vh;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -258,7 +262,7 @@ $ratingSummary = $product['rating_summary'];
                 </ul>
 
                 <div class="navbar-right d-flex align-items-center">
-                    <div class="nav-notification">
+                    <div class="nav-notification" onclick="window.location.href='news.php'">
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">2</span>
                     </div>
@@ -477,7 +481,7 @@ $ratingSummary = $product['rating_summary'];
                                 <i class="fas fa-bolt"></i>
                                 Mua ngay
                             </button>
-                            <button class="btn-chat-auto" id="chatBtn">
+                            <button class="btn-chat-auto" style="border-radius: 15px; background-color: white; color: #0084ff;" id="chatBtn">
                                 <i class="fas fa-comments"></i>
                                 <span>Chat</span>
                             </button>
@@ -744,7 +748,7 @@ $ratingSummary = $product['rating_summary'];
                         <div class="footer-section">
                             <h4 class="footer-title">Hỗ trợ</h4>
                             <ul class="footer-links">
-                                <li><a href="#">Liên hệ chúng tôi</a></li>
+                                <li><a href="about.php">Liên hệ chúng tôi</a></li>
                                 <li><a href="#">Chính sách giao hàng</a></li>
                                 <li><a href="#">Chính sách hoàn trả</a></li>
                                 <li><a href="#">FAQ</a></li>
@@ -844,7 +848,7 @@ $ratingSummary = $product['rating_summary'];
 
         <!-- HEADER -->
         <div class="chat-header">
-            <span>💬 Chat nhanh</span>
+            <span style="color: #00c6ff; border-radius: 15px;">💬 Chat nhanh</span>
             <button onclick="closeChat()">×</button>
         </div>
 
