@@ -8,8 +8,13 @@ ob_start();
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/../Database.php';
+require_once __DIR__ . '../Database.php';
+require_once __DIR__ . '../model/Mailer.php';
 
+$phpmailerAutoload = __DIR__ . '/../vendor/autoload.php';
+if (file_exists($phpmailerAutoload)) {
+    require_once $phpmailerAutoload;
+}
 ob_clean();
 
 try {
@@ -83,8 +88,13 @@ try {
 
         // ========== ĐẶT HÀNG ==========
         case 'place_order':
-            $userId = (int)$_SESSION['user_id'];
-            
+            $userId = (int) $_SESSION['user_id'];
+
+            // Lấy thông tin user (cần email để gửi thông báo)
+            $stmt = $conn->prepare("SELECT id, ten, email, so_dien_thoai FROM nguoi_dung WHERE id = ? LIMIT 1");
+            $stmt->execute([$userId]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
             // Validate dữ liệu
             $tenNguoiNhan = trim($data['ten_nguoi_nhan'] ?? '');
             $soDienThoai = trim($data['so_dien_thoai_nhan'] ?? '');
@@ -92,7 +102,7 @@ try {
             $phuongThuc = trim($data['phuong_thuc_thanh_toan'] ?? 'tien_mat');
             $tongTien = floatval($data['tong_tien'] ?? 0);
             $tienGiam = floatval($data['tien_giam_gia'] ?? 0);
-            $maGiamGiaId = !empty($data['ma_giam_gia_id']) ? (int)$data['ma_giam_gia_id'] : null;
+            $maGiamGiaId = !empty($data['ma_giam_gia_id']) ? (int) $data['ma_giam_gia_id'] : null;
             $lat = floatval($data['lat'] ?? 0);
             $lng = floatval($data['lng'] ?? 0);
 
@@ -144,14 +154,14 @@ try {
                 $thanhTien = $tongTien - $tienGiam;
 
                 $stmt = $conn->prepare("
-                    INSERT INTO don_hang 
-                    (nguoi_dung_id, ten_nguoi_nhan, so_dien_thoai_nhan, dia_chi_giao_hang, 
-                     ma_don_hang, tong_tien, tien_giam, thanh_tien, ma_giam_gia_id, 
-                     phuong_thuc_thanh_toan, trang_thai, ngay_dat, lat, lng) 
-                    VALUES 
+                    INSERT INTO don_hang
+                    (nguoi_dung_id, ten_nguoi_nhan, so_dien_thoai_nhan, dia_chi_giao_hang,
+                     ma_don_hang, tong_tien, tien_giam, thanh_tien, ma_giam_gia_id,
+                     phuong_thuc_thanh_toan, trang_thai, ngay_dat, lat, lng)
+                    VALUES
                     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'cho_xac_nhan', NOW(), ?, ?)
                 ");
-                
+
                 $stmt->execute([
                     $userId,
                     $tenNguoiNhan,
@@ -171,14 +181,19 @@ try {
 
                 // Sao chép chi tiết giỏ hàng sang đơn hàng
                 $stmt = $conn->prepare("
-                    SELECT 
+                    SELECT
                         ctgh.san_pham_id,
                         ctgh.so_luong,
+                        sp.ten,
                         sp.gia,
                         ctgh.kich_thuoc_id,
-                        ctgh.mau_sac_id
+                        ks.ten  AS kich_thuoc,
+                        ctgh.mau_sac_id,
+                        ms.ten  AS mau_sac
                     FROM chi_tiet_gio_hang ctgh
                     JOIN san_pham sp ON ctgh.san_pham_id = sp.id
+                    LEFT JOIN kich_thuoc ks ON ctgh.kich_thuoc_id = ks.id
+                    LEFT JOIN mau_sac    ms ON ctgh.mau_sac_id    = ms.id
                     WHERE ctgh.gio_hang_id = ?
                 ");
                 $stmt->execute([$giohang['id']]);
@@ -186,13 +201,13 @@ try {
 
                 foreach ($cartItems as $item) {
                     $thanhTienItem = $item['so_luong'] * $item['gia'];
-                    
+
                     $stmt = $conn->prepare("
-                        INSERT INTO chi_tiet_don_hang 
-                        (don_hang_id, san_pham_id, so_luong, gia, thanh_tien, kich_thuoc_id, mau_sac_id) 
+                        INSERT INTO chi_tiet_don_hang
+                        (don_hang_id, san_pham_id, so_luong, gia, thanh_tien, kich_thuoc_id, mau_sac_id)
                         VALUES (?, ?, ?, ?, ?, ?, ?)
                     ");
-                    
+
                     $stmt->execute([
                         $donHangId,
                         $item['san_pham_id'],
@@ -204,23 +219,58 @@ try {
                     ]);
                 }
 
-                // Xóa giỏ hàng chi tiết
+                // Xóa giỏ hàng chi tiết & giỏ hàng
                 $stmt = $conn->prepare("DELETE FROM chi_tiet_gio_hang WHERE gio_hang_id = ?");
                 $stmt->execute([$giohang['id']]);
 
-                // Xóa giỏ hàng
                 $stmt = $conn->prepare("DELETE FROM gio_hang WHERE id = ?");
                 $stmt->execute([$giohang['id']]);
 
                 $conn->commit();
 
-                // Trả về thông tin đơn hàng
+                // ================================================
+                // GỬI EMAIL XÁC NHẬN ĐƠN HÀNG
+                // ================================================
+                $orderForMail = [
+                    'ma_don_hang' => $maDonHang,
+                    'ngay_dat' => date('Y-m-d H:i:s'),
+                    'ten_nguoi_nhan' => $tenNguoiNhan,
+                    'so_dien_thoai_nhan' => $soDienThoai,
+                    'dia_chi_giao_hang' => $diaChiGiao,
+                    'phuong_thuc_thanh_toan' => $phuongThuc,
+                    'tong_tien' => $tongTien,
+                    'tien_giam' => $tienGiam,
+                    'thanh_tien' => $thanhTien,
+                ];
+
+                // Chuẩn hóa items để đưa vào template email
+                $itemsForMail = array_map(fn($i) => [
+                    'ten' => $i['ten'],
+                    'so_luong' => $i['so_luong'],
+                    'gia' => $i['gia'],
+                    'kich_thuoc' => $i['kich_thuoc'] ?? '',
+                    'mau_sac' => $i['mau_sac'] ?? '',
+                ], $cartItems);
+
+                try {
+                    $mailer = new Mailer();
+                    $emailSent = $mailer->sendOrderConfirmation($orderForMail, $itemsForMail, $user);
+                    if (!$emailSent) {
+                        error_log("Email không gửi được cho đơn hàng #$maDonHang - user: " . ($user['email'] ?? 'N/A'));
+                    }
+                } catch (Exception $mailEx) {
+                    // Gửi email thất bại KHÔNG rollback đơn hàng — chỉ log lỗi
+                    error_log("Mailer exception: " . $mailEx->getMessage());
+                }
+                // ================================================
+
                 echo json_encode([
                     'success' => true,
                     'message' => 'Đơn hàng đã được tạo thành công',
                     'order_id' => $donHangId,
                     'order_code' => $maDonHang,
-                    'redirect' => 'orders.php?id=' . $donHangId
+                    'redirect' => 'orders.php?id=' . $donHangId,
+                    'email_sent' => $emailSent ?? false,
                 ]);
 
             } catch (Exception $e) {
