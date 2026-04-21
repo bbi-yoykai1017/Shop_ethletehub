@@ -10,7 +10,7 @@ $db = new Database();
 $conn = $db->connect();
 $products = getallproduct($conn);
 $latestNews = getLatestNews($conn, 4);
-$newsCount = countNews($conn, null, 1); // Lấy tổng số tin tức công khai
+$newsCount = countNews($conn, null, 1); 
 
 // Xử lý sản phẩm - thêm các trường tính toán
 $products = processProducts($products);
@@ -102,7 +102,7 @@ $displayProducts = array_slice($products, 0, 8);
                         <div class="navbar-right">
                              <div class="nav-notification" onclick="window.location.href='news.php'">
                                 <i class="fas fa-bell"></i>
-                                <span class="notification-badge">2</span>
+                                <span class="notification-badge"><?= $newsCount ?></span>
                             </div>
                             <div class="cart-icon" onclick="window.location.href='cart.php'">
                                 <i class="fas fa-shopping-cart"></i>
@@ -520,96 +520,6 @@ $displayProducts = array_slice($products, 0, 8);
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="js/cart.js"></script>
-    
-    <!-- Notification Script -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const notificationBell = document.getElementById('notificationBell');
-        const notificationDropdown = document.getElementById('notificationDropdown');
-        const notificationList = document.getElementById('notificationList');
-        
-        if (!notificationBell) return;
-        
-        // Toggle dropdown khi click chuông
-        notificationBell.addEventListener('click', function(e) {
-            e.stopPropagation();
-            notificationDropdown.classList.toggle('active');
-            
-            // Nếu mở dropdown, load tin tức
-            if (notificationDropdown.classList.contains('active')) {
-                loadNotifications();
-            }
-        });
-        
-        // Đóng dropdown khi click ngoài
-        document.addEventListener('click', function(e) {
-            if (!notificationDropdown.parentElement.contains(e.target)) {
-                notificationDropdown.classList.remove('active');
-            }
-        });
-        
-        // Load tin tức từ API
-        function loadNotifications() {
-            fetch('api/news.php?action=get_latest_news&limit=5')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.data.length > 0) {
-                        let html = '';
-                        data.data.forEach(news => {
-                            const date = new Date(news.ngay_tao);
-                            const formattedDate = date.toLocaleDateString('vi-VN');
-                            const typeLabel = getNewsTypeLabel(news.loai_tin);
-                            
-                            html += `
-                                <a href="news-detail.php?id=${news.id}" class="notification-item">
-                                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 10px;">
-                                        <div style="flex: 1;">
-                                            <div class="notification-item-title">${escapeHtml(news.tieu_de)}</div>
-                                            <span class="notification-item-type">${typeLabel}</span>
-                                        </div>
-                                    </div>
-                                    <div class="notification-item-date">
-                                        <i class="fas fa-calendar"></i> ${formattedDate} 
-                                        <i class="fas fa-eye"></i> ${news.luot_xem}
-                                    </div>
-                                </a>
-                            `;
-                        });
-                        notificationList.innerHTML = html;
-                    } else {
-                        notificationList.innerHTML = '<div class="notification-loading">Chưa có tin tức nào</div>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Lỗi tải tin tức:', error);
-                    notificationList.innerHTML = '<div class="notification-loading">Lỗi tải dữ liệu</div>';
-                });
-        }
-        
-        // Hàm escape HTML
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, m => map[m]);
-        }
-        
-        // Hàm format loại tin
-        function getNewsTypeLabel(loai_tin) {
-            const labels = {
-                'san-pham-moi': '🎉 Sản phẩm mới',
-                'khuyen-mai': '💰 Khuyến mãi',
-                'su-kien': '🏃 Sự kiện',
-                'other': '⭐ Khác'
-            };
-            return labels[loai_tin] || 'Tin tức';
-        }
-    });
-    </script>
     <script src="js/script.js"></script>
     <script src="js/categories.js"></script>
     <script>
