@@ -8,9 +8,9 @@ ob_start();
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
+require_once __DIR__ . '/../vendor/autoload.php'; 
 require_once __DIR__ . '/../Database.php';
 require_once __DIR__ . '/../model/Mailer.php';
-require_once __DIR__ . '/../vendor/autoload.php';
 
 ob_clean();
 
