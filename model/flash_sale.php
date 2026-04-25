@@ -92,7 +92,7 @@ function getFlashSaleProducts($conn, $flashSaleId) {
             'description' => $p['mo_ta'],
             'price' => floatval($p['gia_giam_gia']),
             'originalPrice' => floatval($p['gia_goc']),
-            'image' => $p['hinh_anh_chinh'],
+            'image' => $p['hinh_anh_chinh'] ? 'public/' . $p['hinh_anh_chinh'] : 'public/placeholder.svg',
             'rating' => floatval($p['trung_binh_sao']),
             'so_luong_danh_gia' => $p['so_luong_danh_gia'],
             'discount' => intval($p['phan_tram_giam']),
