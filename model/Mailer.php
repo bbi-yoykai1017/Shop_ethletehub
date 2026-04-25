@@ -84,7 +84,7 @@ class Mailer
 
             //  noi dung
             $mail->isHTML(true);
-            $mail->Subject = $subject; 
+            $mail->Subject = $subject;
             $mail->Body = $html;
             $mail->AltBody = $plain; // noi dung thuong de hien thi khi mail client khong ho tro HTML
 
@@ -103,6 +103,41 @@ class Mailer
             error_log('[Mailer] ❌ ' . $msg);
             return ['sent' => false, 'error' => $msg];
         }
+    }
+    /**
+     *  fallback cho cac email client cu 
+     * @param array $order
+     * @param array $items 
+     * @param string $toName
+     * @return string
+     */
+    private function buildPlainText(array $order, array $items, string $toName): string
+    {
+        $lines = [];
+        $lines[] = "AthleteHub - Xác nhận đơn hàng";
+        $lines[] = str_repeat('=', 40);
+        $lines[] = "Xin chào $toName,";
+        $lines[] = "Đơn hàng của bạn đã được đặt thành công!";
+        $lines[] = "";
+        $lines[] = "Mã đơn:    #" . $order['ma_don_hang'];
+        $lines[] = "Ngày đặt:  " . date('d/m/Y H:i', strtotime($order['ngay_dat'] ?? 'now'));
+        $lines[] = "Địa chỉ:   " . $order['dia_chi_giao_hang'];
+        $lines[] = "SĐT:       " . $order['so_dien_thoai_nhan'];
+        $lines[] = "";
+        $lines[] = "SẢN PHẨM:";
+        foreach ($items as $item) {
+            $lines[] = "- " . $item['ten'] . " x" . $item['so_luong']
+                . " = " . number_format($item['gia'] * $item['so_luong'], 0, ',', '.') . "đ";
+        }
+        $lines[] = "";
+        $lines[] = "Tổng tiền:  " . number_format($order['tong_tien'], 0, ',', '.') . "đ";
+        $lines[] = "Giảm giá:  -" . number_format($order['tien_giam'], 0, ',', '.') . "đ";
+        $lines[] = "Thành tiền: " . number_format($order['thanh_tien'], 0, ',', '.') . "đ";
+        $lines[] = "";
+        $lines[] = "Xem đơn hàng: " . $this->shopUrl . "/orders.php";
+        $lines[] = "";
+        $lines[] = "Cảm ơn bạn đã mua sắm tại AthleteHub!";
+        return implode("\n", $lines);
     }
 }
 ?>
