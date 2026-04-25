@@ -3,7 +3,6 @@ session_start();
 require_once 'Database.php';
 require_once 'model/CRUD.php';
 require_once 'auth.php';
-// Truy vấn lấy ID và Tên danh mục
 
 $db = new Database();
 $conn = $db->connect();
@@ -20,13 +19,12 @@ $edit_product = [
     'phan_tram_giam' => 0,
     'hinh_anh_chinh' => ''
 ];
-// Truy vấn lấy ID và Tên danh mục sap xep theoo id tang dan
+
 $sql_dm = "SELECT id, ten_danh_muc FROM danh_muc ORDER BY id DESC";
-/** @var PDOStatement $stmt_dm */
 $stmt_dm = $conn->prepare($sql_dm);
 $stmt_dm->execute();
 $list_danhmuc = $stmt_dm->fetchAll(PDO::FETCH_ASSOC);
-// ================= 1. XỬ LÝ LẤY DỮ LIỆU ĐỂ SỬA (Sửa Link ở dưới thành ?edit=) =================
+
 if (isset($_GET['edit'])) {
     $id = $_GET['edit'];
     $sql = "SELECT * FROM san_pham WHERE id = ?";
@@ -39,7 +37,6 @@ if (isset($_GET['edit'])) {
     }
 }
 
-// ================= 2. XỬ LÝ THÊM HOẶC CẬP NHẬT =================
 if (isset($_POST['save_product'])) {
     $danh_muc_id = $_POST['danh_muc_id'];
     $ten = $_POST['ten'];
@@ -48,9 +45,6 @@ if (isset($_POST['save_product'])) {
     $gia_goc = $_POST['gia_goc'];
     $phan_tram_giam = $_POST['phan_tram_giam'];
 
-
-
-    // Xử lý Upload Ảnh
     $hinh_anh = $_POST['hinh_anh_cu'] ?? '';
 
     if (isset($_FILES['hinh_anh_upload']) && $_FILES['hinh_anh_upload']['error'] == 0) {
@@ -59,7 +53,7 @@ if (isset($_POST['save_product'])) {
         $target_file = $target_dir . $file_name;
 
         if (move_uploaded_file($_FILES["hinh_anh_upload"]["tmp_name"], $target_file)) {
-            $hinh_anh = $file_name; // Gán tên file mới để lưu vào DB
+            $hinh_anh = $file_name;
         }
     }
 
@@ -69,7 +63,7 @@ if (isset($_POST['save_product'])) {
         $stmt = $conn->prepare($sql);
         $stmt->execute([$danh_muc_id, $ten, $mo_ta, $gia, $gia_goc, $phan_tram_giam, $hinh_anh, $id]);
     } else {
-        $sql = "INSERT INTO san_pham (danh_muc_id, ten, mo_ta, gia, gia_goc, phan_tram_giam,  hinh_anh_chinh) VALUES (?,  ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO san_pham (danh_muc_id, ten, mo_ta, gia, gia_goc, phan_tram_giam, hinh_anh_chinh) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->execute([$danh_muc_id, $ten, $mo_ta, $gia, $gia_goc, $phan_tram_giam, $hinh_anh]);
     }
@@ -77,7 +71,6 @@ if (isset($_POST['save_product'])) {
     exit;
 }
 
-// ================= 3. XỬ LÝ XÓA (Sửa Link ở dưới thành ?delete=) =================
 if (isset($_GET['delete'])) {
     $sql = "DELETE FROM san_pham WHERE id = ?";
     $stmt = $conn->prepare($sql);
@@ -85,45 +78,40 @@ if (isset($_GET['delete'])) {
     header("Location: CRUDproduct.php");
     exit;
 }
-// ================= 4. XỬ LÝ TÌM KIẾM & PHÂN TRANG =================
 
-// Cấu hình phân trang
-$limit = 10; // Số dòng trên mỗi trang
+$limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) $page = 1;
 $offset = ($page - 1) * $limit;
 
-// Xử lý từ khóa tìm kiếm
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $params = [];
 $where_sql = "";
 
 if (!empty($search)) {
-    // Nếu nội dung tìm kiếm là số, ưu tiên tìm chính xác ID san pham
     if (is_numeric($search)) {
         $where_sql = " WHERE id = ? ";
-        $params[] = (int)$search; // Tìm chính xác số ID
-      
+        $params[] = (int)$search;
     } else {
-        // Nếu là chữ, tìm gần đúng theo ten
         $where_sql = " WHERE ten LIKE ? ";
         $params[] = "%$search%";
     }
 }
 
-// Đếm tổng số dòng để tính số trang
 $total_sql = "SELECT COUNT(*) FROM san_pham" . $where_sql;
 $total_stmt = $conn->prepare($total_sql);
 $total_stmt->execute($params);
 $total_rows = $total_stmt->fetchColumn();
 $total_pages = ceil($total_rows / $limit);
 
-// Lấy dữ liệu theo trang và tìm kiếm
 $sql_list = "SELECT * FROM san_pham" . $where_sql . " ORDER BY id ASC LIMIT $limit OFFSET $offset";
 $stmt_list = $conn->prepare($sql_list);
 $stmt_list->execute($params);
 $listproduct = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
 
+// Stats
+$sale_count_sql = "SELECT COUNT(*) FROM san_pham WHERE phan_tram_giam > 0";
+$sale_count = $conn->query($sale_count_sql)->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -133,51 +121,36 @@ $listproduct = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quản lý sản phẩm - EthleteHub</title>
 
-
-
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Font Awesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
     <!-- Custom CSS Files -->
     <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/navbar.css">
-    <link rel="stylesheet" href="css/hero.css">
-    <link rel="stylesheet" href="css/categories.css">
-    <link rel="stylesheet" href="css/products.css">
-    <link rel="stylesheet" href="css/footer.css">
-    <link rel="stylesheet" href="css/utilities.css">
-    <link href="css/crud.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/crud-modern.css">
     <link rel="stylesheet" href="css/admin-layout.css">
-    <link rel="stylesheet" href="css/page-link.css">
 </head>
 
-<body style="background:#f4f6f9;">
-
+<body style="background: linear-gradient(135deg, #f5f7fa 0%, #e4ecfb 100%); min-height: 100vh;">
 
     <!-- NAVBAR ADMIN -->
-
-    <nav class="navbar navbar-dark bg-dark shadow">
+    <nav class="navbar navbar-dark shadow" style="background: var(--dark-gradient);">
         <div class="container-fluid px-4">
             <span class="navbar-brand fw-bold">
-                <i class="bi bi-speedometer2"></i> AthleteHub Admin
+                <i class="fas fa-tachometer-alt me-2"></i> AthleteHub Admin
             </span>
-
             <a href="index.php" class="btn btn-outline-light btn-sm">
-                <i class="bi bi-house"></i> Trang chủ
+                <i class="fas fa-home me-1"></i> Trang chủ
             </a>
         </div>
     </nav>
 
     <!-- CONTENT -->
     <div class="layout">
-
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <ul>
-                <li><a href="CRUDproduct.php"><i class="fas fa-box me-2"></i> Sản phẩm</a></li>
+                <li><a href="CRUDproduct.php" class="active"><i class="fas fa-box me-2"></i> Sản phẩm</a></li>
                 <li><a href="CRUDuser.php"><i class="fas fa-users me-2"></i> Khách hàng</a></li>
                 <li><a href="CRUDdonhang.php"><i class="fas fa-shopping-cart me-2"></i> Đơn hàng</a></li>
                 <li><a href="CRUDgiamgia.php"><i class="fas fa-tags me-2"></i> Mã giảm giá</a></li>
@@ -189,9 +162,41 @@ $listproduct = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
 
         <!-- NỘI DUNG -->
         <div class="main-content">
+            <!-- Breadcrumb -->
+            <nav class="modern-breadcrumb animate-fade-in-up">
+                <a href="index.php"><i class="fas fa-home"></i></a>
+                <span class="separator"><i class="fas fa-chevron-right"></i></span>
+                <span class="current">Quản lý sản phẩm</span>
+            </nav>
 
-            <div class="card shadow border-0 mb-4">
-                <div class="card-header bg-primary text-white py-3">
+            <!-- Stats Cards -->
+            <div class="row stats-row g-3">
+                <div class="col-md-4">
+                    <div class="stat-card stat-primary delay-1">
+                        <div class="stat-icon"><i class="fas fa-box"></i></div>
+                        <div class="stat-value"><?= number_format($total_rows) ?></div>
+                        <div class="stat-label">Tổng sản phẩm</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card stat-warning delay-2">
+                        <div class="stat-icon"><i class="fas fa-percent"></i></div>
+                        <div class="stat-value"><?= number_format($sale_count) ?></div>
+                        <div class="stat-label">Sản phẩm giảm giá</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card stat-success delay-3">
+                        <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+                        <div class="stat-value"><?= count($list_danhmuc) ?></div>
+                        <div class="stat-label">Danh mục</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Card -->
+            <div class="glass-card mb-4">
+                <div class="card-header">
                     <h5 class="mb-0">
                         <?php if ($update_mode): ?>
                             <i class="fas fa-edit me-2"></i> Chỉnh sửa sản phẩm
@@ -201,86 +206,79 @@ $listproduct = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST" class="row g-3" enctype="multipart/form-data">
+                    <form method="POST" class="row g-3 form-modern" enctype="multipart/form-data">
                         <input type="hidden" name="id" value="<?= $edit_product['id'] ?>">
-                        <div class="col-md-2">
-                            <label class="form-label fw-bold">Danh mục sản phẩm</label>
-                            <select name="danh_muc_id" class="form-select" required>
-                                <option value="">-- Chọn danh mục --</option>
-                                <?php foreach ($list_danhmuc as $dm): ?>
-                                    <option value="<?= $dm['id'] ?>"
-                                        <?= ($update_mode && $edit_product['danh_muc_id'] == $dm['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($dm['ten_danh_muc']) ?>
 
+                        <div class="col-md-2">
+                            <label class="form-label"><i class="fas fa-folder me-1 text-primary"></i> Danh mục</label>
+                            <select name="danh_muc_id" class="form-select" required>
+                                <option value="">-- Chọn --</option>
+                                <?php foreach ($list_danhmuc as $dm): ?>
+                                    <option value="<?= $dm['id'] ?>" <?= ($update_mode && $edit_product['danh_muc_id'] == $dm['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($dm['ten_danh_muc']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Tên sản phẩm</label>
-                            <input type="text" name="ten" class="form-control" value="<?= $edit_product['ten'] ?>" required>
+                            <label class="form-label"><i class="fas fa-tag me-1 text-primary"></i> Tên sản phẩm</label>
+                            <input type="text" name="ten" class="form-control" value="<?= $edit_product['ten'] ?>" required placeholder="Nhập tên sản phẩm...">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Mô tả ngắn</label>
-                            <input type="text" name="mo_ta" class="form-control" value="<?= $edit_product['mo_ta'] ?>">
+                            <label class="form-label"><i class="fas fa-align-left me-1 text-primary"></i> Mô tả ngắn</label>
+                            <input type="text" name="mo_ta" class="form-control" value="<?= $edit_product['mo_ta'] ?>" placeholder="Mô tả ngắn...">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">Giá gốc</label>
-                            <input type="number" id="gia_goc" name="gia_goc" class="form-control" value="<?= $edit_product['gia_goc'] ?>" min="0">
+                            <label class="form-label"><i class="fas fa-dollar-sign me-1 text-primary"></i> Giá gốc</label>
+                            <input type="number" id="gia_goc" name="gia_goc" class="form-control" value="<?= $edit_product['gia_goc'] ?>" min="0" placeholder="0">
                         </div>
-
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">Giá bán</label>
-                            <input type="number" id="gia_ban" name="gia" class="form-control" value="<?= $edit_product['gia'] ?>" min="0" required>
+                            <label class="form-label"><i class="fas fa-tags me-1 text-primary"></i> Giá bán</label>
+                            <input type="number" id="gia_ban" name="gia" class="form-control" value="<?= $edit_product['gia'] ?>" min="0" required placeholder="0">
                             <div class="invalid-feedback">Giá bán không được cao hơn giá gốc!</div>
                         </div>
-
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">Phần trăm giảm (%)</label>
-                            <input type="number" id="phan_tram_giam" step="1" name="phan_tram_giam" class="form-control" value="<?= $edit_product['phan_tram_giam'] ?>" required>
-                            <small class="text-muted">Phần trăm giảm phải nằm trong khoảng 0-100</small>
+                            <label class="form-label"><i class="fas fa-percentage me-1 text-primary"></i> Giảm (%)</label>
+                            <input type="number" id="phan_tram_giam" step="1" name="phan_tram_giam" class="form-control" value="<?= $edit_product['phan_tram_giam'] ?>" required placeholder="0-100">
+                            <small class="text-muted">0-100</small>
                         </div>
-
-
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Hình ảnh sản phẩm</label>
+                            <label class="form-label"><i class="fas fa-image me-1 text-primary"></i> Hình ảnh</label>
                             <input type="file" name="hinh_anh_upload" class="form-control" accept="image/*">
                             <?php if ($update_mode && !empty($edit_product['hinh_anh_chinh'])): ?>
                                 <small class="text-muted">Ảnh hiện tại: <?= $edit_product['hinh_anh_chinh'] ?></small>
                                 <input type="hidden" name="hinh_anh_cu" value="<?= $edit_product['hinh_anh_chinh'] ?>">
                             <?php endif; ?>
                         </div>
-                        <div class="col-md-3 d-flex align-items-end">
+                        <div class="col-md-3 d-flex align-items-end gap-2">
                             <?php if ($update_mode): ?>
-                                <button name="save_product" class="btn btn-warning w-50 me-2">Cập nhật</button>
-                                <a href="CRUDproduct.php" class="btn btn-secondary w-50">Hủy</a>
+                                <button name="save_product" class="btn btn-gradient-warning flex-fill"><i class="fas fa-save me-1"></i> Cập nhật</button>
+                                <a href="CRUDproduct.php" class="btn btn-outline-gradient-primary flex-fill">Hủy</a>
                             <?php else: ?>
-                                <button name="save_product" class="btn btn-success w-100">Lưu sản phẩm</button>
+                                <button name="save_product" class="btn btn-gradient-success w-100"><i class="fas fa-plus me-1"></i> Lưu sản phẩm</button>
                             <?php endif; ?>
-                        </div>
-                        <div class="col-md-2 ">
-                            <span class="badge bg-secondary">Tổng cộng: <?= count($listproduct) ?> sản phẩm</span>
                         </div>
                     </form>
                 </div>
             </div>
-            <!-- Tim kiem -->
-            <div class="filter-group mb-3">
-                <h4 class="filter-title"><i class="fas fa-search"></i> Tìm kiếm</h4>
-                <form method="GET" action="CRUDproduct.php" class="search-box d-flex gap-2">
-                    <input type="text" name="search" id="searchInput" class="form-control"
-                        placeholder="Nhập ID  hoặc tên sản phẩm..." value="<?= htmlspecialchars($search) ?>">
-                    <button type="submit" class="btn btn-primary">Tìm</button>
+
+            <!-- Search -->
+            <div class="filter-group">
+                <div class="filter-title"><i class="fas fa-search"></i> Tìm kiếm sản phẩm</div>
+                <form method="GET" action="CRUDproduct.php" class="search-modern">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" name="search" class="form-control" placeholder="Nhập ID hoặc tên sản phẩm..." value="<?= htmlspecialchars($search) ?>">
+                    <button type="submit" class="btn btn-gradient-primary"><i class="fas fa-search me-1"></i> Tìm</button>
                     <?php if (!empty($search)): ?>
-                        <a href="CRUDproduct.php" class="btn btn-outline-secondary">Xóa</a>
+                        <a href="CRUDproduct.php" class="btn btn-outline-gradient-primary"><i class="fas fa-times"></i></a>
                     <?php endif; ?>
                 </form>
             </div>
-            <div class="table-responsive">
 
-                <table class="table table-hover align-middle text-center">
-
-                    <thead class="table-dark">
+            <!-- Table -->
+            <div class="table-responsive animate-fade-in-up delay-2">
+                <table class="modern-table">
+                    <thead>
                         <tr>
                             <th>ID</th>
                             <th>Danh mục</th>
@@ -288,79 +286,86 @@ $listproduct = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                             <th>Mô tả</th>
                             <th>Giá bán</th>
                             <th>Giá gốc</th>
-                            <th>Phần trăm giảm</th>
+                            <th>Giảm</th>
                             <th>Hình ảnh</th>
-                            <th width="180">Hành động</th>
+                            <th width="160">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($listproduct as $product) { ?>
+                        <?php if (empty($listproduct)): ?>
                             <tr>
-                                <td><?= $product['id'] ?></td>
-                                <td><?= $product['danh_muc_id'] ?></td>
-                                <td><?= $product['ten'] ?></td>
-                                <td><?= $product['mo_ta'] ?></td>
-                                <td><?= $product['gia'] ?></td>
-                                <td><?= $product['gia_goc'] ?></td>
-                                <td><?= $product['phan_tram_giam'] ?></td>
-                                <td>
-                                    <img src="./public/<?php echo htmlspecialchars($product['hinh_anh_chinh']); ?>"
-                                        alt="<?= $product['ten'] ?>" width="80" height="80">
-                                </td>
-                                <td>
-                                    <a href="?edit=<?= $product['id'] ?>" class="btn btn-sm btn-outline-warning">Sửa</a>
-                                    <a href="?delete=<?= $product['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa sản phẩm này?')">Xóa</a>
+                                <td colspan="9">
+                                    <div class="empty-state">
+                                        <div class="empty-icon"><i class="fas fa-box-open"></i></div>
+                                        <div class="empty-title">Không tìm thấy sản phẩm nào</div>
+                                        <div class="empty-text">Vui lòng thử tìm kiếm khác hoặc thêm sản phẩm mới</div>
+                                    </div>
                                 </td>
                             </tr>
-                        <?php } ?>
-
+                        <?php else: ?>
+                            <?php foreach ($listproduct as $product) { ?>
+                                <tr>
+                                    <td><strong>#<?= $product['id'] ?></strong></td>
+                                    <td><span class="badge bg-light text-dark border"><?= $product['danh_muc_id'] ?></span></td>
+                                    <td class="fw-semibold"><?= htmlspecialchars($product['ten']) ?></td>
+                                    <td class="text-muted"><?= htmlspecialchars($product['mo_ta']) ?></td>
+                                    <td class="fw-bold text-primary"><?= number_format($product['gia'], 0, ',', '.') ?>đ</td>
+                                    <td class="text-muted"><s><?= number_format($product['gia_goc'], 0, ',', '.') ?>đ</s></td>
+                                    <td>
+                                        <?php if ($product['phan_tram_giam'] > 0): ?>
+                                            <span class="badge bg-danger">-<?= $product['phan_tram_giam'] ?>%</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-light text-dark">—</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <img src="./public/<?= htmlspecialchars($product['hinh_anh_chinh']) ?>" alt="<?= htmlspecialchars($product['ten']) ?>" class="table-product-img">
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-1 justify-content-center">
+                                            <a href="?edit=<?= $product['id'] ?>" class="btn btn-sm btn-gradient-warning" title="Sửa"><i class="fas fa-edit"></i></a>
+                                            <a href="?delete=<?= $product['id'] ?>" class="btn btn-sm btn-gradient-danger" onclick="return confirm('Xóa sản phẩm này?')" title="Xóa"><i class="fas fa-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                        <?php endif; ?>
                     </tbody>
-
                 </table>
-
             </div>
-            <div class="pagination-section">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>">
-                                <i class="fas fa-chevron-left"></i> Trước
-                            </a>
-                        </li>
 
-                        <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
-                            <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
-                                <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+            <!-- Pagination -->
+            <?php if ($total_pages > 1): ?>
+                <div class="pagination-section mt-4 animate-fade-in delay-3">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-modern justify-content-center">
+                            <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                                <a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>"><i class="fas fa-chevron-left"></i></a>
                             </li>
-                        <?php endfor; ?>
-
-                        <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>">
-                                <span>Tiếp</span> <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <div class="text-center mt-2 small text-muted">
-                    Hiển thị trang <?= $page ?> / <?= $total_pages ?> (Tổng <?= $total_rows ?> Sản phẩm)
+                            <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                                <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                                </li>
+                            <?php endfor; ?>
+                            <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                                <a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>"><i class="fas fa-chevron-right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="text-center mt-2 small text-muted">
+                        Hiển thị trang <?= $page ?> / <?= $total_pages ?> — Tổng <?= number_format($total_rows) ?> sản phẩm
+                    </div>
                 </div>
-            </div>
-
+            <?php endif; ?>
         </div>
-
-    </div>
-
-    </div>
-
     </div>
 
     <!-- FOOTER -->
-    <footer class="bg-dark text-white text-center py-3">
-        EthleteHub Admin © 2026
+    <footer class="text-white text-center py-3" style="background: var(--dark-gradient);">
+        <small>EthleteHub Admin © 2026</small>
     </footer>
 
-    <script src="bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const giaGocInput = document.getElementById('gia_goc');
@@ -373,68 +378,39 @@ $listproduct = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                 let giaBan = parseFloat(giaBanInput.value) || 0;
                 let phanTram = parseFloat(phanTramInput.value) || 0;
                 let isValid = true;
-
-                // Lấy ID của ô đang trực tiếp gõ vào
                 const activeId = e ? e.target.id : "";
 
                 if (giaGoc > 0) {
-                    // TRƯỜNG HỢP 1: Đang gõ vào ô Giá Bán -> Tính % Giảm
                     if (activeId === 'gia_ban') {
-                        if (giaBanInput.value === "") {
-                            phanTramInput.value = "";
-                        } else if (giaBan <= giaGoc) {
-                            phanTramInput.value = (((giaGoc - giaBan) / giaGoc) * 100).toFixed(1);
+                        if (giaBanInput.value === "") { phanTramInput.value = ""; }
+                        else if (giaBan <= giaGoc) { phanTramInput.value = (((giaGoc - giaBan) / giaGoc) * 100).toFixed(1); }
+                    } else if (activeId === 'phan_tram_giam') {
+                        if (phanTramInput.value === "") { giaBanInput.value = giaGoc; }
+                        else if (phanTram >= 0 && phanTram <= 100) {
+                            giaBanInput.value = Math.round(giaGoc * (1 - phanTram / 100));
+                            giaBan = parseFloat(giaBanInput.value);
                         }
-                    }
-                    // TRƯỜNG HỢP 2: Đang gõ vào ô % Giảm -> Tính Giá Bán
-                    else if (activeId === 'phan_tram_giam') {
-                        if (phanTramInput.value === "") {
-                            giaBanInput.value = giaGoc; // Nếu xóa trống % thì giá bán = giá gốc
-                        } else if (phanTram >= 0 && phanTram <= 100) {
-                            let tinhGiaBan = Math.round(giaGoc * (1 - phanTram / 100));
-                            giaBanInput.value = tinhGiaBan;
-                            giaBan = tinhGiaBan; // Cập nhật để validate bên dưới
-                        }
-                    }
-                    // TRƯỜNG HỢP 3: Đang gõ vào ô Giá Gốc -> Cập nhật lại % hoặc Giá bán tùy bạn chọn
-                    // Ở đây ta ưu tiên giữ nguyên % và tính lại Giá bán
-                    else if (activeId === 'gia_goc' && phanTramInput.value !== "") {
+                    } else if (activeId === 'gia_goc' && phanTramInput.value !== "") {
                         giaBanInput.value = Math.round(giaGoc * (1 - phanTram / 100));
                         giaBan = parseFloat(giaBanInput.value);
                     }
                 }
+                if (giaGoc > 0 && giaBan > giaGoc) { giaBanInput.classList.add('is-invalid'); isValid = false; }
+                else { giaBanInput.classList.remove('is-invalid'); if (giaGoc > 0 && giaBan > 0) giaBanInput.classList.add('is-valid'); }
 
-                // --- KIỂM TRA VALIDATE ---
-                // Validate Giá bán
-                if (giaGoc > 0 && giaBan > giaGoc) {
-                    giaBanInput.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    giaBanInput.classList.remove('is-invalid');
-                    if (giaGoc > 0 && giaBan > 0) giaBanInput.classList.add('is-valid');
-                }
-
-                // Validate % Giảm
                 if (phanTramInput.value !== "" && (phanTram < 0 || phanTram > 100)) {
-                    phanTramInput.classList.add('is-invalid');
-                    phanTramInput.classList.remove('is-valid');
-                    isValid = false;
+                    phanTramInput.classList.add('is-invalid'); phanTramInput.classList.remove('is-valid'); isValid = false;
                 } else {
                     phanTramInput.classList.remove('is-invalid');
-                    // Nếu ô không trống, thì dù là 0 vẫn tính là hợp lệ (is-valid)
                     if (phanTramInput.value !== "") phanTramInput.classList.add('is-valid');
                 }
-
                 if (btnSave) btnSave.disabled = !isValid;
             }
-
-            // Lắng nghe sự kiện
             [giaGocInput, giaBanInput, phanTramInput].forEach(input => {
-                // Truyền event 'e' vào hàm để biết chính xác target
                 input.addEventListener('input', (e) => validateForm(e));
             });
         });
     </script>
 </body>
-
 </html>
+
