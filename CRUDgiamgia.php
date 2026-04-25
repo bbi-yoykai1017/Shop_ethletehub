@@ -74,8 +74,9 @@ if (isset($_GET['delete'])) {
 
 // Cấu hình phân trang
 $limit = 10; // Số dòng trên mỗi trang
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-if ($page < 1) $page = 1;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+if ($page < 1)
+    $page = 1;
 $offset = ($page - 1) * $limit;
 
 // Xử lý từ khóa tìm kiếm
@@ -88,7 +89,7 @@ if (!empty($search)) {
     if (is_numeric($search)) {
         $where_sql = " WHERE id = ?  ";
         $params[] = $search; // Tìm chính xác số ID
-       // $params[] = "%$search%"; // Hoặc tuong doi
+        // $params[] = "%$search%"; // Hoặc tuong doi
     } else {
         // Nếu là chữ, tìm gần đúng theo ten
         $where_sql = " WHERE ma_code LIKE ? ";
@@ -137,7 +138,7 @@ $list = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="css/utilities.css">
     <link href="css/crud.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/admin-layout.css">
-     <link rel="stylesheet" href="css/page-link.css">
+    <link rel="stylesheet" href="css/page-link.css">
 </head>
 
 <body style="background:#f4f6f9;">
@@ -166,9 +167,11 @@ $list = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                 <li><a href="CRUDproduct.php"><i class="fas fa-box me-2"></i> Sản phẩm</a></li>
                 <li><a href="CRUDuser.php"><i class="fas fa-users me-2"></i> Khách hàng</a></li>
                 <li><a href="CRUDdonhang.php"><i class="fas fa-shopping-cart me-2"></i> Đơn hàng</a></li>
-                <li><a href="CRUDgiamgia.php" class="active"><i class="fas fa-tags me-2"></i> Mã giảm giá</a></li>
+                <li><a href="CRUDgiamgia.php"><i class="fas fa-tags me-2"></i> Mã giảm giá</a></li>
                 <li><a href="CRUDnews.php"><i class="fas fa-newspaper me-2"></i> Tin tức</a></li>
-                <li class="d-lg-none"><a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
+                <li><a href="CRUDflashsale.php"><i class="fas fa-fire me-2"></i> Flash Sale</a></li>
+                <li class="d-lg-none"><a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i>
+                        Đăng xuất</a></li>
             </ul>
         </aside>
 
@@ -180,7 +183,8 @@ $list = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                     <div class="card-header bg-primary text-white py-3">
                         <h5 class="mb-0">
                             <?php if ($update_mode): ?>
-                                <i class="fas fa-bolt text-warning me-2"></i> Cập nhật mã giảm giá <span class="badge bg-light text-primary"></span>
+                                <i class="fas fa-bolt text-warning me-2"></i> Cập nhật mã giảm giá <span
+                                    class="badge bg-light text-primary"></span>
                             <?php else: ?>
                                 <i class="fas fa-plus-square text-info me-2"></i> Thêm mã giảm giá mới
                             <?php endif; ?>
@@ -192,7 +196,8 @@ $list = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
 
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">Mã Code</label>
-                                <input type="text" name="ma_code" class="form-control" value="<?= $edit_data['ma_code'] ?>" required>
+                                <input type="text" name="ma_code" class="form-control"
+                                    value="<?= $edit_data['ma_code'] ?>" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Mô tả</label>
@@ -200,27 +205,33 @@ $list = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">Phần trăm giảm (%)</label>
-                                <input type="number" name="phan_tram_giam" class="form-control" value="<?= $edit_data['phan_tram_giam'] ?>">
+                                <input type="number" name="phan_tram_giam" class="form-control"
+                                    value="<?= $edit_data['phan_tram_giam'] ?>">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">Số tiền giảm </label>
-                                <input type="number" name="so_tien_giam" class="form-control" value="<?= $edit_data['so_tien_giam'] ?>">
+                                <input type="number" name="so_tien_giam" class="form-control"
+                                    value="<?= $edit_data['so_tien_giam'] ?>">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">Đơn tối thiểu </label>
-                                <input type="number" name="don_hang_toi_thieu" class="form-control" value="<?= $edit_data['don_hang_toi_thieu'] ?>">
+                                <input type="number" name="don_hang_toi_thieu" class="form-control"
+                                    value="<?= $edit_data['don_hang_toi_thieu'] ?>">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">Giảm tối đa (đ)</label>
-                                <input type="number" name="giam_toi_da" class="form-control" value="<?= $edit_data['giam_toi_da'] ?>">
+                                <input type="number" name="giam_toi_da" class="form-control"
+                                    value="<?= $edit_data['giam_toi_da'] ?>">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">Giới hạn sử dụng</label>
-                                <input type="number" name="gioi_han_su_dung" class="form-control" value="<?= $edit_data['gioi_han_su_dung'] ?>">
+                                <input type="number" name="gioi_han_su_dung" class="form-control"
+                                    value="<?= $edit_data['gioi_han_su_dung'] ?>">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">Đã sử dụng</label>
-                                <input type="number" name="da_su_dung" class="form-control" value="<?= $edit_data['da_su_dung'] ?>">
+                                <input type="number" name="da_su_dung" class="form-control"
+                                    value="<?= $edit_data['da_su_dung'] ?>">
                             </div>
 
 
@@ -290,34 +301,35 @@ $list = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
 
                 </div>
                 <div class="pagination-section">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>">
-                                <i class="fas fa-chevron-left"></i> Trước
-                            </a>
-                        </li>
-
-                        <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
-                            <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
-                                <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                                <a class="page-link" href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>">
+                                    <i class="fas fa-chevron-left"></i> Trước
+                                </a>
                             </li>
-                        <?php endfor; ?>
 
-                        <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>">
-                                <span>Tiếp</span> <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <div class="text-center mt-2 small text-muted">
-                    Hiển thị trang <?= $page ?> / <?= $total_pages ?> (Tổng <?= $total_rows ?> Mã giảm)
+                            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                                    <a class="page-link"
+                                        href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                                </li>
+                            <?php endfor; ?>
+
+                            <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                                <a class="page-link" href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>">
+                                    <span>Tiếp</span> <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="text-center mt-2 small text-muted">
+                        Hiển thị trang <?= $page ?> / <?= $total_pages ?> (Tổng <?= $total_rows ?> Mã giảm)
+                    </div>
                 </div>
             </div>
-        </div>
 
-    </div>
+        </div>
 
     </div>
 

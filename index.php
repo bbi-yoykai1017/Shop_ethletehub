@@ -3,6 +3,7 @@ session_start();
 require_once 'model/functions.php';
 require_once 'model/detail.php';
 require_once 'model/news.php';
+require_once 'model/flash_sale.php';
 require_once 'Database.php';
 require_once 'chattudong.php';
 
@@ -39,6 +40,7 @@ $displayProducts = array_slice($products, 0, 8);
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/hero.css">
     <link rel="stylesheet" href="css/categories.css">
+    <link rel="stylesheet" href="css/flash-sale.css">
     <link rel="stylesheet" href="css/products.css">
     <link rel="stylesheet" href="css/news.css">
     <link rel="stylesheet" href="css/footer.css">
@@ -318,6 +320,19 @@ $displayProducts = array_slice($products, 0, 8);
     </section>
 
     <!-- ========================
+         FLASH SALE SECTION
+         ======================== -->
+    <section class="flash-sale-section">
+        <div class="container-custom">
+            <div id="flash-sale-container">
+                <div class="text-center">
+                    <p class="text-muted"><i class="fas fa-spinner fa-spin"></i></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================
          PRODUCTS SECTION
          ======================== -->
     <section class="products" id="products">
@@ -519,6 +534,7 @@ $displayProducts = array_slice($products, 0, 8);
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="js/flash-sale.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/script.js"></script>
     <script src="js/categories.js"></script>
