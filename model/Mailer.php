@@ -2,8 +2,6 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
 class Mailer
 {
     // cau hinh smtp 
@@ -17,6 +15,8 @@ class Mailer
 
     public function __construct()
     {
+       $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+        $dotenv->safeLoad();
         $this->smtpHost = $_ENV['SMTP_HOST'];
         $this->smtpPort = (int) $_ENV['SMTP_PORT'];
         $this->smtpUser = $_ENV['SMTP_USER'];

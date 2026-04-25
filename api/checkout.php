@@ -8,7 +8,7 @@ ob_start();
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/../vendor/autoload.php'; 
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../Database.php';
 require_once __DIR__ . '/../model/Mailer.php';
 
@@ -143,17 +143,36 @@ try {
             try {
                 $conn->beginTransaction();
 
-                // Tạo đơn hàng
                 $maDonHang = 'ATH-' . strtoupper(uniqid());
                 $thanhTien = $tongTien - $tienGiam;
 
+                // BƯỚC 1: Lấy cartItems TRƯỚC (fix lỗi JOIN sai ctgh.chi_tiet_id → ctgh.san_pham_id)
                 $stmt = $conn->prepare("
-                    INSERT INTO don_hang
-                    (nguoi_dung_id, ten_nguoi_nhan, so_dien_thoai_nhan, dia_chi_giao_hang,
-                     ma_don_hang, tong_tien, tien_giam, thanh_tien, ma_giam_gia_id,
-                     phuong_thuc_thanh_toan, trang_thai, ngay_dat, lat, lng)
-                    VALUES
-                    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'cho_xac_nhan', NOW(), ?, ?)
+                SELECT
+                    ctgh.san_pham_id,
+                    ctgh.so_luong,
+                    sp.ten,
+                    sp.gia,
+                    ctgh.kich_thuoc_id,
+                    ks.ten  AS kich_thuoc,
+                    ctgh.mau_sac_id,
+                    ms.ten  AS mau_sac
+                FROM chi_tiet_gio_hang ctgh
+                JOIN san_pham sp ON ctgh.san_pham_id = sp.id
+                LEFT JOIN kich_thuoc ks ON ctgh.kich_thuoc_id = ks.id
+                LEFT JOIN mau_sac    ms ON ctgh.mau_sac_id    = ms.id
+                WHERE ctgh.gio_hang_id = ?
+                ");
+                $stmt->execute([$giohang['id']]);
+                $cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // BƯỚC 2: Tạo đơn hàng
+                $stmt = $conn->prepare("
+                INSERT INTO don_hang
+                (nguoi_dung_id, ten_nguoi_nhan, so_dien_thoai_nhan, dia_chi_giao_hang,
+                ma_don_hang, tong_tien, tien_giam, thanh_tien, ma_giam_gia_id,
+                phuong_thuc_thanh_toan, trang_thai, ngay_dat, lat, lng)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'cho_xac_nhan', NOW(), ?, ?)
                 ");
                 $stmt->execute([
                     $userId,
@@ -169,49 +188,23 @@ try {
                     $lat,
                     $lng
                 ]);
-
                 $donHangId = $conn->lastInsertId();
 
-                // Lấy chi tiết giỏ hàng kèm tên sản phẩm, size, màu
-                $stmt = $conn->prepare("
-                    SELECT
-                        ctgh.san_pham_id,
-                        ctgh.so_luong,
-                        sp.ten,
-                        sp.gia,
-                        ctgh.kich_thuoc_id,
-                        ks.ten  AS kich_thuoc,
-                        ctgh.mau_sac_id,
-                        ms.ten  AS mau_sac
-                    FROM chi_tiet_gio_hang ctgh
-                    JOIN san_pham sp ON ctgh.san_pham_id = sp.id
-                    LEFT JOIN kich_thuoc ks ON ctgh.kich_thuoc_id = ks.id
-                    LEFT JOIN mau_sac    ms ON ctgh.mau_sac_id    = ms.id
-                    WHERE ctgh.gio_hang_id = ?
-                ");
-                $stmt->execute([$giohang['id']]);
-                $cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                // Sao chép sang chi tiết đơn hàng
+                // BƯỚC 3: Insert chi tiết đơn hàng (giờ $cartItems đã có dữ liệu)
+                $stmtDetail = $conn->prepare("INSERT INTO chi_tiet_don_hang (don_hang_id, san_pham_id, kich_thuoc_id, mau_sac_id, so_luong, gia)
+                VALUES (?, ?, ?, ?, ?, ?)");
                 foreach ($cartItems as $item) {
-                    $thanhTienItem = $item['so_luong'] * $item['gia'];
-                    $stmt = $conn->prepare("
-                        INSERT INTO chi_tiet_don_hang
-                        (don_hang_id, san_pham_id, so_luong, gia, thanh_tien, kich_thuoc_id, mau_sac_id)
-                        VALUES (?, ?, ?, ?, ?, ?, ?)
-                    ");
-                    $stmt->execute([
+                    $stmtDetail->execute([
                         $donHangId,
                         $item['san_pham_id'],
+                        $item['kich_thuoc_id'] ?? null,
+                        $item['mau_sac_id'] ?? null,
                         $item['so_luong'],
-                        $item['gia'],
-                        $thanhTienItem,
-                        $item['kich_thuoc_id'],
-                        $item['mau_sac_id']
+                        $item['gia']
                     ]);
                 }
 
-                // Xóa giỏ hàng
+                // BƯỚC 4: Xóa giỏ hàng
                 $stmt = $conn->prepare("DELETE FROM chi_tiet_gio_hang WHERE gio_hang_id = ?");
                 $stmt->execute([$giohang['id']]);
                 $stmt = $conn->prepare("DELETE FROM gio_hang WHERE id = ?");
@@ -219,9 +212,7 @@ try {
 
                 $conn->commit();
 
-                // ================================================
-                // 📧 GỬI EMAIL XÁC NHẬN ĐƠN HÀNG
-                // ================================================
+                // GỬI EMAIL XÁC NHẬN ĐƠN HÀNG
                 $orderForMail = [
                     'ma_don_hang' => $maDonHang,
                     'ngay_dat' => date('Y-m-d H:i:s'),
