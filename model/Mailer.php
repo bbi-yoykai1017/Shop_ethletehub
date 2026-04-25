@@ -48,6 +48,61 @@ class Mailer
 
         return $this->sendViaSMTP($toEmail, $toName, $subject, $html, $plain);
     }
+    /**
+     * gui email xac nhan dat hang thanh cong cho khach hang
+     * @param string $toEmail
+     * @param string $toName
+     * @param string $subject
+     * @param string $html
+     * @param string $plain
+     * @return array{error: null, sent: bool|array{error: string, sent: bool}}
+     */
+    private function sendViaSMTP(
+        string $toEmail,
+        string $toName,
+        string $subject,
+        string $html,
+        string $plain
+    ): array {
+        try {
+            $mail = new PHPMailer(true); // true = bat exception
 
+            // Server
+            $mail->isSMTP();
+            $mail->Host = $this->smtpHost;
+            $mail->SMTPAuth = true;
+            $mail->Username = $this->smtpUser;
+            $mail->Password = $this->smtpPass;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = $this->smtpPort;
+            $mail->CharSet = PHPMailer::CHARSET_UTF8;
+
+            // nguoi gui nguoi nhan
+            $mail->setFrom($this->fromEmail, $this->fromName);
+            $mail->addAddress($toEmail, $toName);
+            $mail->addReplyTo($this->fromEmail, $this->fromName);
+
+            //  noi dung
+            $mail->isHTML(true);
+            $mail->Subject = $subject; 
+            $mail->Body = $html;
+            $mail->AltBody = $plain; // noi dung thuong de hien thi khi mail client khong ho tro HTML
+
+            $mail->send();
+
+            error_log('[Mailer]  Gửi thành công → ' . $toEmail);
+            return ['sent' => true, 'error' => null];
+
+        } catch (PHPMailerException $e) {
+            $msg = 'PHPMailer error: ' . $e->getMessage();
+            error_log('[Mailer] ❌ ' . $msg);
+            return ['sent' => false, 'error' => $msg];
+
+        } catch (\Exception $e) {
+            $msg = 'Unexpected error: ' . $e->getMessage();
+            error_log('[Mailer] ❌ ' . $msg);
+            return ['sent' => false, 'error' => $msg];
+        }
+    }
 }
 ?>
