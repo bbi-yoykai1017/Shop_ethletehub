@@ -245,6 +245,7 @@ function loadCart() {
                         <h4>${item.name}</h4>
                         ${variantInfo}
                         <div class="cart-item-price">${formatPrice(item.price)}</div>
+                    </div>
                     <div class="cart-item-details">
                         <div class="quantity-control">
                             <button class="qty-control-btn" onclick="event.stopPropagation(); changeQty(${item.id}, ${item.quantity - 1}, '${item.size_id || ''}', '${item.color_id || ''}')">
@@ -257,6 +258,7 @@ function loadCart() {
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
+                    </div>
                     <div class="cart-item-subtotal">
                         <strong>${formatPrice((item.price || 0) * (item.quantity || 1))}</strong>
                     </div>
@@ -268,6 +270,7 @@ function loadCart() {
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
+                </div>
                 `;
             }).join('');
 

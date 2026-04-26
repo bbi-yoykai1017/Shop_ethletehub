@@ -204,7 +204,7 @@ if (addToCartBtn) {
 }
 
 // ===========================
-// BUY NOW
+// BUY NOW (MUA NGAY - KHÔNG THÊM VÀO GIỎ)
 // ===========================
 
 let isBuyingNow = false;
@@ -238,7 +238,7 @@ if (buyNowBtn) {
         const productId = parseInt(document.querySelector('.btn-add-to-cart-detail').dataset.productId);
         const quantity = parseInt(document.getElementById('quantity').value) || 1;
         
-        // Chuẩn bị dữ liệu biến thể giống hệt phần ADD TO CART
+        // Chuẩn bị dữ liệu biến thể
         const sizeId = sizeBtn ? sizeBtn.dataset.sizeId : null;
         const colorId = colorBtn ? colorBtn.dataset.colorId : null;
         const sizeName = sizeBtn ? sizeBtn.dataset.sizeName : null;
@@ -248,42 +248,40 @@ if (buyNowBtn) {
         isBuyingNow = true;
         this.disabled = true;
         
-        // Thêm vào giỏ rồi chuyển sang thanh toán
-        fetch('api/cart.php?action=add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                product_id: productId,
-                quantity: quantity,
-                size_id: sizeId,
-                color_id: colorId,
-                size_name: sizeName,
-                color_name: colorName
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification('Chuyển hướng tới trang thanh toán...', 'info');
-                setTimeout(() => {
-                    window.location.href = 'ThanhToan.php';
-                }, 1000);
-            } else {
-                showNotification(data.message || 'Lỗi khi thêm sản phẩm', 'danger');
-                // RE-ENABLE BUTTON NẾU LỖI
-                isBuyingNow = false;
-                this.disabled = false;
-            }
-        })
-        .catch(error => {
-            console.error('Lỗi:', error);
-            showNotification('Lỗi kết nối server', 'danger');
-            // RE-ENABLE BUTTON NẾU LỖI
-            isBuyingNow = false;
-            this.disabled = false;
+        // TRỰC TIẾP CHUYỂN SANG THANH TOÁN KHÔNG THÊM VÀO GIỎ
+        showNotification('Chuyển hướng tới trang thanh toán...', 'info');
+        
+        // Tạo form ẩn để gửi dữ liệu qua POST
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'ThanhToan.php';
+        form.style.display = 'none';
+        
+        // Thêm các hidden input fields
+        const fields = {
+            'quick_order': '1',  // Flag cho biết đây là "mua ngay"
+            'product_id': productId,
+            'quantity': quantity,
+            'size_id': sizeId || '',
+            'color_id': colorId || '',
+            'size_name': sizeName || '',
+            'color_name': colorName || ''
+        };
+        
+        Object.keys(fields).forEach(key => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = fields[key];
+            form.appendChild(input);
         });
+        
+        document.body.appendChild(form);
+        
+        // Gửi form
+        setTimeout(() => {
+            form.submit();
+        }, 500);
     });
 }
 
