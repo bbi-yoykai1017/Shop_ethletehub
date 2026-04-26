@@ -6,6 +6,21 @@ require_once 'model/detail.php';
 require_once 'model/functions.php';
 require_once 'Database.php';
 
+// conect chat ai de lay anh san pham
+$product_id = $_GET['id'] ?? 0;
+$conn = new mysqli('localhost', 'root', '', 'athletehub');
+$conn->set_charset('utf8');
+
+$sp = null;
+if ($product_id) {
+    $stmt = $conn->prepare("SELECT id, ten, gia, gia_goc, phan_tram_giam, mo_ta, hinh_anh_chinh FROM san_pham WHERE id = ?");
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $sp = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+}
+$conn->close();
+// the -- end
 $db = new Database();
 $conn = $db->connect();
 
@@ -65,22 +80,7 @@ $ratingSummary = $product['rating_summary'];
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/product-detail.css">
     <style>
-        /* ================= CHAT POPUP ================= */
-        .chat-popup {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 340px;
-            height: 480px;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            z-index: 9999;
-            animation: fadeInUp 0.3s ease;
-        }
+        
 
         /* Animation */
         @keyframes fadeInUp {
@@ -95,65 +95,6 @@ $ratingSummary = $product['rating_summary'];
             }
         }
 
-        /* ================= HEADER ================= */
-        .chat-header {
-            background: linear-gradient(135deg, #0084ff, #00c6ff);
-            color: white;
-            padding: 12px 15px;
-            font-weight: 600;
-            font-size: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-header button {
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        /* ================= CHAT CONTENT ================= */
-        .chat-content {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            background: #f5f7fb;
-        }
-
-        /* Scroll đẹp */
-        .chat-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-content::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 10px;
-        }
-
-        /* ================= MESSAGE ================= */
-        .user-msg {
-            background: #ff4d4f;
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 15px 15px 0 15px;
-            margin: 6px 0;
-            max-width: 75%;
-            margin-left: auto;
-            font-size: 13px;
-        }
-
-        .bot-msg {
-            background: #fff;
-            padding: 8px 12px;
-            border-radius: 15px 15px 15px 0;
-            margin: 6px 0;
-            max-width: 75%;
-            border: 1px solid #eee;
-            font-size: 13px;
-        }
 
         /* ================= PRODUCT CARD ================= */
         .product-card-chat {
@@ -184,48 +125,7 @@ $ratingSummary = $product['rating_summary'];
             font-size: 13px;
         }
 
-        /* ================= FOOTER ================= */
-        .chat-footer {
-            display: flex;
-            gap: 8px;
-            padding: 10px;
-            border-top: 1px solid #eee;
-            background: #fff;
-        }
-
-        .chat-footer input {
-            flex: 1;
-            border: none;
-            background: #f1f1f1;
-            border-radius: 20px;
-            padding: 8px 14px;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .chat-footer button {
-            background: #ff2d55;
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: 0.2s;
-        }
-
-        .chat-footer button:hover {
-            background: #e60023;
-        }
-
-        /* ================= RESPONSIVE ================= */
-        @media (max-width: 480px) {
-            .chat-popup {
-                width: 90%;
-                right: 5%;
-                height: 70vh;
-            }
-        }
+       
     </style>
 </head>
 
@@ -481,10 +381,7 @@ $ratingSummary = $product['rating_summary'];
                                 <i class="fas fa-bolt"></i>
                                 Mua ngay
                             </button>
-                            <button class="btn-chat-auto" style="border-radius: 15px; background-color: white; color: #0084ff;" id="chatBtn">
-                                <i class="fas fa-comments"></i>
-                                <span>Chat</span>
-                            </button>
+                            
                         </div>
 
                         <!-- Shipping Info -->
@@ -791,88 +688,8 @@ $ratingSummary = $product['rating_summary'];
 
 
     <script src="js/review.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const chatBtn = document.getElementById("chatBtn");
-            const chatPopup = document.getElementById("chatPopup");
-
-            if (chatBtn && chatPopup) {
-                chatBtn.addEventListener("click", () => {
-                    chatPopup.style.display = "block";
-                });
-            }
-        });
-
-        function closeChat() {
-            document.getElementById("chatPopup").style.display = "none";
-        }
-
-        function sendMessage() {
-            const input = document.getElementById("chatInput");
-            const chatContent = document.getElementById("chatContent");
-
-            const msg = input.value.trim();
-            if (!msg) return;
-
-            // Hiện tin nhắn người dùng
-            const userMsg = document.createElement("div");
-            userMsg.className = "user-msg";
-            userMsg.innerText = msg;
-            chatContent.appendChild(userMsg);
-
-            // Xóa input
-            input.value = "";
-
-            // Giả lập bot trả lời 1 câu duy nhất
-            setTimeout(() => {
-                const botMsg = document.createElement("div");
-                botMsg.className = "bot-msg";
-                botMsg.innerText = "Shop sẽ phản hồi bạn sớm nhất nhé! 😊";
-                chatContent.appendChild(botMsg);
-
-                chatContent.scrollTop = chatContent.scrollHeight;
-            }, 500);
-
-            // Scroll xuống
-            chatContent.scrollTop = chatContent.scrollHeight;
-        }
-        document.getElementById("chatInput").addEventListener("keypress", function(e) {
-            if (e.key === "Enter") {
-                sendMessage();
-            }
-        });
-    </script>
-
-
-    <div id="chatPopup" class="chat-popup">
-
-        <!-- HEADER -->
-        <div class="chat-header">
-            <span style="color: #00c6ff; border-radius: 15px;">💬 Chat nhanh</span>
-            <button onclick="closeChat()">×</button>
-        </div>
-
-        <!-- CHAT CONTENT -->
-        <div id="chatContent" class="chat-content">
-            <div class="bot-msg">👋 Xin chào! Bạn cần hỗ trợ gì?</div>
-        </div>
-
-        <!-- CARD SẢN PHẨM -->
-        <div class="product-card-chat">
-            <img src="public/<?php echo htmlspecialchars($mainImage); ?>">
-            <div>
-                <h6><?php echo htmlspecialchars($product['ten']); ?></h6>
-                <span class="price"><?php echo $product['gia_formatted']; ?></span>
-            </div>
-        </div>
-
-        <!-- INPUT -->
-        <div class="chat-footer">
-            <input type="text" id="chatInput" placeholder="Nhập tin nhắn...">
-            <button onclick="sendMessage()">Gửi</button>
-        </div>
-
-    </div>
+    
+    <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/Shop_ethletehub/chat-widget.php'; ?>
 </body>
 
 </html>
