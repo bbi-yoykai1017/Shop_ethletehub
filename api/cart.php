@@ -154,6 +154,40 @@ try {
                 exit;
             }
 
+            // KIỂM TRA SẢN PHẨM CÓ YÊU CẦU SIZE/COLOR KHÔNG
+            // Nếu sản phẩm có biến thể (size hoặc color), thì chúng là bắt buộc
+            $stmt = $conn->prepare("
+                SELECT COUNT(DISTINCT kich_thuoc_id) as size_count, 
+                       COUNT(DISTINCT mau_sac_id) as color_count
+                FROM bien_the_san_pham 
+                WHERE san_pham_id = :id AND trang_thai = 1
+            ");
+            $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
+            $stmt->execute();
+            $variantInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            $hasSize = (int)$variantInfo['size_count'] > 0;
+            $hasColor = (int)$variantInfo['color_count'] > 0;
+            
+            // KIỂM TRA SIZE/COLOR BẮT BUỘC
+            if ($hasSize && empty($sizeId)) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Vui lòng chọn size!']);
+                exit;
+            }
+            
+            if ($hasColor && empty($colorId)) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Vui lòng chọn màu sắc!']);
+                exit;
+            }
+
+            if (!$product) {
+                http_response_code(404);
+                echo json_encode(['success' => false, 'message' => 'Sản phẩm không tồn tại']);
+                exit;
+            }
+
             // Kiểm tra tồn kho
             $stmtStock = $conn->prepare("
                 SELECT COALESCE(SUM(so_luong_ton), 0) as total 

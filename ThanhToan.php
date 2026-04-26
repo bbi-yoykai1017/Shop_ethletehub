@@ -69,6 +69,39 @@ if ($giohang) {
     } else {
         $cart = $allCartItems;
     }
+    
+    $invalidItemsRemoved = [];
+    $validCart = [];
+    
+    foreach ($cart as $item) {
+        // Kiểm tra xem sản phẩm có yêu cầu size/color không
+        $stmtCheck = $conn->prepare("
+            SELECT COUNT(DISTINCT kich_thuoc_id) as size_count, 
+                   COUNT(DISTINCT mau_sac_id) as color_count
+            FROM bien_the_san_pham 
+            WHERE san_pham_id = ? AND trang_thai = 1
+        ");
+        $stmtCheck->execute([$item['id']]);
+        $variantInfo = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        
+        $hasSize = (int)$variantInfo['size_count'] > 0;
+        $hasColor = (int)$variantInfo['color_count'] > 0;
+        
+        // Nếu sản phẩm yêu cầu size/color nhưng item không có, thì xóa
+        if (($hasSize && empty($item['kich_thuoc_id'])) || ($hasColor && empty($item['mau_sac_id']))) {
+            // Xóa từ database
+            $stmtDelete = $conn->prepare("DELETE FROM chi_tiet_gio_hang WHERE id = ?");
+            $stmtDelete->execute([$item['chi_tiet_id']]);
+            
+            $invalidItemsRemoved[] = $item['name'];
+        } else {
+            // Item hợp lệ, giữ lại
+            $validCart[] = $item;
+        }
+    }
+    
+    // Cập nhật cart
+    $cart = $validCart;
 }
 
 // Kiểm tra giỏ hàng rỗng
@@ -269,6 +302,16 @@ if (empty($cart)) {
     <div class="checkout-container">
         <div class="container-custom py-5">
             <h1 class="mb-4"><i class="fas fa-credit-card"></i> Thanh Toán Đơn Hàng</h1>
+            
+            <!-- THÔNG BÁO XÓA ITEM KHÔNG HỢP LỆ -->
+            <?php if (isset($_SESSION['removed_items_message'])): ?>
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($_SESSION['removed_items_message']) ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <?php unset($_SESSION['removed_items_message']); ?>
+            <?php endif; ?>
+            
             <!-- form thanh toán -->
             <form method="POST" id="checkoutForm">
                 <div class="row">
@@ -498,11 +541,11 @@ if (empty($cart)) {
             const lng = parseFloat(document.getElementById('lng').value);
             // kiem tra
             if (!tenNguoiNhan || tenNguoiNhan.length < 3) {
-                showMessage('Tên người nhận phải ít nhất 3 ky tự');
+                showMessage('Tên người nhận phải ít nhất 3 ký tự', 'warning');
                 return false;
             }               
             if (!soDienThoai || !/^0[0-9]{9}$/.test(soDienThoai)) {
-                showMessage('Số điện thoại không hợp lên','warning');
+                showMessage('Số điện thoại không hợp lệ', 'warning');
                 return false;
             }
             if (!diaChiGiao) {
@@ -539,19 +582,19 @@ if (empty($cart)) {
                     btn.innerHTML = originalText;
 
                     if (data.success) {
-                        showMessage('oke ròi đó cưng :33 ' + data.message, 'success');
+                        showMessage(data.message, 'success');
                         setTimeout(() => {
                             window.location.href = data.redirect;
                         }, 1500);
                     } else {
-                        showMessage('xin lỗi cưng nha haha ' + (data.message || 'cưng không thể tạo đơn hàng'), 'danger');
+                        showMessage(data.message || 'Không thể tạo đơn hàng', 'danger');
                     }
                 })
                 .catch(error => {
                     btn.disabled = false;
                     btn.innerHTML = originalText;
                     console.error('Error:', error);
-                    showMessage('xin lỗi quý khách server của chúng tôi đang đi nhậu hihi', 'danger');
+                    showMessage('Lỗi kết nối server, vui lòng thử lại sau', 'danger');
                 });
 
             return false;
