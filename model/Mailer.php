@@ -1,190 +1,168 @@
 <?php
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception as PHPMailerException;
+use Dotenv\Dotenv;
+
 class Mailer
 {
-    // cau hinh smtp 
-    private string $smtpHost;
-    private int $smtpPort;
-    private string $smtpUser;
-    private string $smtpPass;
-    private string $fromEmail = 'shopathletehub@gmail.com';
-    private string $fromName = 'AthleteHub';
-    private string $shopUrl = 'https://shopethletehub.kesug.com/';
+  private string $apiKey;
+  private string $fromEmail = 'shopathletehub@gmail.com';
+  private string $fromName = 'AthleteHub';
+  private string $shopUrl = 'https://shopethletehub.kesug.com/';
 
-    public function __construct()
-    {
-       $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-        $dotenv->safeLoad();
-        $this->smtpHost = $_ENV['SMTP_HOST'];
-        $this->smtpPort = (int) $_ENV['SMTP_PORT'];
-        $this->smtpUser = $_ENV['SMTP_USER'];
-        $this->smtpPass = $_ENV['SMTP_PASS'];
+  public function __construct()
+  {
+    $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
+    $dotenv->safeLoad();
+    $this->apiKey = $_ENV['BREVO_API_KEY'];
+  }
+
+  public function sendOrderConfirmation(array $order, array $items, array $user): array
+  {
+    $toEmail = trim($user['email'] ?? '');
+    $toName = $order['ten_nguoi_nhan'] ?? $user['ten'] ?? 'Quý khách';
+
+    if (empty($toEmail) || !filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
+      return ['sent' => false, 'error' => 'Email không hợp lệ: ' . $toEmail];
     }
 
-    /**
-     * gui email xac nhan don hang cho khach hang
-     *
-     * @param array $order  thong tin don hang
-     * @param array $items  danh sach san pham trong don hang
-     * @param array $user   thong tin khach hang
-     * @return array        
-     */
-    public function sendOrderConfirmation(array $order, array $items, array $user): array
-    {
-        $toEmail = trim($user['email'] ?? '');
-        $toName = $order['ten_nguoi_nhan'] ?? $user['ten'] ?? 'Quý khách';
+    $subject = 'AthleteHub - Xác nhận đơn hàng #' . $order['ma_don_hang'];
+    $html = $this->buildOrderEmailHTML($order, $items, $toName);
+    $plain = $this->buildPlainText($order, $items, $toName);
 
-        if (empty($toEmail) || !filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
-            $msg = 'Email khách hàng không hợp lệ: ' . $toEmail;
-            error_log('[Mailer] ' . $msg);
-            return ['sent' => false, 'error' => $msg];
-        }
+    return $this->sendViaBrevo($toEmail, $toName, $subject, $html, $plain);
+  }
 
-        $subject = 'AthleteHub - Xác nhận đơn hàng #' . $order['ma_don_hang'];
-        $html = $this->buildOrderEmailHTML($order, $items, $toName);
-        $plain = $this->buildPlainText($order, $items, $toName);
+  private function sendViaBrevo(
+    string $toEmail,
+    string $toName,
+    string $subject,
+    string $html,
+    string $plain
+  ): array {
+    $payload = json_encode([
+      'sender' => ['name' => $this->fromName, 'email' => $this->fromEmail],
+      'to' => [['email' => $toEmail, 'name' => $toName]],
+      'replyTo' => ['email' => $this->fromEmail],
+      'subject' => $subject,
+      'htmlContent' => $html,
+      'textContent' => $plain,
+    ]);
 
-        return $this->sendViaSMTP($toEmail, $toName, $subject, $html, $plain);
+    $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+    curl_setopt_array($ch, [
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_POST => true,
+      CURLOPT_POSTFIELDS => $payload,
+      CURLOPT_HTTPHEADER => [
+        'api-key: ' . $this->apiKey,
+        'Content-Type: application/json',
+        'Accept: application/json',
+      ],
+      CURLOPT_SSL_VERIFYPEER => false,
+      CURLOPT_SSL_VERIFYHOST => false,
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlError) {
+      error_log('[Mailer] cURL error: ' . $curlError);
+      return ['sent' => false, 'error' => $curlError];
     }
-    /**
-     * gui email xac nhan dat hang thanh cong cho khach hang
-     * @param string $toEmail
-     * @param string $toName
-     * @param string $subject
-     * @param string $html
-     * @param string $plain
-     * @return array{error: null, sent: bool|array{error: string, sent: bool}}
-     */
-    private function sendViaSMTP(
-        string $toEmail,
-        string $toName,
-        string $subject,
-        string $html,
-        string $plain
-    ): array {
-        try {
-            $mail = new PHPMailer(true); // true = bat exception
 
-            // Server
-            $mail->isSMTP();
-            $mail->Host = $this->smtpHost;
-            $mail->SMTPAuth = true;
-            $mail->Username = $this->smtpUser;
-            $mail->Password = $this->smtpPass;
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = $this->smtpPort;
-            $mail->CharSet = PHPMailer::CHARSET_UTF8;
-
-            // nguoi gui nguoi nhan
-            $mail->setFrom($this->fromEmail, $this->fromName);
-            $mail->addAddress($toEmail, $toName);
-            $mail->addReplyTo($this->fromEmail, $this->fromName);
-
-            //  noi dung
-            $mail->isHTML(true);
-            $mail->Subject = $subject;
-            $mail->Body = $html;
-            $mail->AltBody = $plain; // noi dung thuong de hien thi khi mail client khong ho tro HTML
-
-            $mail->send();
-
-            error_log('[Mailer]  Gửi thành công → ' . $toEmail);
-            return ['sent' => true, 'error' => null];
-
-        } catch (PHPMailerException $e) {
-            $msg = 'PHPMailer error: ' . $e->getMessage();
-            error_log('[Mailer] ❌ ' . $msg);
-            return ['sent' => false, 'error' => $msg];
-
-        } catch (\Exception $e) {
-            $msg = 'Unexpected error: ' . $e->getMessage();
-            error_log('[Mailer] ❌ ' . $msg);
-            return ['sent' => false, 'error' => $msg];
-        }
+    if ($httpCode === 201) {
+      error_log('[Mailer] Gửi thành công → ' . $toEmail);
+      return ['sent' => true, 'error' => null];
     }
-    /**
-     *  fallback cho cac email client cu 
-     * @param array $order
-     * @param array $items 
-     * @param string $toName
-     * @return string
-     */
-    private function buildPlainText(array $order, array $items, string $toName): string
-    {
-        $lines = [];
-        $lines[] = "AthleteHub - Xác nhận đơn hàng";
-        $lines[] = str_repeat('=', 40);
-        $lines[] = "Xin chào $toName,";
-        $lines[] = "Đơn hàng của bạn đã được đặt thành công!";
-        $lines[] = "";
-        $lines[] = "Mã đơn:    #" . $order['ma_don_hang'];
-        $lines[] = "Ngày đặt:  " . date('d/m/Y H:i', strtotime($order['ngay_dat'] ?? 'now'));
-        $lines[] = "Địa chỉ:   " . $order['dia_chi_giao_hang'];
-        $lines[] = "SĐT:       " . $order['so_dien_thoai_nhan'];
-        $lines[] = "";
-        $lines[] = "SẢN PHẨM:";
-        foreach ($items as $item) {
-            $lines[] = "- " . $item['ten'] . " x" . $item['so_luong']
-                . " = " . number_format($item['gia'] * $item['so_luong'], 0, ',', '.') . "đ";
-        }
-        $lines[] = "";
-        $lines[] = "Tổng tiền:  " . number_format($order['tong_tien'], 0, ',', '.') . "đ";
-        $lines[] = "Giảm giá:  -" . number_format($order['tien_giam'], 0, ',', '.') . "đ";
-        $lines[] = "Thành tiền: " . number_format($order['thanh_tien'], 0, ',', '.') . "đ";
-        $lines[] = "";
-        $lines[] = "Xem đơn hàng: " . $this->shopUrl . "/orders.php";
-        $lines[] = "";
-        $lines[] = "Cảm ơn bạn đã mua sắm tại AthleteHub!";
-        return implode("\n", $lines);
+
+    $result = json_decode($response, true);
+    $msg = $result['message'] ?? $response;
+    error_log('[Mailer] Brevo error ' . $httpCode . ': ' . $msg);
+    return ['sent' => false, 'error' => $msg];
+  }
+
+  /**
+   *  fallback cho cac email client cu 
+   * @param array $order
+   * @param array $items 
+   * @param string $toName
+   * @return string
+   */
+  private function buildPlainText(array $order, array $items, string $toName): string
+  {
+    $lines = [];
+    $lines[] = "AthleteHub - Xác nhận đơn hàng";
+    $lines[] = str_repeat('=', 40);
+    $lines[] = "Xin chào $toName,";
+    $lines[] = "Đơn hàng của bạn đã được đặt thành công!";
+    $lines[] = "";
+    $lines[] = "Mã đơn:    #" . $order['ma_don_hang'];
+    $lines[] = "Ngày đặt:  " . date('d/m/Y H:i', strtotime($order['ngay_dat'] ?? 'now'));
+    $lines[] = "Địa chỉ:   " . $order['dia_chi_giao_hang'];
+    $lines[] = "SĐT:       " . $order['so_dien_thoai_nhan'];
+    $lines[] = "";
+    $lines[] = "SẢN PHẨM:";
+    foreach ($items as $item) {
+      $lines[] = "- " . $item['ten'] . " x" . $item['so_luong']
+        . " = " . number_format($item['gia'] * $item['so_luong'], 0, ',', '.') . "đ";
     }
-   
-    /**
-     * Summary of buildOrderEmailHTML
-     * @param array $order
-     * @param array $items
-     * @param string $toName
-     * @return string
-     */
-    private function buildOrderEmailHTML(array $order, array $items, string $toName): string
-    {
-        $maDonHang = htmlspecialchars($order['ma_don_hang']); // 
-        $ngayDat = date('d/m/Y H:i', strtotime($order['ngay_dat'] ?? 'now'));
-        $diaChiGiao = htmlspecialchars($order['dia_chi_giao_hang']);
-        $soDienThoai = htmlspecialchars($order['so_dien_thoai_nhan']);
+    $lines[] = "";
+    $lines[] = "Tổng tiền:  " . number_format($order['tong_tien'], 0, ',', '.') . "đ";
+    $lines[] = "Giảm giá:  -" . number_format($order['tien_giam'], 0, ',', '.') . "đ";
+    $lines[] = "Thành tiền: " . number_format($order['thanh_tien'], 0, ',', '.') . "đ";
+    $lines[] = "";
+    $lines[] = "Xem đơn hàng: " . $this->shopUrl . "/orders.php";
+    $lines[] = "";
+    $lines[] = "Cảm ơn bạn đã mua sắm tại AthleteHub!";
+    return implode("\n", $lines);
+  }
 
-        $phuongThuc = match ($order['phuong_thuc_thanh_toan'] ?? 'tien_mat') {
-            'tien_mat' => '💵 Thanh toán khi nhận hàng (COD)',
-            'bank_transfer' => '🏦 Chuyển khoản ngân hàng',
-            default => htmlspecialchars($order['phuong_thuc_thanh_toan'])
-        };
+  /**
+   * Summary of buildOrderEmailHTML
+   * @param array $order
+   * @param array $items
+   * @param string $toName
+   * @return string
+   */
+  private function buildOrderEmailHTML(array $order, array $items, string $toName): string
+  {
+    $maDonHang = htmlspecialchars($order['ma_don_hang']); // 
+    $ngayDat = date('d/m/Y H:i', strtotime($order['ngay_dat'] ?? 'now'));
+    $diaChiGiao = htmlspecialchars($order['dia_chi_giao_hang']);
+    $soDienThoai = htmlspecialchars($order['so_dien_thoai_nhan']);
 
-        $tongTien = number_format($order['tong_tien'] ?? 0, 0, ',', '.');
-        $tienGiam = number_format($order['tien_giam'] ?? 0, 0, ',', '.');
-        $thanhTien = number_format($order['thanh_tien'] ?? 0, 0, ',', '.');
+    $phuongThuc = match ($order['phuong_thuc_thanh_toan'] ?? 'tien_mat') {
+      'tien_mat' => '💵 Thanh toán khi nhận hàng (COD)',
+      'bank_transfer' => '🏦 Chuyển khoản ngân hàng',
+      default => htmlspecialchars($order['phuong_thuc_thanh_toan'])
+    };
 
-        $phiShip = ($order['tong_tien'] ?? 0) >= 500000 ? 0 : 25000;
-        $phiShipStr = $phiShip === 0
-            ? '<span style="color:#28a745">Miễn phí</span>'
-            : number_format($phiShip, 0, ',', '.') . 'đ';
+    $tongTien = number_format($order['tong_tien'] ?? 0, 0, ',', '.');
+    $tienGiam = number_format($order['tien_giam'] ?? 0, 0, ',', '.');
+    $thanhTien = number_format($order['thanh_tien'] ?? 0, 0, ',', '.');
 
-        // Render từng sản phẩm
-        $itemsHTML = '';
-        foreach ($items as $item) {
-            $tenSP = htmlspecialchars($item['ten'] ?? '');
-            $soLuong = (int) ($item['so_luong'] ?? 1);
-            $gia = number_format($item['gia'] ?? 0, 0, ',', '.');
-            $thanhTienItem = number_format(($item['gia'] ?? 0) * $soLuong, 0, ',', '.');
+    $phiShip = ($order['tong_tien'] ?? 0) >= 500000 ? 0 : 25000;
+    $phiShipStr = $phiShip === 0
+      ? '<span style="color:#28a745">Miễn phí</span>'
+      : number_format($phiShip, 0, ',', '.') . 'đ';
 
-            $variant = '';
-            if (!empty($item['kich_thuoc']))
-                $variant .= 'Size: ' . htmlspecialchars($item['kich_thuoc']);
-            if (!empty($item['mau_sac']))
-                $variant .= ($variant ? ' | ' : '') . 'Màu: ' . htmlspecialchars($item['mau_sac']);
-            $variantHTML = $variant ? "<br><small style='color:#888;'>$variant</small>" : '';
+    // Render từng sản phẩm
+    $itemsHTML = '';
+    foreach ($items as $item) {
+      $tenSP = htmlspecialchars($item['ten'] ?? '');
+      $soLuong = (int) ($item['so_luong'] ?? 1);
+      $gia = number_format($item['gia'] ?? 0, 0, ',', '.');
+      $thanhTienItem = number_format(($item['gia'] ?? 0) * $soLuong, 0, ',', '.');
 
-            $itemsHTML .= "
+      $variant = '';
+      if (!empty($item['kich_thuoc']))
+        $variant .= 'Size: ' . htmlspecialchars($item['kich_thuoc']);
+      if (!empty($item['mau_sac']))
+        $variant .= ($variant ? ' | ' : '') . 'Màu: ' . htmlspecialchars($item['mau_sac']);
+      $variantHTML = $variant ? "<br><small style='color:#888;'>$variant</small>" : '';
+
+      $itemsHTML .= "
             <tr>
                 <td style='padding:10px 8px;border-bottom:1px solid #eee;'>
                     <strong style='color:#222;'>$tenSP</strong>$variantHTML
@@ -193,12 +171,12 @@ class Mailer
                 <td style='padding:10px 8px;border-bottom:1px solid #eee;text-align:right;color:#555;'>{$gia}đ</td>
                 <td style='padding:10px 8px;border-bottom:1px solid #eee;text-align:right;font-weight:bold;color:#ff6b35;'>{$thanhTienItem}đ</td>
             </tr>";
-        }
+    }
 
-        $shopUrl = $this->shopUrl;
-        $year = date('Y');
+    $shopUrl = $this->shopUrl;
+    $year = date('Y');
 
-        return <<<HTML
+    return <<<HTML
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -355,7 +333,7 @@ class Mailer
 </body>
 </html>
 HTML;
-    }
+  }
 }
 
 ?>
