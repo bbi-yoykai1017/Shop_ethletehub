@@ -41,10 +41,13 @@ class Mailer
     $payload = json_encode([
       'sender' => ['name' => $this->fromName, 'email' => $this->fromEmail],
       'to' => [['email' => $toEmail, 'name' => $toName]],
-      'replyTo' => ['email' => $this->fromEmail],
+      'replyTo' => ['email' => $this->fromEmail, 'name' => $this->fromName],
       'subject' => $subject,
       'htmlContent' => $html,
       'textContent' => $plain,
+      'headers' => [
+        'X-Mailer' => 'AthleteHub Mailer',
+      ],
     ]);
 
     $ch = curl_init('https://api.brevo.com/v3/smtp/email');
