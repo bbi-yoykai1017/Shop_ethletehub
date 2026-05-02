@@ -15,6 +15,141 @@ class Mailer
     $this->apiKey = $_ENV['BREVO_API_KEY'];
   }
 
+    /**
+   * Gửi email đặt lại mật khẩu
+   */
+  public function sendPasswordResetEmail(string $toEmail, string $toName, string $resetToken): array
+  {
+    if (empty($toEmail) || !filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
+      return ['sent' => false, 'error' => 'Email không hợp lệ'];
+    }
+
+    $resetLink = $this->shopUrl . 'reset-password.php?token=' . $resetToken;
+    $subject = 'AthleteHub - Đặt lại mật khẩu';
+    $html = $this->buildPasswordResetEmailHTML($toName, $resetLink);
+    $plain = $this->buildPasswordResetPlainText($toName, $resetLink);
+
+    return $this->sendViaBrevo($toEmail, $toName, $subject, $html, $plain);
+  }
+
+  /**
+   * Tạo nội dung email đặt lại mật khẩu (HTML)
+   */
+  private function buildPasswordResetEmailHTML(string $toName, string $resetLink): string
+  {
+    $name = htmlspecialchars($toName);
+    $link = htmlspecialchars($resetLink);
+    $shopUrl = $this->shopUrl;
+    $year = date('Y');
+
+    return <<<HTML
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Đặt lại mật khẩu - AthleteHub</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:30px 0;">
+<tr><td align="center">
+  <table width="620" cellpadding="0" cellspacing="0"
+         style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.1);">
+ 
+    <!-- HEADER -->
+    <tr>
+      <td style="background:linear-gradient(135deg,#ff6b35,#e55a24);padding:36px 40px;text-align:center;">
+        <h1 style="margin:0;color:#fff;font-size:28px;font-weight:800;letter-spacing:1px;">🏋️ AthleteHub</h1>
+        <p style="margin:10px 0 0;color:rgba(255,255,255,0.9);font-size:15px;">Đặt lại mật khẩu</p>
+      </td>
+    </tr>
+ 
+    <!-- BODY -->
+    <tr>
+      <td style="padding:36px 40px;">
+        <p style="color:#444;font-size:16px;margin-top:0;">
+          Xin chào <strong style="color:#ff6b35;">$name</strong>,
+        </p>
+        <p style="color:#555;font-size:15px;line-height:1.7;">
+          Chúng tôi nhận được yêu cầu đặt lại mật khẩu của bạn. 
+          Nhấp vào nút bên dưới để tạo mật khẩu mới:
+        </p>
+ 
+        <!-- CTA BUTTON -->
+        <div style="text-align:center;margin:32px 0;">
+          <a href="$link"
+             style="background:#ff6b35;color:#fff;padding:14px 36px;border-radius:8px;
+                    text-decoration:none;font-weight:bold;font-size:16px;display:inline-block;">
+            🔑 Đặt lại mật khẩu
+          </a>
+        </div>
+ 
+        <p style="color:#888;font-size:13px;line-height:1.7;">
+          Link này sẽ hết hạn sau <strong>1 giờ</strong>.<br>
+          Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.
+        </p>
+ 
+        <!-- SECURITY NOTICE -->
+        <table width="100%" cellpadding="0" cellspacing="0"
+               style="background:#fff8f5;border:2px solid #ff6b35;border-radius:10px;margin:24px 0;">
+          <tr><td style="padding:16px 20px;text-align:center;">
+            <p style="margin:0;color:#555;font-size:14px;">
+              🔒 <strong>Bảo mật:</strong> Không bao giờ chia sẻ mật khẩu với bất kỳ ai
+            </p>
+          </td></tr>
+        </table>
+ 
+        <p style="color:#888;font-size:13px;line-height:1.7;border-top:1px solid #eee;padding-top:20px;margin-bottom:0;">
+          Thắc mắc? Liên hệ:<br>
+          📧 <a href="mailto:support@athletehub.vn" style="color:#ff6b35;">support@athletehub.vn</a>
+          &nbsp;|&nbsp; 📞 <strong>+84 (0) 123 456 789</strong>
+        </p>
+      </td>
+    </tr>
+ 
+    <!-- FOOTER -->
+    <tr>
+      <td style="background:#222;padding:20px 40px;text-align:center;">
+        <p style="margin:0;color:#aaa;font-size:13px;">
+          © $year <strong style="color:#ff6b35;">AthleteHub</strong>. Bảo lưu mọi quyền.<br>
+          <a href="$shopUrl" style="color:#ff6b35;text-decoration:none;">athletehub.vn</a>
+        </p>
+      </td>
+    </tr>
+ 
+  </table>
+</td></tr>
+</table>
+</body>
+</html>
+HTML;
+  }
+
+  /**
+   * Tạo nội dung email đặt lại mật khẩu (Plain text)
+   */
+  private function buildPasswordResetPlainText(string $toName, string $resetLink): string
+  {
+    return <<<TEXT
+AthleteHub - Đặt lại mật khẩu
+===============================
+
+Xin chào $toName,
+
+Chúng tôi nhận được yêu cầu đặt lại mật khẩu của bạn.
+
+Để tạo mật khẩu mới, vui truy cập:
+$resetLink
+
+Link này sẽ hết hạn sau 1 giờ.
+
+Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.
+
+---
+AthleteHub - Shop thể thao uy tín
+TEXT;
+  }
+
   public function sendOrderConfirmation(array $order, array $items, array $user): array
   {
     $toEmail = trim($user['email'] ?? '');
