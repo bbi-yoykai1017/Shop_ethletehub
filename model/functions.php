@@ -252,5 +252,131 @@ function loginUser($conn, $email, $mat_khau) {
         error_log("Login error: " . $e->getMessage());
         return ['success' => false, 'message' => 'Lỗi cơ sở dữ liệu!'];
     }
+
+    /**
+ * ========================================
+ * HÀM QUÊN MẬT KHẨU
+ * ========================================
+ */
+
+/**
+ * Tạo token ngẫu nhiên
+ */
+function generateResetToken() {
+    return bin2hex(random_bytes(32));
+}
+
+/**
+ * Tìm user bằng email và tạo token đặt lại mật khẩu
+ */
+function createPasswordResetToken($conn, $email) {
+    try {
+        $email = strtolower(trim($email));
+        
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['success' => false, 'message' => 'Email không hợp lệ'];
+        }
+        
+        // Kiểm tra user tồn tại
+        $sql = "SELECT id, ten, email FROM nguoi_dung WHERE email = :email";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$user) {
+            // Không tiết lộ user có tồn tại hay không
+            return ['success' => true, 'message' => 'Nếu email tồn tại, chúng tôi đã gửi link đặt lại mật khẩu'];
+        }
+        
+        // Tạo token
+        $token = generateResetToken();
+        $expire = date('Y-m-d H:i:s', strtotime('+1 hour')); // Token hết hạn sau 1 giờ
+        
+        // Lưu token vào database
+        $sql_update = "UPDATE nguoi_dung 
+                      SET reset_token = :token, reset_token_expire = :expire 
+                      WHERE id = :id";
+        $stmt_update = $conn->prepare($sql_update);
+        $stmt_update->bindParam(':token', $token, PDO::PARAM_STR);
+        $stmt_update->bindParam(':expire', $expire, PDO::PARAM_STR);
+        $stmt_update->bindParam(':id', $user['id'], PDO::PARAM_INT);
+        $stmt_update->execute();
+        
+        error_log("Password reset token created for: $email");
+        
+        return [
+            'success' => true, 
+            'message' => 'Nếu email tồn tại, chúng tôi đã gửi link đặt lại mật khẩu',
+            'token' => $token,
+            'email' => $email,
+            'user' => $user
+        ];
+        
+    } catch (PDOException $e) {
+        error_log("Password reset token error: " . $e->getMessage());
+        return ['success' => true, 'message' => 'Nếu email tồn tại, chúng tôi đã gửi link đặt lại mật khẩu'];
+    }
+}
+
+/**
+ * Xác minh token đặt lại mật khẩu
+ */
+function verifyPasswordResetToken($conn, $token) {
+    try {
+        if (empty($token)) {
+            return ['success' => false, 'message' => 'Token không hợp lệ'];
+        }
+        
+        $sql = "SELECT id, ten, email FROM nguoi_dung 
+                WHERE reset_token = :token AND reset_token_expire > NOW()";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':token', $token, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$user) {
+            return ['success' => false, 'message' => 'Token đã hết hạn hoặc không hợp lệ'];
+        }
+        
+        return ['success' => true, 'user' => $user];
+        
+    } catch (PDOException $e) {
+        error_log("Verify token error: " . $e->getMessage());
+        return ['success' => false, 'message' => 'Lỗi xác minh token'];
+    }
+}
+
+/**
+ * Cập nhật mật khẩu mới
+ */
+function updatePassword($conn, $userId, $newPassword) {
+    try {
+        if (empty($newPassword) || strlen($newPassword) < 6) {
+            return ['success' => false, 'message' => 'Mật khẩu phải có ít nhất 6 ký tự'];
+        }
+        
+        $hashed_password = password_hash($newPassword, PASSWORD_DEFAULT);
+        
+        // Cập nhật mật khẩu và xóa token
+        $sql = "UPDATE nguoi_dung 
+                SET mat_khau = :mat_khau, reset_token = NULL, reset_token_expire = NULL 
+                WHERE id = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':mat_khau', $hashed_password, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        error_log("Password updated for user ID: $userId");
+        
+        return ['success' => true, 'message' => 'Đặt lại mật khẩu thành công'];
+        
+    } catch (PDOException $e) {
+        error_log("Update password error: " . $e->getMessage());
+        return ['success' => false, 'message' => 'Lỗi cập nhật mật khẩu'];
+    }
+}
 }
 ?>

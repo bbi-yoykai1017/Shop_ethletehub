@@ -1,55 +1,70 @@
 <?php
 session_start();
+require_once 'vendor/autoload.php';
 require_once 'Database.php';
-require_once 'model/login.php';
+require_once 'model/functions.php';
+require_once 'model/Mailer.php';
 
 $error = "";
+$success = "";
 
+// Nếu đã đăng nhập thì chuyển về trang chủ
 if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
 }
 
-if (isset($_POST['login_btn'])) {
+// Xử lý form quên mật khẩu
+if (isset($_POST['forgot_password_btn'])) {
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-    $password = isset($_POST['mat_khau']) ? trim($_POST['mat_khau']) : '';
 
-    if (empty($email) || empty($password)) {
-        $error = "Vui lòng nhập đầy đủ thông tin";
+    if (empty($email)) {
+        $error = "Vui lòng nhập email của bạn";
     } else {
-        // Khởi tạo kết nối
         $db = new Database();
         $conn = $db->connect();
 
-        // Gọi hàm đăng nhập từ function
-        $result = loginUser($conn, $email, $password);
-
-        if ($result['success']) {
-            // ✅ Lưu thông tin user đúng cách
-            $_SESSION['user_id'] = $result['user']['id'];
-            $_SESSION['user_name'] = $result['user']['ten'];
-            $_SESSION['user_email'] = $result['user']['email'];
-            $_SESSION['user_role'] = $result['user']['vai_tro'];
-            $_SESSION['user_phone'] = isset($result['user']['so_dien_thoai']) ? $result['user']['so_dien_thoai'] : '';
-            $_SESSION['user_address'] = isset($result['user']['dia_chi']) ? $result['user']['dia_chi'] : '';
-            
-            // ✅ Chuyển hướng về index.php
-            header("Location: index.php");
-            exit();
+        if (!$conn) {
+            $error = "Lỗi kết nối cơ sở dữ liệu!";
         } else {
-            $error = $result['message'];
+            // Tạo token đặt lại mật khẩu
+            $result = createPasswordResetToken($conn, $email);
+
+            // Luôn hiển thị thông báo thành công để tránh leak thông tin user
+            if ($result['success'] && isset($result['token']) && isset($result['user'])) {
+                // Gửi email đặt lại mật khẩu
+                try {
+                    $mailer = new Mailer();
+                    $mailResult = $mailer->sendPasswordResetEmail(
+                        $result['email'],
+                        $result['user']['ten'],
+                        $result['token']
+                    );
+
+                    if ($mailResult['sent']) {
+                        error_log("Password reset email sent to: " . $result['email']);
+                    } else {
+                        error_log("Failed to send reset email: " . ($mailResult['error'] ?? 'Unknown error'));
+                        // Vẫn hiển thị thành công cho user, email sẽ được gửi lại sau
+                    }
+                } catch (Exception $e) {
+                    error_log("Mailer error: " . $e->getMessage());
+                }
+            }
+
+            $success = "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi link đặt lại mật khẩu đến email của bạn. Vui kiểm tra hộp thư (bao gồm cả thư rác)!";
         }
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập - AthleteHub</title>
+    <title>Quên mật khẩu - AthleteHub</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
@@ -87,13 +102,13 @@ if (isset($_POST['login_btn'])) {
         </div>
     </nav>
 
-    <!-- LOGIN CONTAINER -->
+    <!-- FORGOT PASSWORD CONTAINER -->
     <div class="login-container">
         <div class="login-card">
             <!-- Header -->
             <div class="login-header">
-                <h1>Đăng Nhập</h1>
-                <p>Chào mừng bạn đã quay trở lại Shop-AthleteHub</p>
+                <h1><i class="fas fa-key"></i> Quên Mật Khẩu</h1>
+                <p>Nhập email của bạn để nhận link đặt lại mật khẩu</p>
             </div>
 
             <!-- Error Message -->
@@ -103,8 +118,15 @@ if (isset($_POST['login_btn'])) {
                 </div>
             <?php endif; ?>
 
-            <!-- Login Form -->
-            <form action="" method="post" id="loginForm">
+            <!-- Success Message -->
+            <?php if (!empty($success)): ?>
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success); ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Forgot Password Form -->
+            <form action="" method="post" id="forgotPasswordForm">
                 <!-- Email -->
                 <div class="form-group">
                     <label for="email" class="form-label">
@@ -115,32 +137,9 @@ if (isset($_POST['login_btn'])) {
                         value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
                 </div>
 
-                <!-- Password -->
-                <div class="form-group">
-                    <label for="password" class="form-label">
-                        <i class="fas fa-lock"></i> Mật khẩu
-                    </label>
-                    <div class="input-group">
-                        <input type="password" class="form-control" id="password" name="mat_khau"
-                            placeholder="Nhập mật khẩu của bạn" required>
-                        <button class="input-group-text" type="button" id="togglePassword">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Remember Me & Forgot Password -->
-                <div class="remember-me">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" name="remember_me" id="rememberMe">
-                        Ghi nhớ tôi
-                    </label>
-                    <a href="forgot-password.php" class="forgot-password">Quên mật khẩu?</a>
-                </div>
-
-                <!-- Login Button -->
-                <button type="submit" name="login_btn" class="btn-login">
-                    <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                <!-- Submit Button -->
+                <button type="submit" name="forgot_password_btn" class="btn-login">
+                    <i class="fas fa-paper-plane"></i> Gửi link đặt lại mật khẩu
                 </button>
             </form>
 
@@ -148,9 +147,9 @@ if (isset($_POST['login_btn'])) {
                 <span>hoặc</span>
             </div>
 
-            <!-- Register Link -->
+            <!-- Back to Login -->
             <div class="login-footer">
-                Chưa có tài khoản? <a href="register.php">Đăng ký ngay</a>
+                Nhớ mật khẩu rồi? <a href="login.php">Đăng nhập tại đây</a>
             </div>
         </div>
     </div>
@@ -170,30 +169,16 @@ if (isset($_POST['login_btn'])) {
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Toggle Password Visibility
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const icon = this.querySelector('i');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-
         // Form Validation
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
             const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
 
-            if (!email || !password) {
+            if (!email) {
                 e.preventDefault();
-                alert('Vui lòng nhập đầy đủ email và mật khẩu!');
+                alert('Vui lòng nhập email!');
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                e.preventDefault();
+                alert('Email không hợp lệ!');
             }
         });
     </script>
