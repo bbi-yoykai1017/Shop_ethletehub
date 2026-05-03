@@ -33,7 +33,7 @@ $member = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$member) {
   // tạo mới membership
   $membershipCode = generateMembershipCode($user_id);
-  $stmt = $conn->prepare("\
+  $stmt = $conn->prepare("
         INSERT INTO thanh_vien_nguoi_dung (nguoi_dung_id, hang_id, ma_thanh_vien, tong_diem, tong_chi_tieu)
         VALUES (:user_id, 1, :code, 0, 0)
     ");
