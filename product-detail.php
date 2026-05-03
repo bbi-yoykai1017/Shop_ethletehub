@@ -6,23 +6,25 @@ require_once 'model/detail.php';
 require_once 'model/functions.php';
 require_once 'Database.php';
 
-// conect chat ai de lay anh san pham
 $product_id = $_GET['id'] ?? 0;
-$conn = new mysqli('localhost', 'root', '', 'athletehub');
-$conn->set_charset('utf8');
 
+// ✅ Chỉ dùng 1 kết nối PDO duy nhất
+$db = new Database();
+$conn = $db->connect();
+
+// ✅ Lấy thông tin sản phẩm cho chat AI bằng PDO
 $sp = null;
 if ($product_id) {
     $stmt = $conn->prepare("SELECT id, ten, gia, gia_goc, phan_tram_giam, mo_ta, hinh_anh_chinh FROM san_pham WHERE id = ?");
-    $stmt->bind_param("i", $product_id);
-    $stmt->execute();
-    $sp = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    $stmt->execute([$product_id]); // ✅ PDO dùng array thay vì bind_param
+    $sp = $stmt->fetch(PDO::FETCH_ASSOC);
 }
-$conn->close();
+
+// Phần còn lại giữ nguyên
+$id = (int) isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$product = getProductDetail($conn, $id);
 // the -- end
-$db = new Database();
-$conn = $db->connect();
+
 
 // Lay id san pham tu URL
 $id = (int) isset($_GET['id']) ? (int) $_GET['id'] : 0;
@@ -80,8 +82,6 @@ $ratingSummary = $product['rating_summary'];
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/product-detail.css">
     <style>
-        
-
         /* Animation */
         @keyframes fadeInUp {
             from {
@@ -124,8 +124,6 @@ $ratingSummary = $product['rating_summary'];
             font-weight: bold;
             font-size: 13px;
         }
-
-       
     </style>
 </head>
 
@@ -381,7 +379,7 @@ $ratingSummary = $product['rating_summary'];
                                 <i class="fas fa-bolt"></i>
                                 Mua ngay
                             </button>
-                            
+
                         </div>
 
                         <!-- Shipping Info -->
@@ -688,8 +686,8 @@ $ratingSummary = $product['rating_summary'];
 
 
     <script src="js/review.js"></script>
-    
-    <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/Shop_ethletehub/chat-widget.php'; ?>
+
+   <?php include_once __DIR__ . '/chat-widget.php'; ?>
 </body>
 
 </html>

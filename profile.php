@@ -354,7 +354,7 @@ $initials = mb_strtoupper($initials);
 <div class="wrap">
 
     <nav class="breadcrumb">
-        <a href="index.php">Trang chủ</a> &rsaquo; <span>Hồ sơ cá nhân</span>
+        <a href="index.php">Trang chủ</a> &rsaquo; <span>Hồ sơ cá nhân</span> &rsaquo;<a href="membership.php">Ưu đãi thành viên</a>
     </nav>
 
     <form action="profile.php?action=edit" method="POST" enctype="multipart/form-data">

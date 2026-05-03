@@ -150,6 +150,9 @@ class FlashSaleTimer {
                             </div>
                             <div class="product-info">
                                 <p class="product-name">${this.escapeHtml(product.name)}</p>
+
+                               
+
                                 <div class="product-price">
                                     <span class="price-new">${this.formatPrice(product.price)}</span>
                                     <span class="price-old">${this.formatPrice(product.originalPrice)}</span>
