@@ -11,7 +11,7 @@ $db = new Database();
 $conn = $db->connect();
 $products = getallproduct($conn);
 $latestNews = getLatestNews($conn, 4);
-$newsCount = countNews($conn, null, 1); 
+$newsCount = countNews($conn, null, 1);
 
 // Xử lý sản phẩm - thêm các trường tính toán
 $products = processProducts($products);
@@ -102,7 +102,7 @@ $displayProducts = array_slice($products, 0, 8);
 
                         <!-- Right Icons -->
                         <div class="navbar-right">
-                             <div class="nav-notification" onclick="window.location.href='news.php'">
+                            <div class="nav-notification" onclick="window.location.href='news.php'">
                                 <i class="fas fa-bell"></i>
                                 <span class="notification-badge"><?= $newsCount ?></span>
                             </div>
@@ -119,12 +119,13 @@ $displayProducts = array_slice($products, 0, 8);
 
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                                         <?php if (isset($_SESSION['user_id'])): ?>
-                                    
+
                                             <li>
                                                 <h6 class="dropdown-header"> <?php echo htmlspecialchars($_SESSION['user_name']); ?></h6>
                                             </li>
                                             <li><a class="dropdown-item" href="profile.php?id=<?= $_SESSION['user_id'] ?>"><i class="fas fa-user-edit me-2"></i> Hồ sơ của tôi</a></li>
                                             <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i> Đơn hàng </a></li>
+
                                             <li>
                                                 <hr class="dropdown-divider">
                                             </li>
@@ -398,7 +399,7 @@ $displayProducts = array_slice($products, 0, 8);
                                 <button class="product-btn btn-add-cart-index" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                     <i class="fas fa-shopping-cart"></i> Thêm
                                 </button>
-                                <button class="btn-buy-now-detail  " style="background-color: #004e89 !important; color: white !important; border-radius: 5px ; font-weight: bold;"  onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
+                                <button class="btn-buy-now-detail  " style="background-color: #004e89 !important; color: white !important; border-radius: 5px ; font-weight: bold;" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                     <i class="fas fa-bolt"></i>
                                     Mua Ngay
                                 </button>
@@ -539,13 +540,13 @@ $displayProducts = array_slice($products, 0, 8);
     <script src="js/script.js"></script>
     <script src="js/categories.js"></script>
     <script>
-    // Dùng kỹ thuật fetch để "nhúng" nội dung vào trang chính
-    fetch('chat-widget.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('chat-container').innerHTML = data;
-        });
-</script>
+        // Dùng kỹ thuật fetch để "nhúng" nội dung vào trang chính
+        fetch('chat-widget.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('chat-container').innerHTML = data;
+            });
+    </script>
     <script>
         // Back to Top Button
         const backToTopBtn = document.getElementById('backToTop');
@@ -565,7 +566,7 @@ $displayProducts = array_slice($products, 0, 8);
             });
         });
     </script>
-   
+
 </body>
 
 </html>

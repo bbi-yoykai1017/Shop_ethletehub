@@ -15,6 +15,7 @@ class Mailer
     $this->apiKey = $_ENV['BREVO_API_KEY'];
   }
 
+
     /**
    * Gửi email đặt lại mật khẩu
    */
@@ -291,6 +292,8 @@ TEXT;
       $soLuong = (int) ($item['so_luong'] ?? 1);
       $gia = number_format($item['gia'] ?? 0, 0, ',', '.');
       $thanhTienItem = number_format(($item['gia'] ?? 0) * $soLuong, 0, ',', '.');
+
+
 
       $variant = '';
       if (!empty($item['kich_thuoc']))

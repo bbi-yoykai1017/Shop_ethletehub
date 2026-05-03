@@ -3,7 +3,10 @@ session_start();
 require_once 'Database.php';
 require_once 'model/CRUD.php';
 require_once 'auth.php';
-
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+    header("Location: login.php");
+    exit;
+}
 $db = new Database();
 $conn = $db->connect();
 
@@ -31,7 +34,7 @@ if (isset($_GET['edit'])) {
     }
 }
 
-if (isset($_POST['save_order']) && !empty($_POST['id'])) {
+if (isset($_POST['save_order']) && !empty($_POST['id'])) {  
     $id = $_POST['id'];
     $user_id = $_POST['nguoi_dung_id'];
     $ma_don = $_POST['ma_don_hang'];
@@ -104,7 +107,7 @@ $listorders = $stmt_list->fetchAll(PDO::FETCH_ASSOC);
 
 // Stats
 $stats = [];
-$statuses = ['cho_thanh_toan','cho_xac_nhan','dang_chuan_bi','dang_giao','da_giao','da_huy'];
+$statuses = ['cho_thanh_toan','cho_xac_nhan','dang_chuan_bi','dang_giao','da_giao','da_huy','da_tra_hang'];
 foreach ($statuses as $st) {
     $stats[$st] = $conn->query("SELECT COUNT(*) FROM don_hang WHERE trang_thai = '$st'")->fetchColumn();
 }
@@ -127,6 +130,8 @@ function getStatusBadge($status) {
         case 'dang_giao': return '<span class="badge-modern badge-status-shipping"><i class="fas fa-truck me-1"></i>Đang giao</span>';
         case 'da_giao': return '<span class="badge-modern badge-status-active"><i class="fas fa-check-circle me-1"></i>Đã giao</span>';
         case 'da_huy': return '<span class="badge-modern badge-status-cancelled"><i class="fas fa-times-circle me-1"></i>Đã hủy</span>';
+        case 'cho_tra_hang': return '<span class="badge-modern badge-status-refunded"><i class="fas fa-undo me-1"></i>Chờ trả hàng</span>';
+        case 'da_tra_hang': return '<span class="badge-modern badge-status-refunded"><i class="fas fa-undo me-1"></i>Đã trả hàng thành công</span>';
         default: return '<span class="badge-modern badge-status-draft">' . htmlspecialchars($status) . '</span>';
     }
 }
@@ -164,6 +169,7 @@ function getStatusBadge($status) {
                 <li><a href="CRUDgiamgia.php"><i class="fas fa-tags me-2"></i> Mã giảm giá</a></li>
                 <li><a href="CRUDnews.php"><i class="fas fa-newspaper me-2"></i> Tin tức</a></li>
                 <li><a href="CRUDflashsale.php"><i class="fas fa-fire me-2"></i> Flash Sale</a></li>
+                    <li><a href="ADreturn.php"><i class="fas fa-undo-alt me-2"></i> Trả Hàng</a></li>
                 <li class="d-lg-none"><a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
             </ul>
         </aside>
@@ -259,6 +265,8 @@ function getStatusBadge($status) {
                                     <option value="dang_giao" <?= $edit_order['trang_thai'] == 'dang_giao' ? 'selected' : '' ?>>Đang giao</option>
                                     <option value="da_giao" <?= $edit_order['trang_thai'] == 'da_giao' ? 'selected' : '' ?>>Đã giao</option>
                                     <option value="da_huy" <?= $edit_order['trang_thai'] == 'da_huy' ? 'selected' : '' ?>>Đã hủy</option>
+                                    <option value="cho_tra_hang" <?= $edit_order['trang_thai'] == 'cho_tra_hang' ? 'selected' : '' ?>>Cho trả hàng</option>
+                                    <option value="da_tra_hang" <?= $edit_order['trang_thai'] == 'da_tra_hang' ? 'selected' : '' ?>>Đã trả hàng</option>
                                 </select>
                             </div>
                             <div class="col-md-6 d-flex align-items-end justify-content-end gap-2">

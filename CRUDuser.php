@@ -3,7 +3,10 @@ session_start();
 require_once 'Database.php';
 require_once 'model/CRUD.php';
 require_once 'auth.php';
-
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+    header("Location: login.php");
+    exit;
+}
 $db = new Database();
 $conn = $db->connect();
 
@@ -124,6 +127,7 @@ if (isset($_GET['msg'])) {
                 <li><a href="CRUDgiamgia.php"><i class="fas fa-tags me-2"></i> Mã giảm giá</a></li>
                 <li><a href="CRUDnews.php"><i class="fas fa-newspaper me-2"></i> Tin tức</a></li>
                 <li><a href="CRUDflashsale.php"><i class="fas fa-fire me-2"></i> Flash Sale</a></li>
+                    <li><a href="ADreturn.php"><i class="fas fa-undo-alt me-2"></i> Trả Hàng</a></li>
                 <li class="d-lg-none"><a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
             </ul>
         </aside>
