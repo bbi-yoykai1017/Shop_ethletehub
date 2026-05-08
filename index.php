@@ -465,9 +465,9 @@ $displayProducts = array_slice($products, 0, 8);
                             <h4 class="footer-title">Hỗ trợ khách hàng</h4>
                             <ul class="footer-links">
                                 <li><a href="#"><i class="fas fa-angle-right"></i>Liên hệ chúng tôi</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right"></i>Chính sách giao hàng</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right"></i>Chính sách hoàn trả</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right"></i>Câu hỏi thường gặp</a></li>
+                                <li><a href="support/chinh-sach-giao-hang.html"><i class="fas fa-angle-right"></i>Chính sách giao hàng</a></li>
+                                <li><a href="support/chinh-sach-hoan-tra.html"><i class="fas fa-angle-right"></i>Chính sách hoàn trả</a></li>
+                                <li><a href="support/faq.html"><i class="fas fa-angle-right"></i>Câu hỏi thường gặp</a></li>
                                 <li><a href="#"><i class="fas fa-angle-right"></i>Theo dõi đơn hàng</a></li>
                             </ul>
                         </div>
