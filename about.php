@@ -516,7 +516,7 @@
                             </div>
                             <div class="contact-item">
                                 <i class="fas fa-phone"></i>
-                                <p>+84 (0) 123 456 789</p>
+                                <p>+84 764 567 781</p>
                             </div>
                             <div class="contact-item">
                                 <i class="fas fa-envelope"></i>
