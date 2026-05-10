@@ -3,9 +3,14 @@ session_start();
 require_once "Database.php";
 require_once 'model/functions.php';
 require_once 'model/detail.php';
+<<<<<<< Updated upstream
+=======
+require_once 'model/news.php';
+>>>>>>> Stashed changes
 
 $db = new Database();
 $conn = $db->connect();
+$newsCount = countNews($conn, null, 1);
 $items = getallproduct($conn);
 ?>
 <!DOCTYPE html>
@@ -60,6 +65,7 @@ $items = getallproduct($conn);
                 </ul>
 
                 <div class="navbar-right d-flex align-items-center">
+<<<<<<< Updated upstream
                     <div class="nav-notification">
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">2</span>
@@ -105,9 +111,60 @@ $items = getallproduct($conn);
                                 <?php endif; ?>
                             </ul>
                         </div>
+=======
+                    <<div class="nav-notification" onclick="window.location.href='news.php'">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">
+                            <?= $newsCount ?>
+                        </span>
+                </div>
+                <div class="cart-icon">
+                    <i class="fas fa-shopping-cart" onclick="window.location.href='cart.php'"></i>
+                    <span class="cart-count">0</span>
+                </div>
+                <div class="user-account-wrapper d-flex align-items-center">
+                    <div class="user-action-dropdown dropdown">
+                        <a href="#" class="user-icon-link me-2 text-decoration-none dropdown-toggle" id="userMenu"
+                            data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">
+                            <i class="fas fa-user-circle fa-lg"></i>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                            <?php if (isset($_SESSION['user_name'])): ?>
+                                <li>
+                                    <h6 class="dropdown-header"> <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                                    </h6>
+                                </li>
+                                <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-edit me-2"></i> Hồ sơ
+                                        của tôi</a></li>
+                                <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i> Đơn
+                                        hàng </a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="logout.php">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                                    </a>
+                                </li>
+                            <?php else: ?>
+                                <li>
+                                    <a class="dropdown-item" href="login.php">
+                                        <i class="fas fa-sign-in-alt me-2"></i> Đăng nhập
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="register.php">
+                                        <i class="fas fa-user-plus me-2"></i> Đăng ký
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+>>>>>>> Stashed changes
                     </div>
                 </div>
             </div>
+        </div>
     </nav>
 
     <!-- PAGE HEADER -->
@@ -174,7 +231,8 @@ $items = getallproduct($conn);
                                 Giá
                             </h4>
                             <div class="price-range">
-                                <input type="range" id="priceRange" min="0" max="2000000" value="2000000" class="form-range">
+                                <input type="range" id="priceRange" min="0" max="2000000" value="2000000"
+                                    class="form-range">
                                 <div class="price-display">
                                     <span>Từ: <strong>0₫</strong></span>
                                     <span>Đến: <strong id="maxPrice">2.000.000₫</strong></span>
@@ -317,7 +375,11 @@ $items = getallproduct($conn);
         window.allProducts = <?php echo json_encode($items); ?>;
     </script>
     <script src="js/products-page.js"></script>
+<<<<<<< Updated upstream
 
+=======
+    <?php include_once __DIR__ . '/chat-widget.php'; ?>
+>>>>>>> Stashed changes
 </body>
 
 </html>

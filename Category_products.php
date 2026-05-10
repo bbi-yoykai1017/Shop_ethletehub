@@ -2,10 +2,12 @@
 session_start();
 require_once 'model/functions.php';
 require_once 'model/detail.php';
+require_once 'model/news.php';
 require_once 'Database.php';
 
 $db = new Database();
 $conn = $db->connect();
+$newsCount = countNews($conn, null, 1);
 
 // Lấy ID từ URL
 $id_danhmuc = isset($_GET['danh_muc_id']) ? (int)$_GET['danh_muc_id'] : 0;
@@ -121,9 +123,11 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
                 </div>
 
                 <div class="navbar-right">
-                    <div class="nav-notification">
+                   <div class="nav-notification" onclick="window.location.href='news.php'">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge">2</span>
+                        <span class="notification-badge">
+                            <?= $newsCount ?>
+                        </span>
                     </div>
 
                     <div class="cart-icon" onclick="window.location.href='cart.php'">

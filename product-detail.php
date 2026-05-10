@@ -5,9 +5,11 @@ error_reporting(E_ALL);
 require_once 'model/detail.php';
 require_once 'model/functions.php';
 require_once 'Database.php';
+require_once 'model/news.php';
 
 $db = new Database();
 $conn = $db->connect();
+$newsCount = countNews($conn, null, 1);
 
 // Lay id san pham tu URL
 $id = (int) isset($_GET['id']) ? (int) $_GET['id'] : 0;
