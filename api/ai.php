@@ -20,20 +20,27 @@ require_once __DIR__ . '/../Database.php';
 // CẤU HÌNH BAN ĐẦU
 // ======================================================
 // Composer autoload
-$envFilePath = dirname(__DIR__) . '/.env';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-// 2. Hàm đọc file .env thủ công
-if (file_exists($envFilePath)) {
-    $lines = file($envFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) continue; // Bỏ qua comment
-        list($name, $value) = explode('=', $line, 2);
-        $_ENV[trim($name)] = trim($value);
-    }
-}
+use Dotenv\Dotenv;
 
-// 3. Lấy API Key
+// Load .env
+$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->safeLoad();
+
+// API KEY
 $groq_api_key = $_ENV['GROQ_API_KEY'] ?? '';
+
+// Nếu thiếu API key
+if (empty($groq_api_key)) {
+
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Thiếu GROQ_API_KEY trong file .env'
+    ]);
+
+    exit;
+}
 
 // Tin nhắn khách gửi lên
 $userMessage = $_POST['message'] ?? '';
@@ -326,16 +333,21 @@ $data = [
 
 $ch = curl_init("https://api.groq.com/openai/v1/chat/completions");
 
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json',
-    'Authorization: Bearer ' . $groq_api_key
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST => true,
+    CURLOPT_POSTFIELDS => json_encode($data),
+
+    CURLOPT_HTTPHEADER => [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $groq_api_key
+    ],
+
+    CURLOPT_SSL_VERIFYPEER => false,
+    CURLOPT_SSL_VERIFYHOST => false,
+
+    CURLOPT_TIMEOUT => 30
 ]);
-
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-// LƯU Ý: Nên bật SSL verify trong production
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 $response = curl_exec($ch);
 
