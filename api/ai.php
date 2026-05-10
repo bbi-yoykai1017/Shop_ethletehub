@@ -7,7 +7,7 @@
 // 3. Nếu khách hỏi sản phẩm đồng giá -> xử lý trực tiếp DB
 // 4. Nếu câu hỏi chung -> gửi sang Groq AI để tư vấn
 // ======================================================
- ini_set('display_errors', 1);
+ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Trả về dữ liệu JSON UTF-8
@@ -20,12 +20,19 @@ require_once __DIR__ . '/../Database.php';
 // CẤU HÌNH BAN ĐẦU
 // ======================================================
 // Composer autoload
-require_once __DIR__ . '/../vendor/autoload.php';
+$envFilePath = dirname(__DIR__) . '/.env';
 
-// Load biến môi trường từ file .env
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
-// API Key Groq (NÊN chuyển sang .env để bảo mật)
+// 2. Hàm đọc file .env thủ công
+if (file_exists($envFilePath)) {
+    $lines = file($envFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue; // Bỏ qua comment
+        list($name, $value) = explode('=', $line, 2);
+        $_ENV[trim($name)] = trim($value);
+    }
+}
+
+// 3. Lấy API Key
 $groq_api_key = $_ENV['GROQ_API_KEY'] ?? '';
 
 // Tin nhắn khách gửi lên
@@ -205,7 +212,7 @@ if ($isAskingPrice) {
                 echo json_encode([
                     'status'   => 'success',
                     'message'  =>
-                        '💰 Dưới đây là một số sản phẩm có giá tương đương '
+                    '💰 Dưới đây là một số sản phẩm có giá tương đương '
                         . number_format($soTien, 0, ',', '.')
                         . 'đ:',
                     'products'       => $spList,
@@ -349,7 +356,6 @@ if (isset($result['choices'][0]['message']['content'])) {
         'status'  => 'success',
         'message' => $result['choices'][0]['message']['content']
     ]);
-
 } else {
 
     // Nếu lỗi

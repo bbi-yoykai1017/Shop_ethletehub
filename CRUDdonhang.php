@@ -52,6 +52,18 @@ if (isset($_POST['save_order']) && !empty($_POST['id'])) {
     $sql = "UPDATE don_hang SET nguoi_dung_id=?, ma_don_hang=?, tong_tien=?, tien_giam=?, thanh_tien=?, phuong_thuc_thanh_toan=?, trang_thai=? WHERE id=?";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$user_id, $ma_don, $tong, $giam, $thanh_tien, $pttt, $trang_thai, $id]);
+
+    if (in_array($trang_thai, ['da_giao', 'hoan_thanh'])) {
+        require_once 'model/membership_functions.php';
+        try {
+            $conn->beginTransaction();
+            syncMembershipForCompletedOrder($conn, $id);
+            $conn->commit();
+        } catch (Exception $e) {
+            $conn->rollBack();
+        }
+    }
+
     header("Location: CRUDdonhang.php?success=updated");
     exit;
 }

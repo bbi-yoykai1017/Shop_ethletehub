@@ -124,6 +124,7 @@
         <link rel="stylesheet" href="css/footer.css">
         <link rel="stylesheet" href="css/utilities.css">
         <link rel="stylesheet" href="css/cart.css">
+        <link rel="stylesheet" href="css/orders-responsive.css"> 
         <style>
             .status-badge {
                 padding: 5px 15px;

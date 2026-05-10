@@ -9,9 +9,12 @@ if (!isset($_SESSION['user_id'])) {
 
 $db = new Database();
 $conn = $db->connect();
+require_once 'model/membership_functions.php';
+
 function generateMembershipCode($user_id) {
     return 'MTV' . str_pad((int)$user_id, 4, '0', STR_PAD_LEFT) . '-' . strtoupper(substr(md5(uniqid((string)$user_id, true)), 0, 6));
 }
+
 $user_id = $_SESSION['user_id'];
 $stmt = $conn->prepare("
     SELECT ten 
@@ -52,6 +55,67 @@ if (!$member) {
   $stmt->execute([':user_id' => $user_id]);
   $member = $stmt->fetch(PDO::FETCH_ASSOC);
 }
+
+// Đồng bộ điểm tự động từ đơn hàng đã hoàn thành
+try {
+    $conn->beginTransaction();
+    $stmt = $conn->prepare("\
+        SELECT dh.id, dh.thanh_tien\
+        FROM don_hang dh\
+        LEFT JOIN lich_su_diem ls ON ls.don_hang_id = dh.id AND ls.nguoi_dung_id = dh.nguoi_dung_id AND ls.loai = 'cong_diem'\
+        WHERE dh.nguoi_dung_id = :user_id\
+          AND dh.trang_thai IN ('da_giao', 'hoan_thanh')\
+          AND ls.id IS NULL\
+    ");
+    $stmt->execute([':user_id' => $user_id]);
+    $missingOrders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $totalPointsToAdd = 0;
+    $totalSpentToAdd = 0;
+    if (!empty($missingOrders)) {
+        $insertHistory = $conn->prepare("INSERT INTO lich_su_diem (nguoi_dung_id, don_hang_id, loai, so_diem, mo_ta) VALUES (:user_id, :order_id, 'cong_diem', :points, :mo_ta)");
+        foreach ($missingOrders as $order) {
+            $points = calculatePoints((float) $order['thanh_tien']);
+            $insertHistory->execute([
+                ':user_id' => $user_id,
+                ':order_id' => $order['id'],
+                ':points' => $points,
+                ':mo_ta' => 'Cộng điểm tự động từ đơn hàng hoàn thành'
+            ]);
+            $totalPointsToAdd += $points;
+            $totalSpentToAdd += (float) $order['thanh_tien'];
+        }
+
+        if ($totalPointsToAdd > 0 || $totalSpentToAdd > 0) {
+            $update = $conn->prepare("UPDATE thanh_vien_nguoi_dung SET tong_diem = tong_diem + :points, tong_chi_tieu = tong_chi_tieu + :total WHERE nguoi_dung_id = :user_id");
+            $update->execute([
+                ':points' => $totalPointsToAdd,
+                ':total' => $totalSpentToAdd,
+                ':user_id' => $user_id
+            ]);
+        }
+    }
+    $conn->commit();
+} catch (Exception $e) {
+    $conn->rollBack();
+}
+
+// Làm mới lại dữ liệu thành viên nếu có thay đổi
+$stmt = $conn->prepare("SELECT tv.*, htv.ten_hang FROM thanh_vien_nguoi_dung tv JOIN hang_thanh_vien htv ON tv.hang_id = htv.id WHERE tv.nguoi_dung_id = :user_id");
+$stmt->execute([':user_id' => $user_id]);
+$member = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Cập nhật hạng nếu tổng chi tiêu đã đạt ngưỡng mới
+$newRank = getRankBySpending((float)($member['tong_chi_tieu'] ?? 0));
+if ($newRank !== (int)($member['hang_id'] ?? 1)) {
+    $stmt = $conn->prepare("UPDATE thanh_vien_nguoi_dung SET hang_id = :hang_id WHERE nguoi_dung_id = :user_id");
+    $stmt->execute([':hang_id' => $newRank, ':user_id' => $user_id]);
+
+    $stmt = $conn->prepare("SELECT tv.*, htv.ten_hang FROM thanh_vien_nguoi_dung tv JOIN hang_thanh_vien htv ON tv.hang_id = htv.id WHERE tv.nguoi_dung_id = :user_id");
+    $stmt->execute([':user_id' => $user_id]);
+    $member = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
 // Tổng đơn hàng hoàn thành
 $stmt = $conn->prepare("
     SELECT COUNT(*) AS total_orders
@@ -158,7 +222,7 @@ $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="flex justify-between items-start">
           <div>
             <p class="uppercase tracking-[0.3em] text-sm font-semibold text-cyan-100">SportZone Club</p>
-            <h2 class="text-4xl font-extrabold mt-3">
+            <h2 class="text-4xl font-extrabold mt-3">Hạng
               <?= $member['ten_hang'] ?>
             </h2>
           </div>
@@ -242,7 +306,7 @@ $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
           </div>
           <div class="border rounded-2xl p-5 bg-slate-50">
             <p class="text-slate-500">💸 Tổng tiết kiệm</p>
-            <p class="text-3xl font-extrabold mt-2">2.4M đ</p>
+            <p class="text-3xl font-extrabold mt-2">0 đ</p>
           </div>
         </div>
       </div>
@@ -289,38 +353,32 @@ $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <h3 class="font-extrabold text-lg mb-5">📜 Lịch Sử Tích Điểm</h3>
 
         <div class="space-y-5">
-          <div class="flex justify-between items-center border-b pb-4">
-            <div class="flex gap-4 items-center">
-              <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-xl">+</div>
-              <div>
-                <p class="font-bold">Mua giày bóng rổ</p>
-                <p class="text-slate-500 text-sm">12/04/2026 • 3,200,000 đ</p>
+          <?php if (!empty($history)): ?>
+            <?php foreach ($history as $item): ?>
+              <?php
+                $isPositive = ($item['so_diem'] >= 0);
+                $pointsLabel = ($isPositive ? '+' : '') . number_format($item['so_diem']);
+                $itemDate = isset($item['ngay_tao']) ? date('d/m/Y', strtotime($item['ngay_tao'])) : '';
+                $itemAmount = isset($item['don_hang_id']) ? '' : '';
+                if (!empty($item['don_hang_id'])) {
+                    $itemAmount = 'Đơn #' . $item['don_hang_id'];
+                }
+                $badgeClass = $isPositive ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500';
+              ?>
+              <div class="flex justify-between items-center border-b pb-4">
+                <div class="flex gap-4 items-center">
+                  <div class="w-12 h-12 rounded-full <?php echo $isPositive ? 'bg-green-100' : 'bg-red-100'; ?> flex items-center justify-center text-xl"><?php echo $isPositive ? '+' : '−'; ?></div>
+                  <div>
+                    <p class="font-bold"><?php echo htmlspecialchars($item['mo_ta'] ?: ($isPositive ? 'Cộng điểm' : 'Trừ điểm')); ?></p>
+                    <p class="text-slate-500 text-sm"><?php echo htmlspecialchars($itemDate . ($itemAmount ? ' • ' . $itemAmount : '')); ?></p>
+                  </div>
+                </div>
+                <span class="font-bold <?php echo $isPositive ? 'text-green-600' : 'text-red-500'; ?>"><?php echo $pointsLabel; ?> điểm</span>
               </div>
-            </div>
-            <span class="font-bold text-green-600">+320 điểm</span>
-          </div>
-
-          <div class="flex justify-between items-center border-b pb-4">
-            <div class="flex gap-4 items-center">
-              <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-xl">+</div>
-              <div>
-                <p class="font-bold">Áo tập gym premium</p>
-                <p class="text-slate-500 text-sm">02/04/2026 • 1,500,000 đ</p>
-              </div>
-            </div>
-            <span class="font-bold text-green-600">+150 điểm</span>
-          </div>
-
-          <div class="flex justify-between items-center">
-            <div class="flex gap-4 items-center">
-              <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-xl">🎁</div>
-              <div>
-                <p class="font-bold">Đổi voucher sinh nhật</p>
-                <p class="text-slate-500 text-sm">25/03/2026</p>
-              </div>
-            </div>
-            <span class="font-bold text-red-500">-500 điểm</span>
-          </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="text-slate-500">Chưa có lịch sử điểm.</div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
