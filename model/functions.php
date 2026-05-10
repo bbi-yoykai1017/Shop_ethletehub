@@ -252,8 +252,9 @@ function loginUser($conn, $email, $mat_khau) {
         error_log("Login error: " . $e->getMessage());
         return ['success' => false, 'message' => 'Lỗi cơ sở dữ liệu!'];
     }
+}
 
-    /**
+/**
  * ========================================
  * HÀM QUÊN MẬT KHẨU
  * ========================================
@@ -377,6 +378,5 @@ function updatePassword($conn, $userId, $newPassword) {
         error_log("Update password error: " . $e->getMessage());
         return ['success' => false, 'message' => 'Lỗi cập nhật mật khẩu'];
     }
-}
 }
 ?>
