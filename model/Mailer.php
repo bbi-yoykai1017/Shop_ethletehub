@@ -6,7 +6,7 @@ class Mailer
   private string $apiKey;
   private string $fromEmail = 'shopathletehub@gmail.com';
   private string $fromName = 'AthleteHub';
-  private string $shopUrl = 'https://shopethletehub.kesug.com/';
+  private string $shopUrl = 'https://shopethtelehub.cu.ma/';
 
   public function __construct()
   {
