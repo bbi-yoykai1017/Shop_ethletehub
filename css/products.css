@@ -9,7 +9,7 @@
 .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--spacing-2xl);
+    gap: var(--spacing-xl);
 }
 
 @media (max-width: 1200px) {

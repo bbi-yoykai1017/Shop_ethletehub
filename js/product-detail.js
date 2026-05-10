@@ -105,9 +105,17 @@ function checkStock() {
 // ADD TO CART
 // ===========================
 
+let isAddingToCart = false;
+
 const addToCartBtn = document.querySelector('.btn-add-to-cart-detail');
 if (addToCartBtn) {
     addToCartBtn.addEventListener('click', function() {
+        // NGĂN CHẶN NHẤN LẠI CÓ CÙNG LÚC (RACE CONDITION)
+        if (isAddingToCart) {
+            showNotification('Đang xử lý, vui lòng chờ...', 'warning');
+            return;
+        }
+        
         const productId = parseInt(this.dataset.productId);
         const quantity = parseInt(document.getElementById('quantity').value) || 1;
         const sizeBtn = document.querySelector('.size-btn.active');
@@ -133,7 +141,9 @@ if (addToCartBtn) {
         const sizeName = sizeBtn ? sizeBtn.dataset.sizeName : null;
         const colorName = colorBtn ? colorBtn.dataset.colorName : null;
         
-
+        // DISABLE BUTTON NGAY LẬP TỨC
+        isAddingToCart = true;
+        this.disabled = true;
         
         // Gọi API để thêm vào giỏ
         fetch('api/cart.php?action=add', {
@@ -184,17 +194,30 @@ if (addToCartBtn) {
                 url: 'api/cart.php?action=add'
             });
             showNotification('Lỗi kết nối server', 'danger');
+        })
+        .finally(() => {
+            // RE-ENABLE BUTTON SAU KHI XỬ LÝ XONG
+            isAddingToCart = false;
+            this.disabled = false;
         });
     });
 }
 
 // ===========================
-// BUY NOW
+// BUY NOW (MUA NGAY - KHÔNG THÊM VÀO GIỎ)
 // ===========================
+
+let isBuyingNow = false;
 
 const buyNowBtn = document.querySelector('.btn-buy-now-detail');
 if (buyNowBtn) {
     buyNowBtn.addEventListener('click', function() {
+        // NGĂN CHẶN NHẤN LẠI CÓ CÙNG LÚC (RACE CONDITION)
+        if (isBuyingNow) {
+            showNotification('Đang xử lý, vui lòng chờ...', 'warning');
+            return;
+        }
+        
         const sizeBtn = document.querySelector('.size-btn.active');
         const colorBtn = document.querySelector('.color-btn.active');
         
@@ -215,32 +238,50 @@ if (buyNowBtn) {
         const productId = parseInt(document.querySelector('.btn-add-to-cart-detail').dataset.productId);
         const quantity = parseInt(document.getElementById('quantity').value) || 1;
         
-        // Thêm vào giỏ rồi chuyển sang thanh toán
-        fetch('api/cart.php?action=add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                product_id: productId,
-                quantity: quantity
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification('Chuyển hướng tới trang thanh toán...', 'info');
-                setTimeout(() => {
-                    window.location.href = 'ThanhToan.php';
-                }, 1000);
-            } else {
-                showNotification(data.message || 'Lỗi khi thêm sản phẩm', 'danger');
-            }
-        })
-        .catch(error => {
-            console.error('Lỗi:', error);
-            showNotification('Lỗi kết nối server', 'danger');
+        // Chuẩn bị dữ liệu biến thể
+        const sizeId = sizeBtn ? sizeBtn.dataset.sizeId : null;
+        const colorId = colorBtn ? colorBtn.dataset.colorId : null;
+        const sizeName = sizeBtn ? sizeBtn.dataset.sizeName : null;
+        const colorName = colorBtn ? colorBtn.dataset.colorName : null;
+        
+        // DISABLE BUTTON NGAY LẬP TỨC
+        isBuyingNow = true;
+        this.disabled = true;
+        
+        // TRỰC TIẾP CHUYỂN SANG THANH TOÁN KHÔNG THÊM VÀO GIỎ
+        showNotification('Chuyển hướng tới trang thanh toán...', 'info');
+        
+        // Tạo form ẩn để gửi dữ liệu qua POST
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'ThanhToan.php';
+        form.style.display = 'none';
+        
+        // Thêm các hidden input fields
+        const fields = {
+            'quick_order': '1',  // Flag cho biết đây là "mua ngay"
+            'product_id': productId,
+            'quantity': quantity,
+            'size_id': sizeId || '',
+            'color_id': colorId || '',
+            'size_name': sizeName || '',
+            'color_name': colorName || ''
+        };
+        
+        Object.keys(fields).forEach(key => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = fields[key];
+            form.appendChild(input);
         });
+        
+        document.body.appendChild(form);
+        
+        // Gửi form
+        setTimeout(() => {
+            form.submit();
+        }, 500);
     });
 }
 
@@ -536,4 +577,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Update cart count on page load (keep for backup)
 updateCartCount();
-

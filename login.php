@@ -135,7 +135,7 @@ if (isset($_POST['login_btn'])) {
                         <input type="checkbox" class="form-check-input" name="remember_me" id="rememberMe">
                         Ghi nhớ tôi
                     </label>
-                    <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                    <a href="forgot-password.php" class="forgot-password">Quên mật khẩu?</a>
                 </div>
 
                 <!-- Login Button -->

@@ -24,12 +24,151 @@ if (!$user) {
     exit;
 }
 
+// ============================================
+// XỬ LÝ "MUA NGAY" (QUICK ORDER)
+// ============================================
+$is_quick_order = false;
+$quick_order_product_id = null;
+$quick_order_size_id = null;
+$quick_order_color_id = null;
+
+if (isset($_POST['quick_order']) && $_POST['quick_order'] == '1') {
+    $is_quick_order = true;
+    $product_id = (int) $_POST['product_id'];
+    $quantity = isset($_POST['quantity']) ? (int) $_POST['quantity'] : 1;
+    $size_id = !empty($_POST['size_id']) ? (int) $_POST['size_id'] : null;
+    $color_id = !empty($_POST['color_id']) ? (int) $_POST['color_id'] : null;
+    
+    // Lưu lại thông tin sản phẩm được mua ngay
+    $quick_order_product_id = $product_id;
+    $quick_order_size_id = $size_id;
+    $quick_order_color_id = $color_id;
+    
+    // Lấy hoặc tạo giỏ hàng
+    $stmt = $conn->prepare("SELECT id FROM gio_hang WHERE nguoi_dung_id = ? LIMIT 1");
+    $stmt->execute([$user_id]);
+    $cart_result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$cart_result) {
+        // Tạo giỏ hàng mới
+        $stmt = $conn->prepare("INSERT INTO gio_hang (nguoi_dung_id) VALUES (?)");
+        $stmt->execute([$user_id]);
+        $cart_id = $conn->lastInsertId();
+    } else {
+        $cart_id = $cart_result['id'];
+    }
+    
+    // Kiểm tra xem item này đã tồn tại trong giỏ không - KHÔNG thêm nếu đã tồn tại
+    // Vì đây là "mua ngay" nên chỉ lấy chính xác số lượng người dùng chọn
+    $stmt = $conn->prepare("
+        SELECT id FROM chi_tiet_gio_hang 
+        WHERE gio_hang_id = ? 
+          AND san_pham_id = ? 
+          AND (kich_thuoc_id <=> ?) 
+          AND (mau_sac_id <=> ?)
+    ");
+    $stmt->execute([$cart_id, $product_id, $size_id, $color_id]);
+    $existing_item = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Lấy giá sản phẩm
+    $stmt = $conn->prepare("SELECT gia FROM san_pham WHERE id = ? LIMIT 1");
+    $stmt->execute([$product_id]);
+    $product_info = $stmt->fetch(PDO::FETCH_ASSOC);
+    $price = $product_info ? $product_info['gia'] : 0;
+    
+    if ($existing_item) {
+        // NẾU ĐÃ TỒN TẠI: XÓA CÁI CŨ, CHỈ GIỮ LẠI QUICK ORDER ITEM
+        $stmt = $conn->prepare("DELETE FROM chi_tiet_gio_hang WHERE id = ?");
+        $stmt->execute([$existing_item['id']]);
+    }
+    
+    // THÊM ITEM MỚI VỚI SỐ LƯỢNG CHÍNH XÁC TỪ QUICK ORDER
+    $stmt = $conn->prepare("
+        INSERT INTO chi_tiet_gio_hang (gio_hang_id, san_pham_id, kich_thuoc_id, mau_sac_id, so_luong, gia)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ");
+    $stmt->execute([$cart_id, $product_id, $size_id, $color_id, $quantity, $price]);
+}
+
+// ============================================
+// XỬ LÝ MUA NGAY TỪ SẢN PHẨM LIÊN QUAN
+// ============================================
+if (isset($_GET['id']) && empty($_GET['selected_items'])) {
+    $product_id = (int) $_GET['id'];
+    
+    // Lấy hoặc tạo giỏ hàng
+    $stmt = $conn->prepare("SELECT id FROM gio_hang WHERE nguoi_dung_id = ? LIMIT 1");
+    $stmt->execute([$user_id]);
+    $cart_result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$cart_result) {
+        // Tạo giỏ hàng mới
+        $stmt = $conn->prepare("INSERT INTO gio_hang (nguoi_dung_id) VALUES (?)");
+        $stmt->execute([$user_id]);
+        $cart_id = $conn->lastInsertId();
+    } else {
+        $cart_id = $cart_result['id'];
+    }
+    
+    // Kiểm tra sản phẩm có yêu cầu size/color không
+    $stmt = $conn->prepare("
+        SELECT COUNT(DISTINCT kich_thuoc_id) as size_count, 
+               COUNT(DISTINCT mau_sac_id) as color_count
+        FROM bien_the_san_pham 
+        WHERE san_pham_id = ? AND trang_thai = 1
+    ");
+    $stmt->execute([$product_id]);
+    $variant_check = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    $has_size = (int)$variant_check['size_count'] > 0;
+    $has_color = (int)$variant_check['color_count'] > 0;
+    
+    // Nếu sản phẩm không yêu cầu size/color, thêm vào giỏ với số lượng 1
+    if (!$has_size && !$has_color) {
+        // Lấy giá sản phẩm
+        $stmt = $conn->prepare("SELECT gia FROM san_pham WHERE id = ? LIMIT 1");
+        $stmt->execute([$product_id]);
+        $product_info = $stmt->fetch(PDO::FETCH_ASSOC);
+        $price = $product_info ? $product_info['gia'] : 0;
+        
+        // Kiểm tra xem item này đã tồn tại trong giỏ không
+        $stmt = $conn->prepare("
+            SELECT id FROM chi_tiet_gio_hang 
+            WHERE gio_hang_id = ? AND san_pham_id = ?
+        ");
+        $stmt->execute([$cart_id, $product_id]);
+        $existing_item = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($existing_item) {
+            // Cập nhật số lượng
+            $stmt = $conn->prepare("UPDATE chi_tiet_gio_hang SET so_luong = so_luong + 1 WHERE id = ?");
+            $stmt->execute([$existing_item['id']]);
+        } else {
+            // Thêm mới vào giỏ
+            $stmt = $conn->prepare("
+                INSERT INTO chi_tiet_gio_hang (gio_hang_id, san_pham_id, so_luong, gia)
+                VALUES (?, ?, 1, ?)
+            ");
+            $stmt->execute([$cart_id, $product_id, $price]);
+        }
+    } else {
+        // Sản phẩm yêu cầu chọn size/color, chuyển hướng về chi tiết sản phẩm
+        header("Location: product-detail.php?id=" . $product_id);
+        exit;
+    }
+}
+
+
 // Lấy giỏ hàng từ database
 $cart = [];
 $selectedItemIds = []; // Track selected items
 
-// Lấy selected items từ GET parameter (nếu có)
-if (isset($_GET['selected_items'])) {
+// Nếu là quick_order, chỉ lấy item vừa thêm
+if ($is_quick_order) {
+    $selectedItemIds = [$quick_order_product_id];
+} 
+// Nếu có selected_items từ GET, lấy theo đó
+elseif (isset($_GET['selected_items'])) {
     $selectedItemsStr = $_GET['selected_items'];
     $selectedItemIds = array_map('intval', explode(',', $selectedItemsStr));
     $selectedItemIds = array_filter($selectedItemIds); // Remove 0 values
@@ -69,6 +208,39 @@ if ($giohang) {
     } else {
         $cart = $allCartItems;
     }
+    
+    $invalidItemsRemoved = [];
+    $validCart = [];
+    
+    foreach ($cart as $item) {
+        // Kiểm tra xem sản phẩm có yêu cầu size/color không
+        $stmtCheck = $conn->prepare("
+            SELECT COUNT(DISTINCT kich_thuoc_id) as size_count, 
+                   COUNT(DISTINCT mau_sac_id) as color_count
+            FROM bien_the_san_pham 
+            WHERE san_pham_id = ? AND trang_thai = 1
+        ");
+        $stmtCheck->execute([$item['id']]);
+        $variantInfo = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+        
+        $hasSize = (int)$variantInfo['size_count'] > 0;
+        $hasColor = (int)$variantInfo['color_count'] > 0;
+        
+        // Nếu sản phẩm yêu cầu size/color nhưng item không có, thì xóa
+        if (($hasSize && empty($item['kich_thuoc_id'])) || ($hasColor && empty($item['mau_sac_id']))) {
+            // Xóa từ database
+            $stmtDelete = $conn->prepare("DELETE FROM chi_tiet_gio_hang WHERE id = ?");
+            $stmtDelete->execute([$item['chi_tiet_id']]);
+            
+            $invalidItemsRemoved[] = $item['name'];
+        } else {
+            // Item hợp lệ, giữ lại
+            $validCart[] = $item;
+        }
+    }
+    
+    // Cập nhật cart
+    $cart = $validCart;
 }
 
 // Kiểm tra giỏ hàng rỗng
@@ -269,6 +441,16 @@ if (empty($cart)) {
     <div class="checkout-container">
         <div class="container-custom py-5">
             <h1 class="mb-4"><i class="fas fa-credit-card"></i> Thanh Toán Đơn Hàng</h1>
+            
+            <!-- THÔNG BÁO XÓA ITEM KHÔNG HỢP LỆ -->
+            <?php if (isset($_SESSION['removed_items_message'])): ?>
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($_SESSION['removed_items_message']) ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <?php unset($_SESSION['removed_items_message']); ?>
+            <?php endif; ?>
+            
             <!-- form thanh toán -->
             <form method="POST" id="checkoutForm">
                 <div class="row">
@@ -498,11 +680,11 @@ if (empty($cart)) {
             const lng = parseFloat(document.getElementById('lng').value);
             // kiem tra
             if (!tenNguoiNhan || tenNguoiNhan.length < 3) {
-                showMessage('Tên người nhận phải ít nhất 3 ky tự');
+                showMessage('Tên người nhận phải ít nhất 3 ký tự', 'warning');
                 return false;
             }               
             if (!soDienThoai || !/^0[0-9]{9}$/.test(soDienThoai)) {
-                showMessage('Số điện thoại không hợp lên','warning');
+                showMessage('Số điện thoại không hợp lệ', 'warning');
                 return false;
             }
             if (!diaChiGiao) {
@@ -539,19 +721,19 @@ if (empty($cart)) {
                     btn.innerHTML = originalText;
 
                     if (data.success) {
-                        showMessage('oke ròi đó cưng :33 ' + data.message, 'success');
+                        showMessage(data.message, 'success');
                         setTimeout(() => {
                             window.location.href = data.redirect;
                         }, 1500);
                     } else {
-                        showMessage('xin lỗi cưng nha haha ' + (data.message || 'cưng không thể tạo đơn hàng'), 'danger');
+                        showMessage(data.message || 'Không thể tạo đơn hàng', 'danger');
                     }
                 })
                 .catch(error => {
                     btn.disabled = false;
                     btn.innerHTML = originalText;
                     console.error('Error:', error);
-                    showMessage('xin lỗi quý khách server của chúng tôi đang đi nhậu hihi', 'danger');
+                    showMessage('Lỗi kết nối server, vui lòng thử lại sau', 'danger');
                 });
 
             return false;

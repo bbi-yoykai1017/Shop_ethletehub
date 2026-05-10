@@ -70,7 +70,7 @@ function updateTotal() {
 
 /* Add to Cart - Send to Backend API */
 
-function addToCart(productId, qty = 1) {
+function addToCart(productId, qty = 1, sizeId = null, colorId = null, sizeName = null, colorName = null) {
     return new Promise((resolve) => {
         // Send request to API backend
         fetch('api/cart.php?action=add', {
@@ -80,7 +80,11 @@ function addToCart(productId, qty = 1) {
             },
             body: JSON.stringify({
                 product_id: productId,
-                quantity: qty
+                quantity: qty,
+                size_id: sizeId,
+                color_id: colorId,
+                size_name: sizeName,
+                color_name: colorName
             })
         })
         .then(response => response.json())
@@ -417,7 +421,7 @@ function formatPrice(price) {
 
 function updateCartCount() {
     fetch('api/cart.php?action=get')
-        .then(response => response.json())
+        .then(response => response.json()) // json file
         .then(data => {
             const cartCount = document.querySelector('.cart-count');
             if (cartCount && data.success) {
@@ -449,7 +453,6 @@ function showNotification(message, type = 'info') {
 }
 
 /* Checkout Function */
-
 function goCheckout() {
     // Lấy danh sách items được chọn
     const checkedCheckboxes = document.querySelectorAll('.item-select-checkbox:checked');
@@ -558,7 +561,7 @@ function editCartItem(productId, size, color, sizeId = null, colorId = null) {
                 const isActive = sizeId == s.id ? 'active' : '';
                 sizesHTML += `<button type="button" class="btn btn-outline-primary size-btn-edit ${isActive}" data-size-id="${s.id}" data-size-name="${s.ten}">${s.ten}</button>`;
             });
-            sizesHTML += '</div></div>';
+            sizesHTML += '</div>';
         }
         
         // Render color buttons
@@ -572,7 +575,7 @@ function editCartItem(productId, size, color, sizeId = null, colorId = null) {
                     <span style="display: inline-block; width: 16px; height: 16px; background: ${colorHex}; border: 2px solid #ccc; border-radius: 4px; margin-right: 5px;"></span>${c.ten}
                 </button>`;
             });
-            colorsHTML += '</div></div>';
+            colorsHTML += '</div>';
         }
         
         // Create modal for editing
@@ -605,17 +608,13 @@ function editCartItem(productId, size, color, sizeId = null, colorId = null) {
                                                    value="${item.quantity}" min="1" max="100">
                                             <button class="btn btn-outline-secondary" type="button" onclick="increaseQtyEdit()">+</button>
                                         </div>
-                                    </div>
                                 </div>
-                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                             <button type="button" class="btn btn-primary" onclick="saveEditCartItem(${productId})">Lưu thay đổi</button>
                         </div>
-                    </div>
                 </div>
-            </div>
         `;
         
         // Xóa modal cũ nếu có

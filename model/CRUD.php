@@ -22,7 +22,7 @@ function getAllVariants($conn) {
 }
 // lay danh sach don hang
 function getAllOrders($conn) {
-    $sql = "SELECT * FROM don_hang  ";
+    $sql = "SELECT * FROM don_hang ";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);

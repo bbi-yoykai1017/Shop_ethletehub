@@ -3,13 +3,15 @@ session_start();
 require_once 'model/functions.php';
 require_once 'model/detail.php';
 require_once 'model/news.php';
+require_once 'model/flash_sale.php';
 require_once 'Database.php';
+require_once 'chattudong.php';
 
 $db = new Database();
 $conn = $db->connect();
 $products = getallproduct($conn);
 $latestNews = getLatestNews($conn, 4);
-$newsCount = countNews($conn, null, 1); // Lấy tổng số tin tức công khai
+$newsCount = countNews($conn, null, 1);
 
 // Xử lý sản phẩm - thêm các trường tính toán
 $products = processProducts($products);
@@ -38,6 +40,7 @@ $displayProducts = array_slice($products, 0, 8);
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/hero.css">
     <link rel="stylesheet" href="css/categories.css">
+    <link rel="stylesheet" href="css/flash-sale.css">
     <link rel="stylesheet" href="css/products.css">
     <link rel="stylesheet" href="css/news.css">
     <link rel="stylesheet" href="css/footer.css">
@@ -83,7 +86,7 @@ $displayProducts = array_slice($products, 0, 8);
                                 </li>
                             <?php endif; ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="#about">Về chúng tôi</a>
+                                <a class="nav-link" href="about.php">Về chúng tôi</a>
                             </li>
                         </ul>
 
@@ -99,9 +102,9 @@ $displayProducts = array_slice($products, 0, 8);
 
                         <!-- Right Icons -->
                         <div class="navbar-right">
-                             <div class="nav-notification" onclick="window.location.href='news.php'">
+                            <div class="nav-notification" onclick="window.location.href='news.php'">
                                 <i class="fas fa-bell"></i>
-                                <span class="notification-badge">2</span>
+                                <span class="notification-badge"><?= $newsCount ?></span>
                             </div>
                             <div class="cart-icon" onclick="window.location.href='cart.php'">
                                 <i class="fas fa-shopping-cart"></i>
@@ -116,12 +119,13 @@ $displayProducts = array_slice($products, 0, 8);
 
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                                         <?php if (isset($_SESSION['user_id'])): ?>
-                                    
+
                                             <li>
                                                 <h6 class="dropdown-header"> <?php echo htmlspecialchars($_SESSION['user_name']); ?></h6>
                                             </li>
                                             <li><a class="dropdown-item" href="profile.php?id=<?= $_SESSION['user_id'] ?>"><i class="fas fa-user-edit me-2"></i> Hồ sơ của tôi</a></li>
                                             <li><a class="dropdown-item" href="orders.php"><i class="fas fa-shopping-bag me-2"></i> Đơn hàng </a></li>
+
                                             <li>
                                                 <hr class="dropdown-divider">
                                             </li>
@@ -317,6 +321,19 @@ $displayProducts = array_slice($products, 0, 8);
     </section>
 
     <!-- ========================
+         FLASH SALE SECTION
+         ======================== -->
+    <section class="flash-sale-section">
+        <div class="container-custom">
+            <div id="flash-sale-container">
+                <div class="text-center">
+                    <p class="text-muted"><i class="fas fa-spinner fa-spin"></i></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================
          PRODUCTS SECTION
          ======================== -->
     <section class="products" id="products">
@@ -382,7 +399,7 @@ $displayProducts = array_slice($products, 0, 8);
                                 <button class="product-btn btn-add-cart-index" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                     <i class="fas fa-shopping-cart"></i> Thêm
                                 </button>
-                                <button class="btn-buy-now-detail  " style="background-color: #004e89 !important; color: white !important; border-radius: 5px ; font-weight: bold;"  onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
+                                <button class="btn-buy-now-detail  " style="background-color: #004e89 !important; color: white !important; border-radius: 5px ; font-weight: bold;" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                     <i class="fas fa-bolt"></i>
                                     Mua Ngay
                                 </button>
@@ -401,52 +418,6 @@ $displayProducts = array_slice($products, 0, 8);
         </div>
     </section>
 
-    <!-- ========================
-         NEWS SECTION
-         ======================== -->
-    <section class="news" id="news">
-        <div class="container-custom">
-            <div class="news-section-title">
-                <h2><i class="fas fa-newspaper"></i> Tin tức & Thông báo</h2>
-                <p>Cập nhật những sản phẩm mới, khuyến mãi, và sự kiện hấp dẫn từ AthleteHub</p>
-            </div>
-
-            <div class="news-cards-grid">
-                <?php if (!empty($latestNews)): ?>
-                    <?php foreach ($latestNews as $news_item): ?>
-                        <div class="news-card" onclick="window.location.href='news-detail.php?id=<?= $news_item['id'] ?>'">
-                            <div class="news-card-image">
-                                <?php if ($news_item['hinh_anh']): ?>
-                                    <img src="<?= htmlspecialchars($news_item['hinh_anh']) ?>" alt="<?= htmlspecialchars($news_item['tieu_de']) ?>">
-                                <?php else: ?>
-                                    <i class="fas fa-newspaper"></i>
-                                <?php endif; ?>
-                                <span class="news-card-badge">
-                                    <?= getNewsTypeLabel($news_item['loai_tin']) ?>
-                                </span>
-                            </div>
-
-                            <div class="news-card-body">
-                                <h3 class="news-card-title"><?= htmlspecialchars($news_item['tieu_de']) ?></h3>
-                                <p class="news-card-excerpt"><?= htmlspecialchars(truncateText($news_item['noi_dung'], 80)) ?></p>
-
-                                <div class="news-card-footer">
-                                    <span><i class="fas fa-calendar"></i> <?= date('d/m/Y', strtotime($news_item['ngay_tao'])) ?></span>
-                                    <span><i class="fas fa-eye"></i> <?= $news_item['luot_xem'] ?></span>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-
-            <div class="news-cta">
-                <a href="news.php" class="btn-news-all">
-                    <i class="fas fa-arrow-right"></i> Xem tất cả tin tức
-                </a>
-            </div>
-        </div>
-    </section>
 
     <!-- ========================
          FOOTER
@@ -484,7 +455,7 @@ $displayProducts = array_slice($products, 0, 8);
                                 <li><a href="index.php"><i class="fas fa-angle-right"></i>Trang chủ</a></li>
                                 <li><a href="products.php"><i class="fas fa-angle-right"></i>Sản phẩm</a></li>
                                 <li><a href="#categories"><i class="fas fa-angle-right"></i>Danh mục</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right"></i>Về chúng tôi</a></li>
+                                <li><a href="about.php"><i class="fas fa-angle-right"></i>Về chúng tôi</a></li>
                             </ul>
                         </div>
                     </div>
@@ -494,9 +465,9 @@ $displayProducts = array_slice($products, 0, 8);
                             <h4 class="footer-title">Hỗ trợ khách hàng</h4>
                             <ul class="footer-links">
                                 <li><a href="#"><i class="fas fa-angle-right"></i>Liên hệ chúng tôi</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right"></i>Chính sách giao hàng</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right"></i>Chính sách hoàn trả</a></li>
-                                <li><a href="#"><i class="fas fa-angle-right"></i>Câu hỏi thường gặp</a></li>
+                                <li><a href="support/chinh-sach-giao-hang.html"><i class="fas fa-angle-right"></i>Chính sách giao hàng</a></li>
+                                <li><a href="support/chinh-sach-hoan-tra.html"><i class="fas fa-angle-right"></i>Chính sách hoàn trả</a></li>
+                                <li><a href="support/faq.html"><i class="fas fa-angle-right"></i>Câu hỏi thường gặp</a></li>
                                 <li><a href="#"><i class="fas fa-angle-right"></i>Theo dõi đơn hàng</a></li>
                             </ul>
                         </div>
@@ -564,100 +535,18 @@ $displayProducts = array_slice($products, 0, 8);
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="js/flash-sale.js"></script>
     <script src="js/cart.js"></script>
-    
-    <!-- Notification Script -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const notificationBell = document.getElementById('notificationBell');
-        const notificationDropdown = document.getElementById('notificationDropdown');
-        const notificationList = document.getElementById('notificationList');
-        
-        if (!notificationBell) return;
-        
-        // Toggle dropdown khi click chuông
-        notificationBell.addEventListener('click', function(e) {
-            e.stopPropagation();
-            notificationDropdown.classList.toggle('active');
-            
-            // Nếu mở dropdown, load tin tức
-            if (notificationDropdown.classList.contains('active')) {
-                loadNotifications();
-            }
-        });
-        
-        // Đóng dropdown khi click ngoài
-        document.addEventListener('click', function(e) {
-            if (!notificationDropdown.parentElement.contains(e.target)) {
-                notificationDropdown.classList.remove('active');
-            }
-        });
-        
-        // Load tin tức từ API
-        function loadNotifications() {
-            fetch('api/news.php?action=get_latest_news&limit=5')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.data.length > 0) {
-                        let html = '';
-                        data.data.forEach(news => {
-                            const date = new Date(news.ngay_tao);
-                            const formattedDate = date.toLocaleDateString('vi-VN');
-                            const typeLabel = getNewsTypeLabel(news.loai_tin);
-                            
-                            html += `
-                                <a href="news-detail.php?id=${news.id}" class="notification-item">
-                                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 10px;">
-                                        <div style="flex: 1;">
-                                            <div class="notification-item-title">${escapeHtml(news.tieu_de)}</div>
-                                            <span class="notification-item-type">${typeLabel}</span>
-                                        </div>
-                                    </div>
-                                    <div class="notification-item-date">
-                                        <i class="fas fa-calendar"></i> ${formattedDate} 
-                                        <i class="fas fa-eye"></i> ${news.luot_xem}
-                                    </div>
-                                </a>
-                            `;
-                        });
-                        notificationList.innerHTML = html;
-                    } else {
-                        notificationList.innerHTML = '<div class="notification-loading">Chưa có tin tức nào</div>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Lỗi tải tin tức:', error);
-                    notificationList.innerHTML = '<div class="notification-loading">Lỗi tải dữ liệu</div>';
-                });
-        }
-        
-        // Hàm escape HTML
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, m => map[m]);
-        }
-        
-        // Hàm format loại tin
-        function getNewsTypeLabel(loai_tin) {
-            const labels = {
-                'san-pham-moi': '🎉 Sản phẩm mới',
-                'khuyen-mai': '💰 Khuyến mãi',
-                'su-kien': '🏃 Sự kiện',
-                'other': '⭐ Khác'
-            };
-            return labels[loai_tin] || 'Tin tức';
-        }
-    });
-    </script>
     <script src="js/script.js"></script>
     <script src="js/categories.js"></script>
-    
+    <script>
+        // Dùng kỹ thuật fetch để "nhúng" nội dung vào trang chính
+        fetch('chat-widget.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('chat-container').innerHTML = data;
+            });
+    </script>
     <script>
         // Back to Top Button
         const backToTopBtn = document.getElementById('backToTop');
@@ -677,6 +566,7 @@ $displayProducts = array_slice($products, 0, 8);
             });
         });
     </script>
+
 </body>
 
 </html>

@@ -7,9 +7,26 @@ require_once 'model/functions.php';
 require_once 'Database.php';
 require_once 'model/news.php';
 
+$product_id = $_GET['id'] ?? 0;
+
+// ✅ Chỉ dùng 1 kết nối PDO duy nhất
 $db = new Database();
 $conn = $db->connect();
 $newsCount = countNews($conn, null, 1);
+
+// ✅ Lấy thông tin sản phẩm cho chat AI bằng PDO
+$sp = null;
+if ($product_id) {
+    $stmt = $conn->prepare("SELECT id, ten, gia, gia_goc, phan_tram_giam, mo_ta, hinh_anh_chinh FROM san_pham WHERE id = ?");
+    $stmt->execute([$product_id]); // ✅ PDO dùng array thay vì bind_param
+    $sp = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Phần còn lại giữ nguyên
+$id = (int) isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$product = getProductDetail($conn, $id);
+// the -- end
+
 
 // Lay id san pham tu URL
 $id = (int) isset($_GET['id']) ? (int) $_GET['id'] : 0;
@@ -67,19 +84,47 @@ $ratingSummary = $product['rating_summary'];
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/product-detail.css">
     <style>
-        .bar {
-            width: 200px;
-            height: 10px;
-            background: #eee;
-            border-radius: 5px;
-            display: inline-block;
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
-        .fill {
-            height: 100%;
-            background: #ffc107;
-            /* Màu vàng sao */
-            border-radius: 5px;
+
+        /* ================= PRODUCT CARD ================= */
+        .product-card-chat {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            background: #fff;
+            align-items: center;
+        }
+
+        .product-card-chat img {
+            width: 55px;
+            height: 55px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .product-card-chat h6 {
+            font-size: 14px;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .product-card-chat .price {
+            color: #ff2d55;
+            font-weight: bold;
+            font-size: 13px;
         }
     </style>
 </head>
@@ -117,9 +162,11 @@ $ratingSummary = $product['rating_summary'];
                 </ul>
 
                 <div class="navbar-right d-flex align-items-center">
-                    <div class="nav-notification">
+                    <div class="nav-notification" onclick="window.location.href='news.php'">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge">2</span>
+                        <span class="notification-badge">
+                            <?= $newsCount ?>
+                        </span>
                     </div>
 
                     <div class="cart-icon" onclick="window.location.href='cart.php'">
@@ -336,11 +383,7 @@ $ratingSummary = $product['rating_summary'];
                                 <i class="fas fa-bolt"></i>
                                 Mua ngay
                             </button>
-                            <button class="btn-wishlist-detail" id="wishlistBtn"
-                                data-product-id="<?php echo $product['id']; ?>">
-                                <i class="far fa-heart"></i>
-                                <span>Yêu thích</span>
-                            </button>
+
                         </div>
 
                         <!-- Shipping Info -->
@@ -604,7 +647,7 @@ $ratingSummary = $product['rating_summary'];
                         <div class="footer-section">
                             <h4 class="footer-title">Hỗ trợ</h4>
                             <ul class="footer-links">
-                                <li><a href="#">Liên hệ chúng tôi</a></li>
+                                <li><a href="about.php">Liên hệ chúng tôi</a></li>
                                 <li><a href="#">Chính sách giao hàng</a></li>
                                 <li><a href="#">Chính sách hoàn trả</a></li>
                                 <li><a href="#">FAQ</a></li>
@@ -638,13 +681,17 @@ $ratingSummary = $product['rating_summary'];
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
         // Set current user info for JavaScript
-        window.currentUserId = <?php echo isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'null'; ?>;
+        window.currentUserId = <?php echo isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : 'null'; ?>;
         window.userRole = '<?php echo isset($_SESSION['user_role']) ? htmlspecialchars($_SESSION['user_role']) : 'user'; ?>';
     </script>
     <script src="js/cart.js"></script>
     <script src="js/script.js"></script>
     <script src="js/product-detail.js"></script>
+
+
     <script src="js/review.js"></script>
+
+    <?php include_once __DIR__ . '/chat-widget.php'; ?>
 </body>
 
 </html>

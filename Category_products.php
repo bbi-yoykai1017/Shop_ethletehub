@@ -5,6 +5,7 @@ require_once 'model/detail.php';
 require_once 'model/news.php';
 require_once 'Database.php';
 
+
 $db = new Database();
 $conn = $db->connect();
 $newsCount = countNews($conn, null, 1);
@@ -566,6 +567,7 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
     <script src="js/cart.js"></script>
     <script src="js/script.js"></script>
     <script src="js/category-products.js"></script>
+    <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/Shop_ethletehub/chat-widget.php'; ?>
 </body>
 
 </html>

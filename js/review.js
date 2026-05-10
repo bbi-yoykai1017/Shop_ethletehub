@@ -162,6 +162,7 @@ function submitReview() {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'same-origin',
         body: JSON.stringify({
             san_pham_id: sanPhamId,
             so_sao: selectedRating,
@@ -281,6 +282,11 @@ function loadAllReviews() {
 
                     reviewsList.innerHTML = '<h4>Đánh giá từ khách hàng (' + data.total + ')</h4>' + reviewsContent;
                     
+                    // Load replies for each review so all users can see them immediately
+                    data.reviews.forEach(review => {
+                        loadReplies(review.id);
+                    });
+
                     // Attach click handlers to like buttons
                     const likeButtons = reviewsList.querySelectorAll('.helpful-btn');
                     likeButtons.forEach(btn => {
@@ -312,6 +318,7 @@ function deleteReview(reviewId) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'same-origin',
         body: JSON.stringify({
             review_id: reviewId
         })
@@ -433,6 +440,7 @@ function submitReply(event, reviewId) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'same-origin',
         body: JSON.stringify({
             review_id: reviewId,
             content: content
@@ -515,6 +523,7 @@ function deleteReply(replyId, reviewId) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'same-origin',
         body: JSON.stringify({
             reply_id: replyId
         })
@@ -561,6 +570,7 @@ function toggleLikeReview(reviewId) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'same-origin',
         body: JSON.stringify({
             review_id: reviewId
         })
