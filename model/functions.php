@@ -1,7 +1,14 @@
 <?php
 function getallproduct($conn)
 {
- $sql = "SELECT * FROM san_pham";
+ $sql = " SELECT
+                sp.*,
+                COALESCE(COUNT(dg.id), 0) AS so_luong_danh_gia,
+                COALESCE(AVG(dg.so_sao), 0) AS trung_binh_sao
+            FROM san_pham sp
+            LEFT JOIN danh_gia dg
+                ON dg.san_pham_id = sp.id AND dg.trang_thai = 1
+            GROUP BY sp.id";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
