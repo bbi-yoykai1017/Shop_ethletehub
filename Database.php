@@ -18,24 +18,18 @@ class Database
 
     public function connect()
     {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
-        $dotenv->safeLoad();
-        $this->host = $_ENV['DB_HOST'];
-        $this->dbname = $_ENV['DB_NAME'];
-        $this->user = $_ENV['DB_USER'];
-        $this->pass = $_ENV['DB_PASS'];
         if (class_exists(Dotenv::class)) {
             $dotenvPath = __DIR__ . '/.env';
             if (file_exists($dotenvPath)) {
-                $dotenv = Dotenv::createImmutable(__DIR__);
+                $dotenv = Dotenv::createImmutable(dirname($dotenvPath));
                 $dotenv->safeLoad();
             }
         }
 
-        $this->host = $_ENV['DB_HOST'] ?? 'localhost';
-        $this->dbname = $_ENV['DB_NAME'] ?? 'athletehub';
-        $this->user = $_ENV['DB_USER'] ?? 'root';
-        $this->pass = $_ENV['DB_PASS'] ?? '';
+        $this->host = $_ENV['DB_HOST'];
+        $this->dbname = $_ENV['DB_NAME'];
+        $this->user = $_ENV['DB_USER'];
+        $this->pass = $_ENV['DB_PASSWORD'];
 
         $this->conn = null;
 
