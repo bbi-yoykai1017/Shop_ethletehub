@@ -5,12 +5,14 @@ error_reporting(E_ALL);
 require_once 'model/detail.php';
 require_once 'model/functions.php';
 require_once 'Database.php';
+require_once 'model/news.php';
 
 $product_id = $_GET['id'] ?? 0;
 
 // ✅ Chỉ dùng 1 kết nối PDO duy nhất
 $db = new Database();
 $conn = $db->connect();
+$newsCount = countNews($conn, null, 1);
 
 // ✅ Lấy thông tin sản phẩm cho chat AI bằng PDO
 $sp = null;
