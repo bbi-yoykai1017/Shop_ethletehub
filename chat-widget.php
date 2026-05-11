@@ -213,16 +213,16 @@ $co_san_pham = isset($sp) && $sp;
     </div>
    <!-- $hinh = '/public/' . $sp['hinh_anh_chinh']; -->
     <?php if ($co_san_pham):
-        $hinh    = '/Shop_ethletehub/public/' . $sp['hinh_anh_chinh'];
+        $hinh    = './public/' . $sp['hinh_anh_chinh'];
         $gia     = number_format($sp['gia'],     0, ',', '.');
         $gia_goc = number_format($sp['gia_goc'], 0, ',', '.');
     ?>
         <!-- Card hiển thị sản phẩm khách đang xem — chỉ xuất hiện trên trang product-detail -->
          <!-- <div id="cw-product-card" onclick="window.location='/product/<?= $sp['id'] ?>'">-->
-        <div id="cw-product-card" onclick="window.location='/Shop_ethletehub/product/<?= $sp['id'] ?>'">
+        <div id="cw-product-card" onclick="window.location='./product-detail.php?id=<?= $sp['id'] ?>'">
             <img src="<?= $hinh ?>"
                  alt="<?= htmlspecialchars($sp['ten']) ?>"
-                 onerror="this.onerror=null; this.src='/Shop_ethletehub/public/placeholder.svg'">
+                 onerror="this.onerror=null; this.src='./public/placeholder.svg'">
                  <!--   onerror="this.onerror=null; this.src='/public/placeholder.svg'">-->
             <div class="cw-card-info">
                 <div class="cw-card-name"><?= htmlspecialchars($sp['ten']) ?></div>
@@ -272,11 +272,9 @@ $co_san_pham = isset($sp) && $sp;
 </div>
 
 <script>
-    // =====================================================================
-    // CW_PRODUCT: data sản phẩm đang xem — PHP xuất ra JS
-    // Gồm: tên, giá, sizes, colors để AI tư vấn đúng, không bịa
-    // Nếu không ở trang sản phẩm → null
-    // =====================================================================
+    // =========================================================
+    // DATA SẢN PHẨM
+    // =========================================================
     const CW_PRODUCT = <?= $co_san_pham
         ? json_encode([
             'ten'            => $sp['ten'],
@@ -284,207 +282,346 @@ $co_san_pham = isset($sp) && $sp;
             'gia_goc'        => $sp['gia_goc'],
             'phan_tram_giam' => $sp['phan_tram_giam'],
             'mo_ta'          => $sp['mo_ta'],
-            'sizes'          => array_column($sizes  ?? [], 'ten'), // VD: ['M', 'L']
-            'colors'         => array_column($colors ?? [], 'ten'), // VD: ['Đen', 'Trắng']
-        ])
+            'sizes'          => array_column($sizes ?? [], 'ten'),
+            'colors'         => array_column($colors ?? [], 'ten'),
+        ], JSON_UNESCAPED_UNICODE)
         : 'null' ?>;
 
-    // =====================================================================
-    // CW_HISTORY: lưu lịch sử hội thoại trong phiên hiện tại (không lưu DB)
-    // Mỗi lượt gửi sẽ đính kèm history này lên server
-    // để AI nhớ ngữ cảnh — tránh hỏi lại những gì đã nói
-    // Giới hạn 20 tin (10 lượt hỏi đáp) để tránh quá tải API
-    // =====================================================================
     let CW_HISTORY = [];
 
-    // Mở/đóng chat box
+    // =========================================================
+    // TOGGLE CHAT
+    // =========================================================
     function toggleChat() {
         const box = document.getElementById('chat-widget-box');
         const btn = document.getElementById('chat-widget-btn');
+
         const isOpen = box.style.display === 'flex';
+
         box.style.display = isOpen ? 'none' : 'flex';
         btn.style.display = isOpen ? 'flex' : 'none';
-        if (!isOpen) document.getElementById('cw-input').focus();
+
+        if (!isOpen) {
+            document.getElementById('cw-input').focus();
+        }
     }
 
-    // Click button gợi ý → điền vào input rồi gửi luôn
-// Ẩn button vừa click, khi hết tất cả button thì ẩn cả khu vực gợi ý
-function cwQuick(text, btn) {
-    // Ẩn button vừa bấm
-    btn.style.display = 'none';
+    // =========================================================
+    // QUICK BUTTON
+    // =========================================================
+    function cwQuick(text, btn) {
 
-    // Kiểm tra còn button nào visible không
-    const allBtns = document.querySelectorAll('#cw-suggestions .cw-suggest-btn');
-    const stillVisible = [...allBtns].some(b => b.style.display !== 'none');
+        if (btn) {
+            btn.style.display = 'none';
 
-    // Nếu hết tất cả → ẩn cả khu vực gợi ý
-    if (!stillVisible) {
-        document.getElementById('cw-suggestions').style.display = 'none';
+            const allBtns = document.querySelectorAll('#cw-suggestions .cw-suggest-btn');
+
+            const stillVisible = [...allBtns].some(
+                b => b.style.display !== 'none'
+            );
+
+            if (!stillVisible) {
+                document.getElementById('cw-suggestions').style.display = 'none';
+            }
+        }
+
+        document.getElementById('cw-input').value = text;
+
+        cwSend();
     }
 
-    document.getElementById('cw-input').value = text;
-    cwSend();
-}
+    // =========================================================
+    // ESCAPE HTML
+    // =========================================================
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
 
-    // Render danh sách card sản phẩm gợi ý (có ảnh + link)
-    // Được gọi khi backend trả về data.products
-    function cwRenderProductCards(products, intro) {
-        const msgs    = document.getElementById('chat-widget-messages');
+    // =========================================================
+    // PARSE MARKDOWN
+    // =========================================================
+    function cwParseMarkdown(text) {
+
+        if (!text) return '';
+
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/^- (.+)/gm, '<div style="margin:3px 0;padding-left:10px">• $1</div>')
+            .replace(/\n/g, '<br>');
+    }
+
+    // =========================================================
+    // APPEND MESSAGE
+    // =========================================================
+    function cwAppend(sender, message) {
+
+        const msgs = document.getElementById('chat-widget-messages');
+
+        const div = document.createElement('div');
+
+        div.className = 'cw-bubble ' +
+            (sender === 'bot' ? 'cw-bot' : 'cw-user');
+
+        if (sender === 'bot') {
+            div.innerHTML = cwParseMarkdown(message);
+        } else {
+            div.textContent = message;
+        }
+
+        msgs.appendChild(div);
+
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    // =========================================================
+    // PRODUCT CARD
+    // =========================================================
+    function cwRenderProductCards(products, intro = null) {
+
+        if (!products || !products.length) return;
+
+        const msgs = document.getElementById('chat-widget-messages');
+
         const wrapper = document.createElement('div');
+
         wrapper.className = 'cw-product-suggestions';
 
         if (intro) {
             const label = document.createElement('div');
-            label.className   = 'cw-suggest-label';
+
+            label.className = 'cw-suggest-label';
+
             label.textContent = intro;
+
             wrapper.appendChild(label);
         }
 
         const row = document.createElement('div');
+
         row.className = 'cw-product-cards-row';
 
         products.forEach(sp => {
-            const card   = document.createElement('a');
-            card.className = 'cw-sp-card';
-            card.href      = '/Shop_ethletehub/product-detail.php?id=' + sp.id;
 
-            const gia    = parseInt(sp.gia).toLocaleString('vi-VN');
-            const giaGoc = parseInt(sp.gia_goc).toLocaleString('vi-VN');
-            const hinh   = '/Shop_ethletehub/public/' + sp.hinh_anh_chinh;
+            const card = document.createElement('a');
+
+            card.className = 'cw-sp-card';
+
+            // FIX LINK
+            card.href = '/product-detail.php?id=' + sp.id;
+
+            const gia = parseInt(sp.gia || 0).toLocaleString('vi-VN');
+
+            const giaGoc = parseInt(sp.gia_goc || 0).toLocaleString('vi-VN');
+
+    
+            const hinh = './public' + sp.hinh_anh_chinh;
 
             card.innerHTML = `
                 <img src="${hinh}"
                      alt="${escHtml(sp.ten)}"
-                     onerror="this.onerror=null;this.src='/Shop_ethletehub/public/placeholder.svg'">
+                     onerror="this.src='https://via.placeholder.com/60'">
+
                 <div class="cw-sp-card-info">
-                    <div class="cw-sp-card-name">${escHtml(sp.ten)}</div>
+                    <div class="cw-sp-card-name">
+                        ${escHtml(sp.ten)}
+                    </div>
+
                     <div class="cw-sp-card-price">
                         ${gia}đ
-                        <span class="cw-sp-card-old">${giaGoc}đ</span>
-                        <span class="cw-sp-card-badge">-${sp.phan_tram_giam}%</span>
+
+                        <span class="cw-sp-card-old">
+                            ${giaGoc}đ
+                        </span>
+
+                        <span class="cw-sp-card-badge">
+                            -${sp.phan_tram_giam || 0}%
+                        </span>
                     </div>
                 </div>
+
                 <div class="cw-sp-card-arrow">›</div>
             `;
+
             row.appendChild(card);
         });
 
         wrapper.appendChild(row);
+
         msgs.appendChild(wrapper);
+
         msgs.scrollTop = msgs.scrollHeight;
     }
 
-    // Escape HTML để tránh XSS khi render tên sản phẩm từ DB
-    function escHtml(str) {
-        return String(str)
-            .replace(/&/g,  '&amp;')
-            .replace(/</g,  '&lt;')
-            .replace(/>/g,  '&gt;')
-            .replace(/"/g,  '&quot;');
-    }
-function cwParseMarkdown(text) {
-    return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/^- (.+)/gm, '<div style="margin:3px 0;padding-left:10px">• $1</div>')
-        .replace(/\n/g, '<br>');
-}
-    // =====================================================================
-    // HÀM CHÍNH: gửi tin nhắn lên ai.php và xử lý response
-    // Luồng: user gõ → hiện bubble user → loading dots →
-    //        gọi API → nhận response → hiện bubble bot → lưu history
-    // =====================================================================
+    // =========================================================
+    // SEND MESSAGE
+    // =========================================================
     async function cwSend() {
+
         const input = document.getElementById('cw-input');
-        const msg   = input.value.trim();
+
+        const msg = input.value.trim();
+
         if (!msg) return;
 
-        // 1. Hiện tin nhắn của user ngay lập tức
         cwAppend('user', msg);
-        input.value    = '';
-        input.disabled = true;
-        document.getElementById('cw-send').disabled = true;
 
-        // 2. Hiện loading dots trong khi chờ AI trả lời
+        input.value = '';
+
+        input.disabled = true;
+
+        const sendBtn = document.getElementById('cw-send');
+
+        sendBtn.disabled = true;
+
+        // LOADING
         const msgs = document.getElementById('chat-widget-messages');
-        const lid  = 'cwl' + Date.now();
-        const ld   = document.createElement('div');
-        ld.className = 'cw-bubble cw-bot cw-loading';
-        ld.id        = lid;
-        ld.innerHTML = '<span></span><span></span><span></span>';
-        msgs.appendChild(ld);
+
+        const loading = document.createElement('div');
+
+        loading.className = 'cw-bubble cw-bot';
+
+        loading.id = 'cw-loading';
+
+        loading.innerHTML = `
+            <div class="cw-loading">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        `;
+
+        msgs.appendChild(loading);
+
         msgs.scrollTop = msgs.scrollHeight;
 
-        // 3. Chuẩn bị data gửi lên server
-        const formData = new URLSearchParams();
+        // =====================================================
+        // FORM DATA
+        // =====================================================
+        const formData = new FormData();
+
         formData.append('message', msg);
-        // Đính kèm lịch sử hội thoại để AI nhớ context
-        formData.append('history', JSON.stringify(CW_HISTORY));
-        // Đính kèm thông tin sản phẩm đang xem (nếu có)
-        if (CW_PRODUCT) formData.append('product_context', JSON.stringify(CW_PRODUCT));
 
-        try {
-            // 4. Gọi API ai.php
-            // const res = await fetch('https://shopethletehub.kesug.com/api-test.php', { method: 'POST', body: formData });
-            const res  = await fetch('/Shop_ethletehub/api/ai.php', { method: 'POST', body: formData });
-            const data = await res.json();
+        formData.append(
+            'history',
+            JSON.stringify(CW_HISTORY)
+        );
 
-            // 5. Xóa loading dots
-            document.getElementById(lid)?.remove();
-
-            if (data.status === 'success') {
-                // 6. Lưu cặp hỏi-đáp vào history để lần sau AI nhớ
-                CW_HISTORY.push({ role: 'user',      content: msg          });
-                CW_HISTORY.push({ role: 'assistant', content: data.message });
-                // Giới hạn 20 items (= 10 lượt) tránh gửi quá nhiều token lên API
-                if (CW_HISTORY.length > 20) CW_HISTORY = CW_HISTORY.slice(-20);
-
-                // 7. Hiển thị response — 2 trường hợp:
-                if (data.products && data.products.length > 0) {
-                    // Trường hợp A: AI gợi ý sản phẩm cụ thể → render card có ảnh
-                    if (data.message) cwAppend('bot', data.message);
-                    cwRenderProductCards(data.products, data.products_label || null);
-                } else {
-                    // Trường hợp B: AI trả lời text thông thường
-                    cwAppend('bot', data.message);
-                }
-            } else {
-                cwAppend('bot', 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!');
-            }
-
-        } catch (e) {
-            // Lỗi network hoặc server không phản hồi
-            document.getElementById(lid)?.remove();
-            cwAppend('bot', 'Không thể kết nối. Vui lòng thử lại!');
+        if (CW_PRODUCT) {
+            formData.append(
+                'product_context',
+                JSON.stringify(CW_PRODUCT)
+            );
         }
 
-        // 8. Mở lại input cho lượt hỏi tiếp theo
-        input.disabled = false;
-        document.getElementById('cw-send').disabled = false;
-        input.focus();
+        try {
+
+            // =================================================
+            // FIX FETCH URL
+            // =================================================
+            const response = await fetch('./api/ai.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            // DEBUG RESPONSE
+            const rawText = await response.text();
+
+            console.log(rawText);
+
+            // XÓA LOADING
+            document.getElementById('cw-loading')?.remove();
+
+            let data;
+
+            try {
+                data = JSON.parse(rawText);
+            } catch (jsonErr) {
+
+                cwAppend(
+                    'bot',
+                    'Server trả về dữ liệu không hợp lệ!'
+                );
+
+                console.error(rawText);
+
+                return;
+            }
+
+            // =================================================
+            // SUCCESS
+            // =================================================
+            if (data.status === 'success') {
+
+                CW_HISTORY.push({
+                    role: 'user',
+                    content: msg
+                });
+
+                CW_HISTORY.push({
+                    role: 'assistant',
+                    content: data.message
+                });
+
+                if (CW_HISTORY.length > 20) {
+                    CW_HISTORY = CW_HISTORY.slice(-20);
+                }
+
+                if (data.message) {
+                    cwAppend('bot', data.message);
+                }
+
+                if (data.products && data.products.length > 0) {
+                    cwRenderProductCards(
+                        data.products,
+                        data.products_label || null
+                    );
+                }
+
+            } else {
+
+                cwAppend(
+                    'bot',
+                    data.message || 'Có lỗi xảy ra!'
+                );
+            }
+
+        } catch (err) {
+
+            document.getElementById('cw-loading')?.remove();
+
+            console.error(err);
+
+            cwAppend(
+                'bot',
+                'Không thể kết nối server!'
+            );
+
+        } finally {
+
+            input.disabled = false;
+
+            sendBtn.disabled = false;
+
+            input.focus();
+        }
     }
 
-    // Thêm bubble tin nhắn vào khung chat
-   function cwAppend(sender, message) {
-    const msgs = document.getElementById('chat-widget-messages');
-    const div  = document.createElement('div');
-    div.className = 'cw-bubble ' + (sender === 'bot' ? 'cw-bot' : 'cw-user');
+    // =========================================================
+    // ENTER TO SEND
+    // =========================================================
+    document.getElementById('cw-input')
+        .addEventListener('keypress', function (e) {
 
-    if (sender === 'bot') {
-        // Render markdown đơn giản cho bot
-        div.innerHTML = cwParseMarkdown(message);
-    } else {
-        // User thì dùng textContent để tránh XSS
-        div.textContent = message;
-    }
-
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
-}
-
-
-    // Cho phép gửi bằng phím Enter
-    document.getElementById('cw-input').addEventListener('keypress', e => {
-        if (e.key === 'Enter' && !e.target.disabled) cwSend();
-    });
+            if (
+                e.key === 'Enter' &&
+                !this.disabled
+            ) {
+                cwSend();
+            }
+        });
 </script>

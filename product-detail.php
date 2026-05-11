@@ -5,12 +5,14 @@ error_reporting(E_ALL);
 require_once 'model/detail.php';
 require_once 'model/functions.php';
 require_once 'Database.php';
+require_once 'model/news.php';
 
 $product_id = $_GET['id'] ?? 0;
 
 // ✅ Chỉ dùng 1 kết nối PDO duy nhất
 $db = new Database();
 $conn = $db->connect();
+$newsCount = countNews($conn, null, 1);
 
 // ✅ Lấy thông tin sản phẩm cho chat AI bằng PDO
 $sp = null;
@@ -21,7 +23,7 @@ if ($product_id) {
 }
 
 // Phần còn lại giữ nguyên
-$id = (int) isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$id = (int) isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $product = getProductDetail($conn, $id);
 // the -- end
 
@@ -162,7 +164,9 @@ $ratingSummary = $product['rating_summary'];
                 <div class="navbar-right d-flex align-items-center">
                     <div class="nav-notification" onclick="window.location.href='news.php'">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge">2</span>
+                        <span class="notification-badge">
+                            <?= $newsCount ?>
+                        </span>
                     </div>
 
                     <div class="cart-icon" onclick="window.location.href='cart.php'">
@@ -494,7 +498,7 @@ $ratingSummary = $product['rating_summary'];
                                     <div class="rating-breakdown">
                                         <?php for ($i = 5; $i >= 1; $i--):
                                             $dist = $ratingSummary['rating_distribution'][$i] ?? ['count' => 0, 'percentage' => 0];
-                                        ?>
+                                            ?>
                                             <div class="rating-bar">
                                                 <span class="rating-label"><?php echo $i; ?> <i
                                                         class="fas fa-star"></i></span>
@@ -677,7 +681,7 @@ $ratingSummary = $product['rating_summary'];
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
         // Set current user info for JavaScript
-        window.currentUserId = <?php echo isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'null'; ?>;
+        window.currentUserId = <?php echo isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : 'null'; ?>;
         window.userRole = '<?php echo isset($_SESSION['user_role']) ? htmlspecialchars($_SESSION['user_role']) : 'user'; ?>';
     </script>
     <script src="js/cart.js"></script>
@@ -687,7 +691,7 @@ $ratingSummary = $product['rating_summary'];
 
     <script src="js/review.js"></script>
 
-   <?php include_once __DIR__ . '/chat-widget.php'; ?>
+    <?php include_once __DIR__ . '/chat-widget.php'; ?>
 </body>
 
 </html>

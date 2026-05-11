@@ -1,4 +1,3 @@
 *.sql
 /vendor/
-Database.php
 .env
