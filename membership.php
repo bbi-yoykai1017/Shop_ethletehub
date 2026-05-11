@@ -11,8 +11,9 @@ $db = new Database();
 $conn = $db->connect();
 require_once 'model/membership_functions.php';
 
-function generateMembershipCode($user_id) {
-    return 'MTV' . str_pad((int)$user_id, 4, '0', STR_PAD_LEFT) . '-' . strtoupper(substr(md5(uniqid((string)$user_id, true)), 0, 6));
+function generateMembershipCode($user_id)
+{
+  return 'MTV' . str_pad((int)$user_id, 4, '0', STR_PAD_LEFT) . '-' . strtoupper(substr(md5(uniqid((string)$user_id, true)), 0, 6));
 }
 
 $user_id = $_SESSION['user_id'];
@@ -58,8 +59,8 @@ if (!$member) {
 
 // Đồng bộ điểm tự động từ đơn hàng đã hoàn thành
 try {
-    $conn->beginTransaction();
-    $stmt = $conn->prepare("\
+  $conn->beginTransaction();
+  $stmt = $conn->prepare("\
         SELECT dh.id, dh.thanh_tien\
         FROM don_hang dh\
         LEFT JOIN lich_su_diem ls ON ls.don_hang_id = dh.id AND ls.nguoi_dung_id = dh.nguoi_dung_id AND ls.loai = 'cong_diem'\
@@ -67,37 +68,37 @@ try {
           AND dh.trang_thai IN ('da_giao', 'hoan_thanh')\
           AND ls.id IS NULL\
     ");
-    $stmt->execute([':user_id' => $user_id]);
-    $missingOrders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $stmt->execute([':user_id' => $user_id]);
+  $missingOrders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $totalPointsToAdd = 0;
-    $totalSpentToAdd = 0;
-    if (!empty($missingOrders)) {
-        $insertHistory = $conn->prepare("INSERT INTO lich_su_diem (nguoi_dung_id, don_hang_id, loai, so_diem, mo_ta) VALUES (:user_id, :order_id, 'cong_diem', :points, :mo_ta)");
-        foreach ($missingOrders as $order) {
-            $points = calculatePoints((float) $order['thanh_tien']);
-            $insertHistory->execute([
-                ':user_id' => $user_id,
-                ':order_id' => $order['id'],
-                ':points' => $points,
-                ':mo_ta' => 'Cộng điểm tự động từ đơn hàng hoàn thành'
-            ]);
-            $totalPointsToAdd += $points;
-            $totalSpentToAdd += (float) $order['thanh_tien'];
-        }
-
-        if ($totalPointsToAdd > 0 || $totalSpentToAdd > 0) {
-            $update = $conn->prepare("UPDATE thanh_vien_nguoi_dung SET tong_diem = tong_diem + :points, tong_chi_tieu = tong_chi_tieu + :total WHERE nguoi_dung_id = :user_id");
-            $update->execute([
-                ':points' => $totalPointsToAdd,
-                ':total' => $totalSpentToAdd,
-                ':user_id' => $user_id
-            ]);
-        }
+  $totalPointsToAdd = 0;
+  $totalSpentToAdd = 0;
+  if (!empty($missingOrders)) {
+    $insertHistory = $conn->prepare("INSERT INTO lich_su_diem (nguoi_dung_id, don_hang_id, loai, so_diem, mo_ta) VALUES (:user_id, :order_id, 'cong_diem', :points, :mo_ta)");
+    foreach ($missingOrders as $order) {
+      $points = calculatePoints((float) $order['thanh_tien']);
+      $insertHistory->execute([
+        ':user_id' => $user_id,
+        ':order_id' => $order['id'],
+        ':points' => $points,
+        ':mo_ta' => 'Cộng điểm tự động từ đơn hàng hoàn thành'
+      ]);
+      $totalPointsToAdd += $points;
+      $totalSpentToAdd += (float) $order['thanh_tien'];
     }
-    $conn->commit();
+
+    if ($totalPointsToAdd > 0 || $totalSpentToAdd > 0) {
+      $update = $conn->prepare("UPDATE thanh_vien_nguoi_dung SET tong_diem = tong_diem + :points, tong_chi_tieu = tong_chi_tieu + :total WHERE nguoi_dung_id = :user_id");
+      $update->execute([
+        ':points' => $totalPointsToAdd,
+        ':total' => $totalSpentToAdd,
+        ':user_id' => $user_id
+      ]);
+    }
+  }
+  $conn->commit();
 } catch (Exception $e) {
-    $conn->rollBack();
+  $conn->rollBack();
 }
 
 // Làm mới lại dữ liệu thành viên nếu có thay đổi
@@ -108,12 +109,12 @@ $member = $stmt->fetch(PDO::FETCH_ASSOC);
 // Cập nhật hạng nếu tổng chi tiêu đã đạt ngưỡng mới
 $newRank = getRankBySpending((float)($member['tong_chi_tieu'] ?? 0));
 if ($newRank !== (int)($member['hang_id'] ?? 1)) {
-    $stmt = $conn->prepare("UPDATE thanh_vien_nguoi_dung SET hang_id = :hang_id WHERE nguoi_dung_id = :user_id");
-    $stmt->execute([':hang_id' => $newRank, ':user_id' => $user_id]);
+  $stmt = $conn->prepare("UPDATE thanh_vien_nguoi_dung SET hang_id = :hang_id WHERE nguoi_dung_id = :user_id");
+  $stmt->execute([':hang_id' => $newRank, ':user_id' => $user_id]);
 
-    $stmt = $conn->prepare("SELECT tv.*, htv.ten_hang FROM thanh_vien_nguoi_dung tv JOIN hang_thanh_vien htv ON tv.hang_id = htv.id WHERE tv.nguoi_dung_id = :user_id");
-    $stmt->execute([':user_id' => $user_id]);
-    $member = $stmt->fetch(PDO::FETCH_ASSOC);
+  $stmt = $conn->prepare("SELECT tv.*, htv.ten_hang FROM thanh_vien_nguoi_dung tv JOIN hang_thanh_vien htv ON tv.hang_id = htv.id WHERE tv.nguoi_dung_id = :user_id");
+  $stmt->execute([':user_id' => $user_id]);
+  $member = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 // Tổng đơn hàng hoàn thành
@@ -132,31 +133,31 @@ $total_spent = (float) ($member['tong_chi_tieu'] ?? 0);
 
 // Tiến trình hạng
 $rankThresholds = [
-    1 => 0,
-    2 => 3000000,
-    3 => 10000000,
-    4 => 25000000,
+  1 => 0,
+  2 => 3000000,
+  3 => 10000000,
+  4 => 25000000,
 ];
 $rankNames = [
-    1 => 'Đồng',
-    2 => 'Bạc',
-    3 => 'Vàng',
-    4 => 'Kim Cương',
+  1 => 'Đồng',
+  2 => 'Bạc',
+  3 => 'Vàng',
+  4 => 'Kim Cương',
 ];
 $currentRank = max(1, min(4, (int) ($member['hang_id'] ?? 1)));
 $nextRank = min(4, $currentRank + 1);
 $currentThreshold = $rankThresholds[$currentRank];
 $nextThreshold = $rankThresholds[$nextRank];
 if ($currentRank === 4) {
-    $progress = 100;
-    $remainingAmount = 0;
-    $progressLabel = 'Đã đạt hạng Kim Cương';
-    $progressText = number_format($total_spent, 0, ',', '.') . ' đ';
+  $progress = 100;
+  $remainingAmount = 0;
+  $progressLabel = 'Đã đạt hạng Kim Cương';
+  $progressText = number_format($total_spent, 0, ',', '.') . ' đ';
 } else {
-    $progress = $currentThreshold === $nextThreshold ? 100 : min(100, max(0, ($total_spent - $currentThreshold) / ($nextThreshold - $currentThreshold) * 100));
-    $remainingAmount = max(0, $nextThreshold - $total_spent);
-    $progressLabel = 'Tiến trình lên ' . $rankNames[$nextRank];
-    $progressText = number_format(min($total_spent, $nextThreshold), 0, ',', '.') . ' / ' . number_format($nextThreshold, 0, ',', '.') . ' đ';
+  $progress = $currentThreshold === $nextThreshold ? 100 : min(100, max(0, ($total_spent - $currentThreshold) / ($nextThreshold - $currentThreshold) * 100));
+  $remainingAmount = max(0, $nextThreshold - $total_spent);
+  $progressLabel = 'Tiến trình lên ' . $rankNames[$nextRank];
+  $progressText = number_format(min($total_spent, $nextThreshold), 0, ',', '.') . ' / ' . number_format($nextThreshold, 0, ',', '.') . ' đ';
 }
 
 // Tổng voucher
@@ -226,7 +227,8 @@ $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <?= $member['ten_hang'] ?>
             </h2>
           </div>
-          <div class="text-4xl">⭐</div>
+          <?php $rankIcons = [1 => '🥉', 2 => '🥈', 3 => '⭐', 4 => '💎']; ?>
+          <div class="text-4xl"><?= $rankIcons[$currentRank] ?></div>
         </div>
 
         <div class="mt-8 tracking-[0.25em] text-lg font-medium"><?= htmlspecialchars($member['ma_thanh_vien'] ?? 0) ?></div>
@@ -255,27 +257,19 @@ $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <div class="xl:col-span-3 bg-white rounded-3xl p-6 shadow-lg border border-slate-200">
         <h3 class="font-extrabold text-lg mb-6">🏅 Tiến Trình Thăng Hạng</h3>
 
+        <?php
+        $rankIcons  = [1 => '🥉', 2 => '🥈', 3 => '⭐', 4 => '💎'];
+        $rankLabels = [1 => 'Đồng', 2 => 'Bạc', 3 => 'Vàng', 4 => 'Kim Cương'];
+        $rankMinSpend = [1 => '0đ+', 2 => '3M+', 3 => '10M+', 4 => '25M+'];
+        ?>
         <div class="grid grid-cols-4 text-center mb-6">
-          <div>
-            <div class="text-2xl">🥉</div>
-            <p class="font-semibold mt-2">Đồng</p>
-            <p class="text-sm text-slate-400">0đ+</p>
-          </div>
-          <div>
-            <div class="text-2xl">🥈</div>
-            <p class="font-semibold mt-2">Bạc</p>
-            <p class="text-sm text-slate-400">3M+</p>
-          </div>
-          <div>
-            <div class="text-2xl">⭐</div>
-            <p class="font-semibold mt-2 text-yellow-500">Vàng</p>
-            <p class="text-sm text-slate-400">10M+</p>
-          </div>
-          <div>
-            <div class="text-2xl">💎</div>
-            <p class="font-semibold mt-2">Kim Cương</p>
-            <p class="text-sm text-slate-400">25M+</p>
-          </div>
+          <?php for ($r = 1; $r <= 4; $r++): ?>
+            <div>
+              <div class="text-2xl"><?= $rankIcons[$r] ?></div>
+              <p class="font-semibold mt-2 <?= $r === 3 ? 'text-yellow-500' : '' ?>"><?= $rankLabels[$r] ?></p>
+              <p class="text-sm text-slate-400"><?= $rankMinSpend[$r] ?></p>
+            </div>
+          <?php endfor; ?>
         </div>
 
         <p class="text-slate-600 font-medium mb-2"><?= htmlspecialchars($progressLabel) ?></p>
@@ -356,14 +350,14 @@ $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <?php if (!empty($history)): ?>
             <?php foreach ($history as $item): ?>
               <?php
-                $isPositive = ($item['so_diem'] >= 0);
-                $pointsLabel = ($isPositive ? '+' : '') . number_format($item['so_diem']);
-                $itemDate = isset($item['ngay_tao']) ? date('d/m/Y', strtotime($item['ngay_tao'])) : '';
-                $itemAmount = isset($item['don_hang_id']) ? '' : '';
-                if (!empty($item['don_hang_id'])) {
-                    $itemAmount = 'Đơn #' . $item['don_hang_id'];
-                }
-                $badgeClass = $isPositive ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500';
+              $isPositive = ($item['so_diem'] >= 0);
+              $pointsLabel = ($isPositive ? '+' : '') . number_format($item['so_diem']);
+              $itemDate = isset($item['ngay_tao']) ? date('d/m/Y', strtotime($item['ngay_tao'])) : '';
+              $itemAmount = isset($item['don_hang_id']) ? '' : '';
+              if (!empty($item['don_hang_id'])) {
+                $itemAmount = 'Đơn #' . $item['don_hang_id'];
+              }
+              $badgeClass = $isPositive ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500';
               ?>
               <div class="flex justify-between items-center border-b pb-4">
                 <div class="flex gap-4 items-center">
