@@ -190,27 +190,44 @@
         /* RESPONSIVE CHO ĐIỆN THOẠI */
         /* ============================= */
 
-       @media (max-width: 480px) {
-    /* Thu nhỏ vùng chứa câu hỏi nhanh */
+   /* Thay thế toàn bộ @media (max-width: 480px) hiện tại bằng đoạn này */
+@media (max-width: 480px) {
+    .chat-launcher {
+        right: 15px !important;
+        bottom: 75px !important;
+        width: 45px !important;
+        height: 45px !important;
+        font-size: 20px;
+    }
+
+    .chat-box {
+        width: calc(100vw - 30px); /* Chiếm gần hết màn hình, chừa 15px mỗi bên */
+        right: 15px;
+        left: 15px;
+        bottom: 130px; /* Đẩy lên cao hơn để không che launcher */
+        height: 60vh;
+        max-height: calc(100vh - 160px);
+    }
+
     .quick-replies {
         display: grid;
-        grid-template-columns: repeat(2, 1fr); /* Chia 2 cột đều nhau */
+        grid-template-columns: repeat(2, 1fr);
         gap: 6px;
         margin-bottom: 10px;
     }
 
-    /* Thu nhỏ nút bấm */
     .reply-btn {
-        font-size: 11px !important; /* Giảm cỡ chữ */
-        padding: 5px 8px !important; /* Giảm khoảng cách đệm */
+        font-size: 11px !important;
+        padding: 5px 8px !important;
         border-radius: 12px !important;
         line-height: 1.2;
-        min-height: 32px; /* Đảm bảo nút vẫn dễ bấm nhưng không quá to */
+        min-height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
     }
+
 
     /* Điều chỉnh khung chat để không bị quá thô */
     .chat-box {

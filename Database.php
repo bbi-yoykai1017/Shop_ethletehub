@@ -35,7 +35,7 @@ class Database
 
         try {
             $this->conn = new PDO(
-                "mysql:host={$this->host};dbname={$this->dbname};charset=utf8",
+                "mysql:host={$this->host};dbname={$this->dbname};charset=utf8mb4",
                 $this->user,
                 $this->pass
             );
@@ -44,6 +44,8 @@ class Database
                 PDO::ATTR_ERRMODE,
                 PDO::ERRMODE_EXCEPTION
             );
+            
+            $this->conn->exec("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
 
         } catch (PDOException $e) {
 

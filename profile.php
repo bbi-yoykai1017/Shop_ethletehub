@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: text/html; charset=utf-8');
 session_start();
 require_once 'Database.php';
 
@@ -20,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btn_save'])) {
     $ten = trim($_POST['ten']);
     $sdt = trim($_POST['so_dien_thoai']);
     $dia_chi = trim($_POST['dia_chi']);
+    $ngay_sinh = !empty($_POST['ngay_sinh']) ? $_POST['ngay_sinh'] : null;
 
     $stmt_old = $conn->prepare("SELECT anh_dai_dien FROM nguoi_dung WHERE id = ?");
     $stmt_old->execute([$user_id]);
@@ -36,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['btn_save'])) {
         }
     }
 
-    $sql_update = "UPDATE nguoi_dung SET ten = ?, so_dien_thoai = ?, dia_chi = ?, anh_dai_dien = ? WHERE id = ?";
-    if ($conn->prepare($sql_update)->execute([$ten, $sdt, $dia_chi, $ten_anh_db, $user_id])) {
+    $sql_update = "UPDATE nguoi_dung SET ten = ?, so_dien_thoai = ?, dia_chi = ?, ngay_sinh = ?, anh_dai_dien = ? WHERE id = ?";
+    if ($conn->prepare($sql_update)->execute([$ten, $sdt, $dia_chi, $ngay_sinh, $ten_anh_db, $user_id])) {
         $success = "Cập nhật thông tin thành công!";
         $mode = 'view';
     } else {
@@ -547,8 +549,14 @@ $initials = mb_strtoupper($initials);
                             </div>
 
                             <div class="field">
-                                <span class="field-label">Email</span>
-                                <div class="field-value muted"><?= htmlspecialchars($user['email']) ?></div>
+                                <span class="field-label">Ngày sinh</span>
+                                <?php if ($mode == 'edit'): ?>
+                                    <input type="date" name="ngay_sinh" class="field-input" value="<?= htmlspecialchars($user['ngay_sinh'] ?? '') ?>">
+                                <?php else: ?>
+                                    <div class="field-value <?= empty($user['ngay_sinh']) ? 'muted' : '' ?>">
+                                        <?= !empty($user['ngay_sinh']) ? date('d/m/Y', strtotime($user['ngay_sinh'])) : 'Chưa cập nhật' ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
 
                             <div class="field">

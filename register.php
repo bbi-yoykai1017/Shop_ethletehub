@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: text/html; charset=utf-8');
 session_start();
 require_once "Database.php";
 require_once 'model/functions.php';

@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: text/html; charset=utf-8');
 require_once 'Database.php';
 require_once 'model/functions.php';
 session_start();
@@ -409,7 +410,7 @@ if (empty($cart)) {
                                             <li><a class="dropdown-item" href="profile.php"><i
                                                         class="fas fa-user-edit me-2"></i> Hồ sơ của tôi</a></li>
                                             <li><a class="dropdown-item" href="orders.php"><i
-                                                        class="fas fa-shopping-bag me-2"></i> Đơn hàng đã mua</a></li>
+                                                        class="fas fa-shopping-bag me-2"></i> Đơn hàng </a></li>
                                             <li>
                                                 <hr class="dropdown-divider">
                                             </li>
