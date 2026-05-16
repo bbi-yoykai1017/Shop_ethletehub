@@ -108,6 +108,29 @@
             }
         }
     }
+    $co_the_tra_hang  = false;
+    $con_lai_ngay_tra = 0;
+
+    if (isset($order) && is_array($order) && $order['trang_thai'] == 'da_giao') {
+        date_default_timezone_set('Asia/Ho_Chi_Minh');
+
+        // Ưu tiên ngay_giao_hang, fallback về ngay_cap_nhat rồi ngay_dat
+        $ngay_giao_str = $order['ngay_giao_hang']
+            ?? $order['ngay_cap_nhat']
+            ?? $order['ngay_dat']
+            ?? null;
+
+        if ($ngay_giao_str) {
+            $ngay_giao_ts = strtotime($ngay_giao_str);
+            $han_tra_hang = $ngay_giao_ts + (3 * 24 * 3600); // +3 ngày
+            $bay_gio      = time();
+
+            if ($bay_gio <= $han_tra_hang) {
+                $co_the_tra_hang  = true;
+                $con_lai_ngay_tra = ceil(($han_tra_hang - $bay_gio) / 86400);
+            }
+        }
+    }
     ?>
 
     <!DOCTYPE html>
@@ -124,7 +147,7 @@
         <link rel="stylesheet" href="css/footer.css">
         <link rel="stylesheet" href="css/utilities.css">
         <link rel="stylesheet" href="css/cart.css">
-        <link rel="stylesheet" href="css/orders-responsive.css"> 
+        <link rel="stylesheet" href="css/orders-responsive.css">
         <style>
             .status-badge {
                 padding: 5px 15px;
@@ -214,7 +237,7 @@
                                         'dang_giao'      => ['label' => 'Dang giao',       'color' => '#ffffff', 'bg' => '#007bff'],  // Xanh dương
                                         'da_giao'        => ['label' => 'Da giao',         'color' => '#ffffff', 'bg' => '#28a745'],  // Xanh lá
                                         'da_huy'         => ['label' => 'Da huy',          'color' => '#ffffff', 'bg' => '#dc3545'],  // Đỏ
-                               
+
                                         'da_tra_hang'    => ['label' => 'Da tra hang',    'color' => '#ffffff', 'bg' => '#20c997'],  // Xanh ngọc
                                     ];
                                     $trang_thai_clean = trim($order['trang_thai'], "' ");
@@ -289,12 +312,22 @@
                                 <?php // ===== NÚT TRẢ HÀNG - Thêm vào đây ===== 
                                 ?>
                                 <?php if ($order['trang_thai'] == 'da_giao'): ?>
-                                    <a href="return_order.php?id=<?= $order['id'] ?>" class="btn btn-warning w-100 mt-2">
-                                        <i class="fas fa-undo-alt me-1"></i> Yêu cầu trả hàng
-                                    </a>
-                                    <small class="text-muted d-block text-center mt-1">
-                                        Được trả trong vòng 7 ngày kể từ khi nhận hàng
-                                    </small>
+                                    <?php if ($co_the_tra_hang): ?>
+                                        <a href="return_order.php?id=<?= $order['id'] ?>" class="btn btn-warning w-100 mt-2">
+                                            <i class="fas fa-undo-alt me-1"></i> Yêu cầu trả hàng
+                                        </a>
+                                        <small class="text-muted d-block text-center mt-1">
+                                            Còn <strong class="text-warning"><?= $con_lai_ngay_tra ?> ngày</strong>
+                                            để yêu cầu trả hàng
+                                        </small>
+                                    <?php else: ?>
+                                        <button class="btn btn-secondary w-100 mt-2" disabled>
+                                            <i class="fas fa-ban me-1"></i> Hết hạn trả hàng
+                                        </button>
+                                        <small class="text-danger d-block text-center mt-1">
+                                            Đã quá 3 ngày kể từ khi nhận hàng, không thể hoàn trả.
+                                        </small>
+                                    <?php endif; ?>
 
                                 <?php elseif ($order['trang_thai'] == 'cho_tra_hang'): ?>
                                     <button class="btn btn-outline-warning w-100 mt-2" disabled>
@@ -354,7 +387,7 @@
                                                         'dang_giao'      => ['label' => 'Dang giao',       'color' => '#ffffff', 'bg' => '#007bff'],  // Xanh dương
                                                         'da_giao'        => ['label' => 'Da giao',         'color' => '#ffffff', 'bg' => '#28a745'],  // Xanh lá
                                                         'da_huy'         => ['label' => 'Da huy',          'color' => '#ffffff', 'bg' => '#dc3545'],  // Đỏ
-                                                        
+
                                                         'da_tra_hang'    => ['label' => 'Da tra hang',    'color' => '#ffffff', 'bg' => '#20c997'],  // Xanh ngọc
                                                     ];
                                                     $trang_thai_clean = trim($o['trang_thai'], "' ");
