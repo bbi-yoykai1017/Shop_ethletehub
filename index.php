@@ -400,9 +400,9 @@ $displayProducts = array_slice($products, 0, 8);
                                 <button class="product-btn btn-add-cart-index" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                     <i class="fas fa-shopping-cart"></i> Thêm
                                 </button>
-                                <button class="btn-buy-now-detail  " style="background-color: #004e89 !important; color: white !important; border-radius: 5px ; font-weight: bold;" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
+                                <button class="product-btn btn-buy-now-detail btn-buy-now-home" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                     <i class="fas fa-bolt"></i>
-                                    Mua Ngay
+                                    <span>Mua ngay</span>
                                 </button>
                             </div>
                         </div>

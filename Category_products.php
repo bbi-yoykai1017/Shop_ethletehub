@@ -77,7 +77,6 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
     <link rel="stylesheet" href="css/utilities.css">
     <link rel="stylesheet" href="css/products-page.css">
     <link rel="stylesheet" href="css/products.css">
-    <link rel="stylesheet" href="css/product-detail.css">
 </head>
 
 <body>
@@ -406,9 +405,9 @@ if ($id_danhmuc > 0 && isset($categoryMap[$id_danhmuc])) {
                                             <button class="product-btn btn-add-cart-index" onclick=" window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                                                 <i class="fas fa-shopping-cart"></i> Thêm
                                             </button>
-                                            <button class="btn-buy-now-detail" onclick="window.location.href='ThanhToan.php?id=<?php echo $product['id']; ?>'">
+                                            <button class="product-btn btn-buy-now-detail" onclick="window.location.href='ThanhToan.php?id=<?php echo $product['id']; ?>'">
                                                 <i class="fas fa-bolt"></i>
-                                                Mua Ngay
+                                                <span>Mua</span>
                                             </button>
                                         </div>
                                     </div>

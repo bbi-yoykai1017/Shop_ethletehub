@@ -236,7 +236,8 @@ if (buyNowBtn) {
         }
         
         const productId = parseInt(document.querySelector('.btn-add-to-cart-detail').dataset.productId);
-        const quantity = parseInt(document.getElementById('quantity').value) || 1;
+        const quantityInput = document.getElementById('quantity');
+        const quantity = parseInt(quantityInput.value) || 1;
         
         // Chuẩn bị dữ liệu biến thể
         const sizeId = sizeBtn ? sizeBtn.dataset.sizeId : null;
@@ -244,6 +245,25 @@ if (buyNowBtn) {
         const sizeName = sizeBtn ? sizeBtn.dataset.sizeName : null;
         const colorName = colorBtn ? colorBtn.dataset.colorName : null;
         
+        // Kiểm tra nếu có badge "Hết hàng" (server-rendered)
+        const outOfStockBadge = document.querySelector('.stock-status-badge.out-of-stock');
+        if (outOfStockBadge) {
+            showNotification('Sản phẩm đã hết hàng.', 'danger');
+            return;
+        }
+
+        // Kiểm tra tồn kho dựa trên thuộc tính `max` của input số lượng
+        const maxStock = parseInt(quantityInput.max) || 99;
+        if (maxStock === 0) {
+            showNotification('Sản phẩm đã hết hàng.', 'danger');
+            return;
+        }
+
+        if (quantity > maxStock) {
+            showNotification('Số lượng yêu cầu vượt quá tồn kho (' + maxStock + '). Vui lòng điều chỉnh.', 'danger');
+            return;
+        }
+
         // DISABLE BUTTON NGAY LẬP TỨC
         isBuyingNow = true;
         this.disabled = true;

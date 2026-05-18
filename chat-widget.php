@@ -411,15 +411,16 @@ $co_san_pham = isset($sp) && $sp;
 
             card.className = 'cw-sp-card';
 
-            // FIX LINK
-            card.href = '/product-detail.php?id=' + sp.id;
+            card.href = './product-detail.php?id=' + encodeURIComponent(sp.id);
 
             const gia = parseInt(sp.gia || 0).toLocaleString('vi-VN');
 
             const giaGoc = parseInt(sp.gia_goc || 0).toLocaleString('vi-VN');
 
     
-            const hinh = './public' + sp.hinh_anh_chinh;
+            const hinh = sp.hinh_anh_chinh
+                ? './public/' + sp.hinh_anh_chinh
+                : './public/placeholder.svg';
 
             card.innerHTML = `
                 <img src="${hinh}"

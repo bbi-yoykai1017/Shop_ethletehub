@@ -71,12 +71,20 @@ function getFlashSaleProducts($conn, $flashSaleId) {
             sp.danh_muc_id,
             sp.trung_binh_sao,
             sp.so_luong_danh_gia,
-            ROUND((1 - fsp.gia_giam_gia / sp.gia) * 100) as phan_tram_giam
+            ROUND((1 - fsp.gia_giam_gia / sp.gia) * 100) as phan_tram_giam,
+            COALESCE(stock.tong_ton_kho, 0) AS tong_ton_kho
         FROM flash_sale_products fsp
         JOIN san_pham sp ON fsp.san_pham_id = sp.id
+        JOIN (
+            SELECT san_pham_id, SUM(so_luong_ton) AS tong_ton_kho
+            FROM bien_the_san_pham
+            WHERE trang_thai = 1
+            GROUP BY san_pham_id
+        ) stock ON stock.san_pham_id = sp.id AND stock.tong_ton_kho > 0
         WHERE fsp.flash_sale_id = ?
         AND fsp.trang_thai = 1
         AND sp.trang_thai = 1
+        AND (fsp.so_luong_gioi_han IS NULL OR fsp.so_luong_gioi_han = 0 OR fsp.so_luong_da_ban < fsp.so_luong_gioi_han)
         ORDER BY fsp.so_luong_da_ban DESC
     ";
     
@@ -148,9 +156,18 @@ function isProductInCurrentFlashSale($conn, $productId) {
         SELECT fsp.* 
         FROM flash_sale_products fsp
         JOIN flash_sale fs ON fsp.flash_sale_id = fs.id
+        JOIN san_pham sp ON sp.id = fsp.san_pham_id
+        JOIN (
+            SELECT san_pham_id, SUM(so_luong_ton) AS tong_ton_kho
+            FROM bien_the_san_pham
+            WHERE trang_thai = 1
+            GROUP BY san_pham_id
+        ) stock ON stock.san_pham_id = fsp.san_pham_id AND stock.tong_ton_kho > 0
         WHERE fsp.san_pham_id = ?
         AND fsp.trang_thai = 1
         AND fs.trang_thai = 1
+        AND sp.trang_thai = 1
+        AND (fsp.so_luong_gioi_han IS NULL OR fsp.so_luong_gioi_han = 0 OR fsp.so_luong_da_ban < fsp.so_luong_gioi_han)
         AND NOW() BETWEEN fs.ngay_bat_dau AND fs.ngay_ket_thuc
         LIMIT 1
     ";

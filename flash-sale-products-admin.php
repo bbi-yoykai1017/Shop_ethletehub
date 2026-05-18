@@ -24,7 +24,21 @@ if (!$flashSale) {
     exit;
 }
 
-$sql = "SELECT fsp.*, sp.ten, sp.gia FROM flash_sale_products fsp JOIN san_pham sp ON fsp.san_pham_id = sp.id WHERE fsp.flash_sale_id = ? ORDER BY fsp.id DESC";
+$sql = "
+    SELECT fsp.*, sp.ten, sp.gia, COALESCE(stock.tong_ton_kho, 0) AS tong_ton_kho
+    FROM flash_sale_products fsp
+    JOIN san_pham sp ON fsp.san_pham_id = sp.id
+    JOIN (
+        SELECT san_pham_id, SUM(so_luong_ton) AS tong_ton_kho
+        FROM bien_the_san_pham
+        WHERE trang_thai = 1
+        GROUP BY san_pham_id
+    ) stock ON stock.san_pham_id = sp.id AND stock.tong_ton_kho > 0
+    WHERE fsp.flash_sale_id = ?
+    AND fsp.trang_thai = 1
+    AND sp.trang_thai = 1
+    ORDER BY fsp.id DESC
+";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$flash_sale_id]);
 $flashSaleProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -39,7 +53,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
     $check_stmt = $conn->prepare($check_sql);
     $check_stmt->execute([$flash_sale_id, $san_pham_id]);
 
-    if ($check_stmt->rowCount() > 0) {
+    $stock_sql = "
+        SELECT sp.id, COALESCE(SUM(btsp.so_luong_ton), 0) AS tong_ton_kho
+        FROM san_pham sp
+        LEFT JOIN bien_the_san_pham btsp
+            ON btsp.san_pham_id = sp.id
+            AND btsp.trang_thai = 1
+        WHERE sp.id = ?
+        AND sp.trang_thai = 1
+        GROUP BY sp.id
+    ";
+    $stock_stmt = $conn->prepare($stock_sql);
+    $stock_stmt->execute([$san_pham_id]);
+    $stockProduct = $stock_stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$stockProduct || (int) $stockProduct['tong_ton_kho'] <= 0) {
+        $error = "Sản phẩm này đang hết hàng nên không thể thêm vào flash sale";
+    } elseif ($so_luong_gioi_han !== null && $so_luong_gioi_han > (int) $stockProduct['tong_ton_kho']) {
+        $error = "Số lượng giới hạn không được vượt quá tồn kho hiện tại (" . (int) $stockProduct['tong_ton_kho'] . " sản phẩm)";
+    } elseif ($check_stmt->rowCount() > 0) {
         $error = "Sản phẩm này đã tồn tại trong flash sale";
     } else {
         $sql = "INSERT INTO flash_sale_products (flash_sale_id, san_pham_id, gia_giam_gia, so_luong_gioi_han, trang_thai) VALUES (?, ?, ?, ?, 1)";
@@ -61,12 +93,26 @@ if (isset($_GET['delete'])) {
     }
 }
 
-$sql = "SELECT id, ten, gia FROM san_pham WHERE trang_thai = 1 ORDER BY ten ASC";
+$sql = "
+    SELECT sp.id, sp.ten, sp.gia, COALESCE(stock.tong_ton_kho, 0) AS tong_ton_kho
+    FROM san_pham sp
+    JOIN (
+        SELECT san_pham_id, SUM(so_luong_ton) AS tong_ton_kho
+        FROM bien_the_san_pham
+        WHERE trang_thai = 1
+        GROUP BY san_pham_id
+    ) stock ON stock.san_pham_id = sp.id AND stock.tong_ton_kho > 0
+    WHERE sp.trang_thai = 1
+    ORDER BY sp.ten ASC
+";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $allProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$existingProductIds = array_column($flashSaleProducts, 'san_pham_id');
+$existingSql = "SELECT san_pham_id FROM flash_sale_products WHERE flash_sale_id = ?";
+$existingStmt = $conn->prepare($existingSql);
+$existingStmt->execute([$flash_sale_id]);
+$existingProductIds = array_column($existingStmt->fetchAll(PDO::FETCH_ASSOC), 'san_pham_id');
 $availableProducts = array_filter($allProducts, function($p) use ($existingProductIds) {
     return !in_array($p['id'], $existingProductIds);
 });
